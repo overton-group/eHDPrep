@@ -1,0 +1,942 @@
+---
+title: "eHDPrep: an R package for Electronic Health Data Quality Control and Semantic Enrichment"
+author: "Tom Toner, Ian Overton"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+    extra_dependencies:
+    - underscore
+    - fancyhdr
+  knitr:::html_vignette:
+    toc: yes
+    number_sections: yes
+    link-citations: yes
+
+
+
+header-includes:
+- \usepackage{float}
+- \floatplacement{figure}{H}
+- \floatplacement{table}{H}
+- \usepackage{fancyvrb}
+- \usepackage{subcaption}
+- \usepackage{booktabs}
+- \usepackage[titles]{tocloft}
+- \usepackage{longtable}
+urlcolor: blue
+toc-title: Contents
+bibliography: references.bib
+link-citations: yes
+vignette: >
+  %\VignetteIndexEntry{Introduction to eHDPrep}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}bibliography: references.bib
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%",
+  fig.align = "center"
+)
+
+options(pillar.width = 85)
+options(pillar.max_dec_width = 3)
+options(pillar.sigfig = 2)
+```
+
+```{r setup, include=FALSE}
+library(eHDPrep)
+```
+# Quick Start
+For quality control of health datasets, there are several high-level functions in eHDPrep:
+
+1. [`import_dataset()`](#data-import) - import the dataset in .csv, .tsv, or .xlsx format.
+
+2. [`assess_quality()`](#assess-input-data-quality) - assess data quality including diagnostics.
+
+3. [`apply_quality_ctrl()`](#apply-quality-control) - apply quality control measures to the dataset.
+
+4. [`review_quality_ctrl()`](#review-of-all-quality-control) - review changes made during quality control.
+
+5. [`export_dataset()`](#data-export) - export dataset to .csv or .tsv format.
+
+eHDPrep also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment).
+
+# Introduction
+
+Data preparation is a key foundation for reliable analysis of health data, eHDPrep has been developed for this purpose. The functionality is broadly divided between two themes:
+
+-   [Quality Control] (QC)
+-   [Semantic Enrichment] (SE)
+
+Additionally, two "levels" of functions are provided:
+
+-   "High-level" functions wrap several "low-level" functions, allowing the user to perform fast, general quality control and SE. This is appropriate for inexperienced R users or those who require rapid data preparation.
+
+-   "Low-level" functions require more user interaction, but can be parameterised more extensively to accommodate specific aspects of a dataset. Some of the "low-level" functions are not provided in the "high-level" functions because they require additional user guidance; for example the merging function: `merge_cols()` (see [Merge variables]).
+
+Finally, this package is built using several packages from the [tidyverse](https://www.tidyverse.org/) and follows its structures and grammars [@wickham2019a]. Therefore, the `data` object can typically be [piped](https://magrittr.tidyverse.org/reference/pipe.html) through eHDPrep's functions which will be modified as described in the function's documentation and returned. We recommend that users have experience with `magrittr`'s pipe operator and core tidyverse packages before using eHDPrep.
+
+# Data
+
+We have created a small synthetic health dataset (a [tibble](https://tibble.tidyverse.org) named `example_data`) to demonstrate the functionality of this package. It contains 10 variables and 1000 observations and is documented in `?example_data`.
+
+```{r}
+data(example_data)
+tibble::glimpse(example_data)
+```
+
+# Quality control
+
+The quality control functions aim to assess, improve, and compare the quality of a dataset along multiple quality dimensions: completeness, validity, accuracy, consistency, and uniqueness [@roebuck2011]. A suggested workflow for quality control is shown below. The order of these steps is defined by dependency, where later steps benefit from earlier steps. Dashed lines and boxes represent optional steps.
+
+![](./images/Figure_1.png)
+
+## High level functions
+
+Quality control can be performed with little code using the high-level functions. It is suggested that the functions are applied in the order that they appear in this section.
+
+### Data Import
+
+eHDPrep provides methods to import a dataset into R from several file types where functionality from `readxl` and `readr` is wrapped into the function `import_dataset()`:
+
+```{r, eval = FALSE}
+# Not run, just examples:
+#excel  
+data <- import_dataset(file = "./dataset.xlsx", format = "excel")
+#csv
+data <- import_dataset(file = "./dataset.csv", format = "csv")
+#tsv
+data <- import_dataset(file = "./dataset.tsv", format = "tsv")
+
+```
+
+### Assess input data quality
+
+An initial assessment of a dataset's quality provides a good basis for its semantic characterisation in understanding variables which require particular attention during quality control. `assess_quality()` will return a list with three top-level elements.
+
+1.  A list of completeness measures:
+
+    i.  A tibble describing row completeness
+
+    ii. A tibble describing variable (column) completeness
+
+    iii. A bar plot showing row and variable completeness
+
+    iv. A heatmap of completeness, clustered on both axes
+
+    v. A function to ensure completeness heatmap is plotted on a blank canvas
+
+2.  A report of internal inconsistencies (requires `consis_tbl` to be provided; see [Internal Consistency] for more information).
+
+3.  A character vector of variables with no entropy (contains only one unique value; see @shannonMathematicalTheoryCommunication1948a).
+
+```{r}
+data(example_data)
+
+# create a consistency table containing consistency rules
+# below states: if a patient has a type of diabetes, they should have diabetes
+ct <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                      "diabetes_type", "diabetes", NA, "Type I", "Yes",
+                      "diabetes_type", "diabetes", NA, "Type II", "Yes") 
+
+res <- assess_quality(data = example_data, id_var = patient_id, consis_tbl = ct)
+
+res$completeness$variable_completeness
+res$completeness$row_completeness
+
+```
+
+```{r, fig.height=3, out.width = "100%"}
+res$completeness$completeness_plot
+
+```
+
+```{r, fig.height=5, out.width = "100%"}
+plot.new()
+res$completeness$completeness_heatmap
+```
+
+```{r}
+res$internal_inconsistency
+
+```
+
+```{r}
+res$vars_with_zero_entropy
+```
+
+### Apply quality control
+
+To apply quality control to a dataset in one function, as `apply_quality_ctrl()` does, it is important to ensure variables are processed appropriately according to their data type. R and eHDPrep suggest data types with `assume_var_classes()` which writes the results to a .csv file. The user can amend this externally and import back into R with `import_var_classes()`.
+
+```{r, eval = FALSE}
+
+assume_var_classes(data = example_data, out_file = "./datatypes.csv")
+
+# (user makes manual edits externally)
+
+import_var_classes(file = "./datatypes.csv")
+
+```
+
+The permitted datatypes are: `"id", "numeric", "double", "integer", "character", "factor", "ordinal", "ordinal_tstage, "ordinal_nstage", "genotype", "freetext", "logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. eHDPrep provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
+
+The data types for `example_data` are shown below:
+
+```{r, echo = FALSE}
+# create an example class_tbl object
+# note that diabetes_type is classes as ordinal and is not modified as its
+# levels are not pre-coded
+tibble::tribble(~"var", ~"datatype",
+"patient_id", "id",
+"tumoursize", "numeric",
+"t_stage", "ordinal_tstage",
+"n_stage", "ordinal_nstage",
+"diabetes", "factor",
+"diabetes_type", "factor",
+"hypertension", "factor",
+"rural_urban", "factor",
+"marital_status", "factor",
+"SNP_a", "genotype",
+"SNP_b", "genotype",
+"free_text", "freetext") -> data_types
+
+```
+
+```{r}
+data_types
+
+```
+
+Data types are modified as follows:
+
+| Data type            | Modification Summary                                         |
+| --------------------- | ------------------------------------------------------------ |
+| `id`                  | Ignored                                                      |
+| `numeric`             | Ignored                                                      |
+| `double`              | Ignored                                                      |
+| `integer`             | Ignored                                                      |
+| `ordinal`             | Ignored                                                      |
+| `logical`             | Ignored                                                      |
+| `ordinal_tstage`      | Converted to ordered factor with predetermined levels        |
+| `ordinal_nstage`      | Converted to ordered factor with predetermined levels        |
+| `factor`; `character` | *If \>2 categories:* converted to multiple variables using one-hot encoding (see [Encoding categorical data](#encode-categorical-data)). *If 2 categories, specified in `bin_cats` parameter:* converted to ordered factor with two levels (see `?encode_binary_cats`) |
+| `genotype`            | Converted to ordered factors using SNP allele frequency in the variable (see [Encoding genotype (SNP) data](#encode-genotype-snp-data)) |
+| `freetext`            | Groups of words which appear within two words each other in the variable with a minimum frequency of occurrence set by `min_freq` are converted to logical variables describing each group (see [Extract information from free text variables]) |
+
+Quality Control with the function `apply_quality_control()` is performed upon\
+the `example_data` with the following parameters (please see below):
+
+-   `data`: The dataset to be quality controlled.
+
+-   `id_var`: The variable which identifies each row. Note it is not surrounded by quotes.
+
+-   `class_tbl`: The object shown above describing variables' data types.
+
+-   `bin_cats:` A character vector showing how variables with two options should be encoded with the syntax `negative_finding = positive_finding`. If positivity/negativity is not associated with the binary categories of a variable (e.g. `rural_urban` in `example_data`) then the ordering can be arbitrarily decided.
+
+-   `min_freq`: The minimum frequency of occurrence for groups of proximal words in free-text variables. Those which meet this threshold are added as logical variables (see `?extract_freetext` and `?skipgram_append`). This is ignored if there are no free-text variables specified in `class_tbl`.
+
+```{r}
+apply_quality_ctrl(data = example_data,
+                   id_var = patient_id,
+                   class_tbl = data_types,
+                   bin_cats =c("No" = "Yes", "rural" = "urban"),
+                   min_freq = 0.6)
+
+```
+
+The variables `diabetes` and `diabetes_type` demonstrate some of the limitations of using the high-level functions which do not support variable merging due to required additional user configuration. For this dataset, we can first merge the two diabetes variables using a low-level function (see `merge_cols()` in [Merge Variables]) before `apply_quality_ctrl()` to produce a dataset with higher uniqueness. Note the data types need to be updated to include the new merged variable:
+
+```{r, echo=FALSE}
+tibble::tribble(~"var", ~"datatype",
+"patient_id", "id",
+"tumoursize", "numeric",
+"t_stage", "ordinal_tstage",
+"n_stage", "ordinal_nstage",
+"diabetes_merged", "factor",
+"hypertension", "factor",
+"rural_urban", "factor",
+"marital_status", "factor",
+"SNP_a", "genotype",
+"SNP_b", "genotype",
+"free_text", "freetext") -> data_types_diabetes_m
+```
+
+Updated `class_tbl`:
+
+```{r}
+data_types_diabetes_m
+```
+
+Quality control using low-level function, `merge_cols()`, to merge variables (see [Merge Variables]):
+
+```{r}
+require(magrittr) # for pipe: %>%
+example_data %>%
+  # first merge diabetes variables
+  merge_cols(primary_var = diabetes_type,
+             secondary_var = diabetes,
+             merge_var_name = "diabetes_merged",
+             rm_in_vars = TRUE) %>%
+  # pass data with diabetes_merged to high-level QC function
+  apply_quality_ctrl(id_var = patient_id, class_tbl = data_types_diabetes_m,
+                     bin_cats =c("No" = "Yes", "rural" = "urban")) ->
+  post_QC_example_data
+  
+  post_QC_example_data
+
+```
+
+The function `merge_cols()` may be run with the parameter `to_numeric_matrix = TRUE`, which automatically converts the dataset to numeric values, facilitated by prior encoding of any [categorical](#encode-categorical-data), [ordinal](#encode-ordinal-data), or [genotype](#encode-genotype-snp-data) data:
+
+```{r}
+example_data %>%
+  # first merge diabetes variables
+    merge_cols(primary_var = diabetes_type,
+             secondary_var = diabetes,
+             merge_var_name = "diabetes_merged",
+             rm_in_vars = TRUE) %>%
+  # pass data with diabetes_merged to high-level QC function
+  apply_quality_ctrl(id_var = patient_id, class_tbl = data_types_diabetes_m,
+                     bin_cats =c("No" = "Yes", "rural" = "urban"),
+                     # Relevant line:
+                     to_numeric_matrix = TRUE) ->
+  post_QC_example_data_m
+
+  # concise summary of output:
+  tibble::glimpse(post_QC_example_data_m)
+
+```
+
+This is useful for preparation for later analysis, including machine learning applications, or for further preparation with [Semantic Enrichment].
+
+### Review of all quality control
+
+eHDPrep provides functionality for users to review the results of quality control operations that have been applied to the input data. `review_quality_ctrl()` provides information of quality control modifications at multiple levels of detail.
+
+```{r}
+qc_review <- review_quality_ctrl(before_tbl = example_data,
+                                 after_tbl = post_QC_example_data,
+                                 id_var = patient_id)
+
+```
+
+The `variable_level_changes` list element is a tibble with variable names in the first column. The second column can contain up to three unique values describing the presence of the variable in the post-quality control dataset (Added, Removed, Preserved):
+
+```{r}
+qc_review$variable_level_changes
+```
+
+The `value_level_changes` element is a tibble which shows changes made during quality control where each row records a value modification:
+
+```{r}
+qc_review$value_level_changes
+
+# summary of above
+qc_review$value_level_changes %>% 
+  dplyr::distinct(across(!patient_id))
+```
+Note in the above that "gc" has been encoded, via [encode_genotypes()](#encode-genotype-snp-data), as "C/G" to create a standard representation of this SNP allele. Positional information for SNP allele should be recorded elsewhere, if required.
+
+The `value_level_changes_plt` element visualises the content of the `value_level_changes` element. It is a bar plot with rows on the x-axis and the proportion of each row's values which were modified (removed, substituted, or added) on the y-axis:
+
+```{r, out.width = "100%", fig.height=3}
+qc_review$value_level_changes_plt
+```
+
+This can be useful when many changes have occurred and the source table contains a large amount of data.
+
+### Data export
+
+Modified data can be exported with `export_dataset()` as either .csv or .tsv:
+
+```{r, eval = FALSE}
+#csv
+export_dataset(x = post_QC_example_data,
+               file = "./post_QC_example_data.csv",
+               format = "csv")
+#tsv
+export_dataset(x = post_QC_example_data,
+               file = "./post_QC_example_data.csv",
+               format = "tsv")
+```
+
+## Low level functions
+
+This section describes functions that can provide more granular access to the eHDPrep quality control operations. While the functionality is largely available within 'high-level' functions, directly calling low-level functions provides greater scope to adjust individual parameter values and allows for finer-grained assessment of each step in the quality control process. Operations that may only be performed using low-level functions are: `merge_cols()`, `compare_info_content()`, `compare_info_content_plt()` (see [Merge variables]).
+
+### Measure completeness
+
+Completeness in variables and rows can be calculated in tibbles and visualised in a bar plot as shown below:
+
+```{r, fig.height=3}
+variable_completeness(example_data)
+
+row_completeness(data = example_data, id_var = patient_id)
+
+plot_completeness(data = example_data, id_var = patient_id, plot = "variables")
+
+plot_completeness(data = example_data, id_var = patient_id, plot = "rows")
+
+```
+
+<!-- ------------------------------------------------------------------------ -->
+
+An overview of the dataset completeness is generated by `completeness_heatmap()` which utilises `pheatmap` [@kolde2019]. Additional parameters are passed to `pheatmap()` through `...` (see `?pheatmap` for all options). Additional parameters are supplied in creating the heatmap below where the row names are hidden because they clutter the plot. The completeness\
+heatmap may be useful for identifying structural patterns in the missingness, for example\
+indicative of non-random missingness.There are three underlying methods which are used to encode the data so that non-numeric data can be visualised:
+
+1.  (Default). Missing values are numerically encoded with a highly negative number, numerically distant from all values in data. Non-missing values in categorical variables are replaced with the number of unique values in the variable. Clustering uses these values. Cells are coloured by presence (yellow = missing; blue = present).
+2.  Same as 1 but cells are coloured by the values input to the clustering algorithm (instead of missing or present).
+3.  Boolean values are used for clustering (present values = 1; missing values = 0). Cells are coloured by presence (yellow = missing; blue = present).
+
+```{r}
+# show_rownames is pased to pheatmap() through ...
+completeness_heatmap(data = strings_to_NA(example_data),
+                     id_var = patient_id, 
+                     show_rownames = F)
+```
+
+Variable-level annotations can be provided with the `annotation_tbl` parameter to further characterise completeness patterns. Below, the `data_types` tibble is used:
+
+```{r}
+completeness_heatmap(data = strings_to_NA(example_data),
+                     id_var = patient_id, 
+                     show_rownames = FALSE,
+                     annotation_tbl = data_types)
+
+```
+
+<!-- ------------------------------------------------------------------------ -->
+
+Comparison of dataset completeness before and after quality control is available using the\
+`compare_completeness()` function. The plot below reveals a decrease in reported\
+completeness following quality control because the input `example_data` encoded\
+missingness as strings (for example 'not recorded') which were converted to `NA` values\
+during quality control.
+
+```{r, fig.height=3}
+compare_completeness(tbl_a = example_data, tbl_b = strings_to_NA(example_data),
+                     dim = 1, tbl_a_lab = "example_data",
+                     tbl_b_lab = "strings_to_NA(\nexample_data\n)")
+```
+
+### Internal consistency
+
+Relationships between the values of different, but related, variables for a given patient\
+may be used to define rules that identify internal inconsistencies. For example the\
+number_of_lymph_nodes examined should be greater than or equal to the\
+number_of_positive_lymph_nodes. `identify_inconsistency()` can test pairs of variables in multiple ways:
+
+1.  Logical operators (`<`, `<=`, `==`, `!=`, `>=`, `>`)
+
+2.  Comparing permitted categories (e.g. cat1 in varA only if cat2 in varB)
+
+3.  Comparing permitted numeric ranges (e.g. 20-25 in varC only if 10-20 in varD
+
+4.  Mixtures of 2 and 3 (e.g. cat1 in varA only if 20-25 in varC)
+
+The internal consistency tests rely on such rules being specified in a separate data frame (argument: `consis_tbl`). An example of this type of table is shown below. Column headers are not important but column order is important. See `?validate_consistency_tbl` for all requirements.
+
+```{r}
+example_incon_rules <-  tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                                        "diabetes_type", "diabetes", NA, "Type I", "Yes",
+                                        "diabetes_type", "diabetes", NA, "Type II", "Yes"
+                                        )
+example_incon_rules
+```
+
+These rules are interpreted as:
+
+-   in rows where `diabetes_type` equals `Type I`, `diabetes` should equal `Yes`.
+-   in rows where `diabetes_type` equals `Type II`, `diabetes` should equal `Yes`.
+
+Note: The order of variables in each row is important here, switching `diabetes` and `diabetes_type` in the first row of `example_incon_rules` would be interpreted as where `diabetes` equals `Yes`, `diabetes_type` should always equal `Type I`.
+
+This format of a user-defined consistency table should be validated as shown below:
+
+```{r}
+# validate the consistency rule table
+validate_consistency_tbl(data = example_data, consis_tbl = example_incon_rules)
+```
+
+The tests are run against the data and all instances (rows). When no inconsistencies are found, a confirmatory message is returned along with the data (invisibly). However, when inconsistencies are found, a warning is thrown and a table detailing the inconsistencies is returned:
+
+```{r}
+identify_inconsistency(data = example_data, consis_tbl = example_incon_rules)
+```
+
+The first five columns represent the rules set in `consis_tbl`. The additional columns describe:
+
+6.  The inconsistent row(s)
+7.  The value in the variable reported in column 1
+8.  The value in the variable reported in column 2 (inconsistent with the corresponding value in the variable in column 1, given the rules in `consis_tbl`).
+
+### Merge variables
+
+Merging variables can improve the uniqueness and completeness of the dataset, also reducing its dimensionality. In `example_data`, `diabetes` and `diabetes_type` record observations of the same disease at different levels and are merged below:
+
+```{r}
+merge <- merge_cols(data = example_data,
+                    primary_var = diabetes_type,
+                    secondary_var = diabetes,
+                    merge_var_name = "diabetes_merged")
+
+```
+
+By default, the input variables (e.g. `diabetes` and `diabetes_type`) are preserved. They can be removed with the parameter `rm_in_vars = TRUE`.
+
+`compare_info_content` and `compare_info_content_plt` can support merging strategies by identifying when a pairwise merge operation results in loss of information:
+
+```{r, fig.height=5}
+merge_IC <- compare_info_content(input1 = merge$diabetes,
+                                 input2 = merge$diabetes_type,
+                                 composite = merge$diabetes_merged)
+
+merge_IC
+
+compare_info_content_plt(compare_info_content_res = merge_IC)
+```
+
+In the above bar chart, the variable `diabetes` has higher information content than its mutual information with the output variable; shown in the bars for `merge$diabetes`. Therefore information loss has occurred in the merge operation, due to two features of the input variables (`diabetes_type` and `diabetes`). Firstly missing values in `diabetes` are represented as "missing". Secondly there is an internal inconsistency where `diabetes` is recorded as "No" but `diabetes_type` is recorded as "Type 1". This example reveals that additional preprocessing is required before the variable merge can be successfully achieved.
+
+### Encoding missing values
+
+Missing values can be recorded in several ways (e.g. "unknown", "missing"). R uses `NA` as a standard representation of missing values which allows for the user and packages to process them appropriately (e.g. `mean(x, na.rm = T)`).
+
+eHDPrep can convert values representing missingness to NA with two functions:
+
+-   `strings_to_NA()` will encode a series of predefined strings which represent missingness or specific strings specified in the argument `strings_to_replace` as `NA`.
+
+    -   predefined strings: "Undetermined", "unknown", "missing", "fail", "fail / unknown", "equivocal", "equivocal / unknown", "\*"
+
+-   `nums_to_NA()` will replace (only) numbers specified in `nums_to_replace` with `NA` in numeric variables.
+
+```{r}
+# default values
+example_data_NAs1 <- strings_to_NA(data = example_data)
+
+# predefined value "equivocal" is removed
+unique(example_data_NAs1$t_stage)
+
+# custom values (T1 does not represent missingness, just used as an example)
+example_data_NAs2 <-strings_to_NA(data = example_data,
+                                  strings_to_replace = "T1")
+
+# custom value "T1" is removed
+unique(example_data_NAs2$t_stage)
+
+# numeric value is removed in patient_id
+nums_to_NA(data = example_data, patient_id, nums_to_replace = c(1,3))
+
+```
+
+### Encoding categorical data {#encode-categorical-data}
+
+Categorical (nominal) data can present problems when analysed; either resulting in an error or improper analysis; for example, treating the relationships between categories as if they were ordinal. To combat this, `encode_cats()` utilises one hot encoding and creates a new variable for each unique value in the input categorical variable. The values in each new variable describe the presence of the unique value where 1 means present and 0 means not present. This is demonstrated below with `marital_status`.
+
+```{r}
+encode_cats(data = example_data, marital_status) %>%
+  dplyr::select(dplyr::starts_with("marital_status"))
+
+```
+
+### Encoding ordinal data {#encode-ordinal-data}
+
+The relationships in ordinal variables can be encoded numerically while preserving the labels in R with 'ordered factors' using `encode_ordinals()`. The numeric relations can later be extracted if fully numeric variables are required. The `ord_levels` parameter should describe the order of categories in ascending order:
+
+```{r}
+example_data %>%
+  encode_ordinals(ord_levels = c("N0","N1","N2"), n_stage) %>%
+  dplyr::select(n_stage)
+
+# demonstrating how ordered factors can be converted to numeric vectors
+example_data %>%
+  encode_ordinals(ord_levels = c("N0","N1","N2"), n_stage) %>%
+  dplyr::select(n_stage) %>%
+  dplyr::mutate(dplyr::across(n_stage, as.numeric))
+```
+
+### Encoding genotype (SNP) data {#encode-genotype-snp-data}
+
+In `encode_genotypes()`, variables which record single nucleotide polymorphism (SNP) information are standardised to a "A/B" syntax. Homozygous SNPs (e.g. recorded as "A") are encoded in two character form (e.g. "A/A") while heterozygous SNPs are ordered alphabetically (e.g. "GA" becomes "A/G"). Alleles are encoded as ordinal factors, ordered by observed allele frequency (in the supplied cohort). The most frequent allele is assigned level 1, the second most frequent value is assigned level 2, and the least frequent values is assigned level 3). This method embeds the numeric relationship between the allele frequencies while preserving value labels.
+
+```{r}
+encode_genotypes(data = example_data, SNP_a, SNP_b) %>%
+  dplyr::select(dplyr::starts_with("SNP"))
+```
+
+### Extract information from free text variables
+
+Medical notes and other free text variables can contain additional information but require Natural Language Processing (NLP). Information on the presence of words, phrases, or groups of proximal words can be extracted with the functionality below; utilising the Quanteda package [@benoit2018]. A knowledge of NLP terminology can be beneficial however the crucial term for this functionality is 'skipgram' which, in this context, is a series of words in a string which can have interrupting words ('skips') between them (see examples in `?quanteda::tokens_skipgrams`). The high-level function `extract_freetext()` can be applied to extract skipgrams in free text variables by their frequency.
+
+There are three underlying stages of extracting skipgrams:
+
+1.  Identify skipgrams in a character variable (`skipgram_identify()`). The variable is also preprocessed here where:
+
+    -   Punctuation, numbers, symbols, stop-words (see `?tm::stopwords`) are removed.
+
+    -   Text is standardised to lower case
+
+    -   Words are stemmed (see `?quanteda::tokens_wordstem`).
+
+2.  Measure skipgram frequency across the variable (`skipgram_freq()`)
+
+3.  Append specified skipgrams to dataset as logical variables (`skipgram_append()`)
+
+In medical notes, a clear signal may appear where certain skipgrams provide information suitable for analysis. The variable `free_text` in `example_data` comprises sample sentences from `stringr::sentences`. While these are not medical notes they are established examples of short pieces of text. As `free_text` does not contain true signals, we set generous parameters below: The number of interrupting words is set to five in the example below (`max_interrupt_words = 5`) however values of one or two are more likely to be useful in real-world applications. Additionally, the minimum frequency of skipgrams across the cohort to consider (`min_freq = 0.5`) is used below although 5 or 10 may be more suitable with real data. Ultimately, user evaluation and tuning is required.
+
+```{r}
+# Identify skipgrams in example_data$free_text
+skipgrams <- skipgram_identify(x = example_data$free_text,
+                  ids = example_data$patient_id,
+                  num_of_words = 2,
+                  max_interrupt_words = 5)
+skipgrams
+
+# Summarise frequency of skipgrams to consider which should be added to the
+# data.
+skipgram_freq(skipgram_tokens = skipgrams, min_freq = 0.5)
+
+# Append chosen skipgrams to example_data
+## a) by minimum frequency
+skipgram_append(skipgram_tokens = skipgrams,
+                id_var = patient_id,
+                min_freq = 0.6,
+                data = example_data)
+
+## b) by specific skipgram(s)
+skipgram_append(skipgram_tokens = skipgrams,
+                id_var = patient_id,
+                skipgrams2append = c("sixteen_week", "bad_strain"),
+                data = example_data)
+
+
+```
+
+The high-level function `extract_freetext()` is a wrapper for the low-level functions in the\
+above example. However use of `extract_freetext()` is limited to appending skipgrams by\
+minimum frequency and selection of skipgrams by name to append is not possible\
+because they are not defined at the point the `extract_freetext()` function is called.:
+
+```{r}
+extract_freetext(data = example_data,
+                 id_var = patient_id,
+                 min_freq = 0.6, free_text)
+```
+
+### Review quality control
+
+Quality control modifications may have unintended effects on the data which could remain undetected until later stages of analysis. `count_compare()` can avoid this situation by reporting changes at each step and reporting a tally of values in relevant variables. The code below uses the earlier variable merging operation ([Merge Variables]) as an example:
+
+```{r}
+# merge data
+example_data_merged <- merge_cols(data = example_data,
+                                  primary_var = diabetes_type,
+                                  secondary_var = diabetes,
+                                  merge_var_name = "diabetes_merged",
+                                  rm_in_vars = T)
+
+# review this step's effects on the involved variables:
+count_compare(before_tbl = example_data,
+          after_tbl = example_data_merged,
+          cols2compare = c("diabetes", "diabetes_type", "diabetes_merged"),
+          kableout = F)
+```
+
+Documentation of quality control modifications is important for writing methodology and summarising changes. The remaining quality control review functions are intended for review once all quality control has been implemented, as in [Review quality control], but can be used at any point; as below with `report_var_mods()` and `mod_plot()` comparing the merging operation example and a `strings_to_NA()` example with the original data:
+
+```{r, fig.height=3}
+#variable level modifications
+report_var_mods(before_tbl = example_data,
+                after_tbl = example_data_merged)
+
+# value level modifications showing which exact missingness values
+# were removed
+mod_track(before_tbl = example_data,
+          after_tbl = strings_to_NA(example_data), 
+          id_var = patient_id)
+
+# plot value level modifications
+mod_track(before_tbl = example_data,
+          after_tbl = strings_to_NA(example_data),
+          id_var = patient_id, plot = T)
+
+```
+
+`mod_track()` with `plot = TRUE` can visualise the extent and any disparity of value modification within the dataset.
+
+### Encoding data as numeric matrix
+
+As a late or final quality control step, the dataset may be converted to a numeric matrix for future analysis. This will require many of the earlier steps, such as encoding categorical variables (see [Encoding categorical data](#encode-categorical-data)), to be completed. `encode_as_num_mat()` will convert all columns to numeric and use the row identifier column (`id_var`) as row names:
+
+```{r}
+# example of data which has been quality controlled.
+example_data %>%
+  merge_cols(primary_var = diabetes_type,
+             secondary_var = diabetes,
+             merge_var_name = "diabetes_merged",
+             rm_in_vars = TRUE) %>%
+  apply_quality_ctrl(id_var = patient_id,
+                     class_tbl = data_types_diabetes_m,
+                     bin_cats =c("No" = "Yes", "rural" = "urban"),
+                     min_freq = 0.6) ->
+  post_qc_data
+
+post_qc_data %>%
+  encode_as_num_mat(id_var = patient_id) %>%
+  tibble::glimpse()
+
+```
+
+Note that the text labels in ordinal variables will be removed in the above conversion to a numeric matrix. The mapping between the text labels and the numerical levels can be extracted to another data frame for future reference using `ordinal_label_levels()`, as below:
+
+```{r}
+post_qc_data %>%
+  ordinal_label_levels()
+
+```
+
+# Semantic enrichment
+
+Data frames are semantically disorganised because no information on the semantic relationships between variables is present. Biomedical ontologies contain extensive semantic information between concepts across medical domains. The semantic commonalities of a dataset's variables can be incorporated with semantic enrichment (SE). The added information may improve performance of later analysis. An overview of the workflow for SE is shown below where the "Normalise Values" box is dashed as it is an optional step:
+
+![](./images/Figure_6.png "semantic enrichment workflow")
+
+## Required inputs
+
+SE requires three input objects:
+
+1.  A numeric dataset (data frame or matrix).
+
+    -   All variables must be numeric because SE attempts to aggregate values.
+
+2.  An ontology in R as a `igraph` or `tidygraph` object.
+
+    -   `example_ontology` is a synthetic ontology we have created to demonstrate the semantic commonalities in `example_data`.
+
+    -   At present, users must supply an ontology themselves. There are several potential ontologies for health data including SNOMED CT, the Gene Ontology, the Disease Ontology, and the Human Phenotype Ontology [@millar2016; @geneontologyconsortium2019; @schriml2019; @köhler2021].
+
+3.  A mapping file (csv or data frame) which links variables in the data with entities in the ontology.
+
+    -   `example_mapping_file` is used to demonstrate SE here.
+    -   The variable name must not be identical to the ontological entity to which it is mapped (e.g. variable `hypertension` cannot be mapped to a ontological entity `hypertension`). This is not typically a problem as most ontologies use a numeric naming system unlikely to be used for variable names.
+
+## Example data
+
+Examples of the three required inputs, described above, are provided with this package.
+
+1.  Because SE requires a numeric dataset, quality control is applied to `example_data`:
+
+```{r, eval=T}
+example_data %>%
+  # first merge diabetes variables
+  merge_cols(primary_var = diabetes_type,
+             secondary_var = diabetes,
+             merge_var_name = "diabetes_merged",
+             rm_in_vars = TRUE) %>%
+  # pass data with diabetes_merged to high-level QC function
+  apply_quality_ctrl(id_var = patient_id,
+                     class_tbl = data_types_diabetes_m,
+                     bin_cats =c("No" = "Yes", "rural" = "urban"),
+                     to_numeric_matrix = TRUE) ->
+  post_qc_data
+
+```
+
+2.  The example ontology containing the semantic information of variables in `example_data` is stored in `example_ontology` as a tidygraph `tbl_graph` object:
+
+```{r}
+data(example_ontology)
+example_ontology
+```
+
+`example_ontology` is visualised in the network graph below:
+
+```{r, out.width = "100%"}
+require(ggplot2)
+ggraph::ggraph(example_ontology, layout = "sugiyama") +
+    ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
+                       colour = "slategray3") +
+    ggraph::geom_node_label(aes(label = name),
+                            size = 2.5, repel = FALSE, hjust="inward") +
+    theme_void() +
+    theme(legend.position = "none") +
+    coord_flip()
+
+```
+
+3.  The example mapping file, as a data frame, is as follows:
+
+```{r}
+data(example_mapping_file)
+example_mapping_file
+
+```
+
+## High level functionality
+
+With the three inputs (`data`, `ontology`, and `mapping_file`) supplied, the semantic enrichment of `post_qc_data` can completed with `semantic_enrichment()`:
+
+```{r, warning=F}
+qc_se_data <- semantic_enrichment(data = post_qc_data,
+                                  ontology = example_ontology,
+                                  mapping_file = example_mapping_file,
+                                  mode = "in",
+                                  root = "root")
+```
+
+Below is an overview of the enriched dataset with semantic aggregations:
+
+```{r}
+tibble::glimpse(qc_se_data)
+```
+
+Below is an example of how the variables `tumoursize`, `t_stage,` and `n_stage`, which all relate to cancer, have this relationship recognised through their semantic commonality of `property_of_cancer` in `example_ontology`:
+
+```{r}
+qc_se_data %>%
+  dplyr::select(tumoursize, t_stage, n_stage,
+                dplyr::starts_with("MV_property_of_cancer")) %>%
+                tibble::glimpse()
+```
+
+Note:
+
+-   The normalisation of values prevents `tumoursize`'s large magnitude (relative to the other variables) having a disproportional effect on the aggregations.
+
+-   The prefix "MV\_" stands for "meta-variable".
+
+```{r, echo = F}
+# Some summary stats of SE
+
+# number of aggregations
+qc_se_data %>%
+  dplyr::select(dplyr::starts_with("MV_")) %>%
+  length() ->
+  num_aggs
+
+# number of meta-variables used (not above / 5 because of zero entropy vars)
+qc_se_data %>%
+  dplyr::select(dplyr::starts_with("MV_")) %>%
+  names() %>%
+  substr(.,4,nchar(.)-4) %>%
+  unique() %>%
+  length() ->
+  num_MVs
+```
+
+In summary, the SE process added `r num_aggs` aggregation variables to the dataset from `r num_MVs` meta-variables.
+
+## Low level functionality
+
+There are some exported lower level functions which users may find useful to see the intermediate steps of SE. The should be carried out in the order shown below:
+
+### Join ontology and data variable names
+
+Nodes representing variable names in the dataset can be joined to the ontology to which they have been mapped with `join_vars_to_ontol()`. Prior to joining, this function calculates the information content of each ontological entity using the equation below, developed by @zhou2008:
+
+$$
+IC(c) = k(1-\frac{\log(hypo(c)+1)}{\log({node_{\max}})})+(1-k)(\frac{\log(deep(c)}{log({deep_{\max}})})
+$$
+
+Where $c$ is an ontological entity in `ontol_graph`, $hypo(c)$ is the number of hyponyms (descendants) of $c$, ${node_{\max}}$ is the total number of ontological entities in `ontol_graph`, $deep(c)$ is the depth of $c$ (distance from `root`), ${deep_{\max}}$ is the maximum depth in `ontol_graph`, and $k$ is an adjustable factor to adjust the weight of the two terms (default = 0.5); a higher $k$ value will reduce the importance/impact of $c$'s relative depth in the ontology.
+
+```{r}
+joined_nw <- join_vars_to_ontol(ontol_graph = example_ontology,
+                                var2entity_tbl = example_mapping_file,
+                                root = "root", k = 0.5)
+```
+
+This network, with the variable names added as nodes, can be visualised as below. The `node_category` node attribute can be used to colour the nodes:
+
+```{r, out.width = "100%", fig.width=11}
+ggraph::ggraph(joined_nw, layout = "sugiyama") +
+    ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
+                       colour = "slategray3") +
+    ggraph::geom_node_label(aes(
+      label = name, color = node_category), size = 2.5,
+      repel = F, hjust="inward") +
+    theme_void() +
+    scale_color_brewer(palette = "Set2") +
+    coord_flip() +
+    theme(legend.position = c(0.08, 0.85))
+    
+```
+
+Node information content can be visualised, as below. Information content is not calculated for dataset variables because they are not part of the original ontology, therefore their node size is 0. This visualisation helps demonstrate how nodes/concepts further down the ontology are more informative than those higher up.
+
+This calculation benefits SE as the common ancestor of a set of variable nodes with the highest information content is chosen to label the group. In the middle branch from the root node, there are two annotation ancestor nodes which are multiple common ancestors of two variables (`SNP_a` and `SNP_b`). The node with the higher information content, `pathway_1`, is chosen to label the semantic commonality between these variables over the less informative node, `metabolic_pathway`.
+
+```{r, out.width = "100%", fig.width=9, warning=FALSE}
+ggraph::ggraph(joined_nw, layout = "sugiyama") +
+    ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
+                       colour = "slategray3") +
+    ggraph::geom_node_point(aes(
+      color = node_category, size = information_content)) +
+    ggraph::geom_node_label(aes(
+      label = round(information_content,2),
+      color = node_category),  size = 2.5, hjust="inward") +
+    scale_color_brewer(palette = "Set2") +
+    theme_void() +
+    coord_flip()
+```
+
+### Compute meta-variable information
+
+"Meta-variable" is defined here as an ontological entity which is the most informative common ancestor of two or more variables in the joined network. Meta-variables are identified in `metavariable_info()` by first determining the unique sets of variable nodes which are descendants of ontological nodes. The information content (IC, calculated above) of nodes which share the same set of variable descendants is compared and the node with the highest IC is used to label the set.
+
+`example_ontology` links variable nodes in `joined_nw` to identify nine sets, shown in the graph below:
+
+```{r}
+example_ontology %>%
+  join_vars_to_ontol(var2entity_tbl = example_mapping_file, root = "root") %>%
+  metavariable_info() ->
+  metavariables_nw
+```
+
+```{r out.width="100%", fig.width=9}
+metavariables_nw %>%
+  # annotations are also considered a set. This isn't helpful for this visualisation
+  # Therefore, the sets of non-meta-variables are removed below
+  tidygraph::mutate(variable_set = ifelse(!is_metavariable, NA, variable_set)) %>%
+  tidygraph::mutate(variable_set = as.factor(variable_set)) %>%
+  ggraph::ggraph(layout = "sugiyama") +
+    ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
+                       colour = "slategray3") +
+    ggraph::geom_node_label(aes(label = ifelse(is_metavariable, 
+                                       as.factor(as.numeric(variable_set)),
+                                       name),
+                        color = ifelse(is_metavariable, 
+                                       as.character(as.numeric(variable_set)),
+                                       node_category)),
+                    repel = F, size = 2.5, hjust="inward") +
+    theme_void() +
+    theme(legend.position = "none") +
+    coord_flip()
+```
+
+Note how variable sets 5 and 8 each have two nodes which share the same set of variables. The information content, calculated during `join_vars_to_ontol()`, of these nodes is compared and the node with the highest information content is used to label the set.
+
+### Generate semantic aggregations
+
+With the sets of variables identified and the meta-variable used to label each set confirmed, the next step is to perform the aggregations. This functionality requires the previously described low-level SE functions and is overlaps with the `semantic_enrichment()` function, but does not carry out some of the checks.
+
+```{r}
+example_ontology %>%
+    join_vars_to_ontol(var2entity_tbl = example_mapping_file, root = "root") %>%
+    metavariable_info() %>%
+    metavariable_agg(data = post_qc_data) ->
+    qc_se_data
+
+## summary of output
+tibble::glimpse(qc_se_data)
+
+```
+
+# References

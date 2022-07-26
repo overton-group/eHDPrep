@@ -1,0 +1,78 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# eHDPrep
+
+<!-- badges: start -->
+
+<!-- badges: end -->
+
+The goal of eHDPrep is to provide robust quality control and semantic enrichment tools for preparation of health datasets. High-level and low-level functionality are included for general and specialist R users, respectively. A detailed vignette can be accessed using: `vignette("Introduction_to_eHDPrep", package = "eHDPrep")`.
+
+## Installation
+
+You can install the released version of eHDPrep from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("eHDPrep")
+```
+
+## Example
+
+eHDPrep can prepare health data for analysis with several approaches. For example, standardising strings representing missing values to `NA`:
+
+```{r example}
+library(eHDPrep)
+data("example_data")
+
+# original values in t_stage variable
+unique(example_data$t_stage)
+
+# predefined value "equivocal" is removed
+unique(eHDPrep::strings_to_NA(example_data, strings_to_replace = "equivocal")$t_stage)
+
+
+```
+
+## System Requirements
+
+Some additional system dependencies are required for eHDPrep. These are detailed below:
+
+### Ubuntu
+
+```{r ubuntu-req}
+remotes::system_requirements(".", os = "ubuntu", os_release = "18.04")
+remotes::system_requirements(".", os = "ubuntu", os_release = "20.04")
+```
+
+### Opensuse
+
+```{r opensuse-req}
+remotes::system_requirements(".", os = "opensuse", os_release = "42.3")
+```
+
+### CentOS
+
+```{r centos-req}
+remotes::system_requirements(".", os = "centos", os_release = "7")
+remotes::system_requirements(".", os = "centos", os_release = "8")
+```
+
+### Red Hat
+
+```{r redhat-req}
+remotes::system_requirements(".", os = "redhat", os_release = "7")
+remotes::system_requirements(".", os = "redhat", os_release = "8")
+```
