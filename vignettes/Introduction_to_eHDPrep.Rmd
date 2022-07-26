@@ -8,13 +8,6 @@ output:
     extra_dependencies:
     - underscore
     - fancyhdr
-  knitr:::html_vignette:
-    toc: yes
-    number_sections: yes
-    link-citations: yes
-
-
-
 header-includes:
 - \usepackage{float}
 - \floatplacement{figure}{H}
