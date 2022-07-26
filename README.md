@@ -21,6 +21,13 @@ You can install the released version of eHDPrep from
 install.packages("eHDPrep")
 ```
 
+Or from [GitHub](https://github.com) with:
+
+``` r
+install.packages("devtools")
+devtools::install_github("overton-group/eHDPrep")
+```
+
 ## Example
 
 eHDPrep can prepare health data for analysis with several approaches.
