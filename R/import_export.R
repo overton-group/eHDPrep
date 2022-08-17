@@ -38,7 +38,7 @@
 #' @seealso \code{\link[readxl]{read_excel}} for additional parameters for
 #'   importing .xls or .xlsx files, \code{\link[readr]{read_csv}} for .csv
 #'   files, \code{\link[readr]{read_tsv}} for .tsv files
-#' @family import to/export from \R functions
+#' @family import to/export from R functions
 #' @export
 #' @examples
 #' \dontrun{
@@ -193,7 +193,7 @@ select_by_datatype <- function(class_tbl, extract_class, negate = FALSE) {
 #' @inheritParams readr::write_csv
 #' @importFrom readr write_csv write_tsv
 #' @seealso \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
-#' @family import to/export from \R functions
+#' @family import to/export from R functions
 #' @export
 
 export_dataset <- function(x, file, format = "csv", ...) {
