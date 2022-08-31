@@ -444,6 +444,7 @@ metavariable_info <- function(graph, mode = "in") {
 #'   prefixed with "MV_" and suffixed by their aggregation function (e.g. "_SUM").
 #' @export
 #' @examples
+#' \dontrun{
 #' require(magrittr)
 #' require(dplyr)
 #' data(example_ontology)
@@ -481,7 +482,8 @@ metavariable_info <- function(graph, mode = "in") {
 
 #' 
 #' # summary of result:
-#' tibble::glimpse(res) 
+#' tibble::glimpse(res)
+#' }
 metavariable_agg <- function(graph, data, label_attr ="name", normalize_vals = TRUE) {
   start_time <- Sys.time()
   start_ncol <- ncol(data)

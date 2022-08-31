@@ -60,6 +60,7 @@ A warning may be shown regarding the '.add' argument being deprecated, this is
   an effect on the functionality of eHDPrep.
 }
 \examples{
+\dontrun{
 require(tibble)
 
 data(example_data)
@@ -92,7 +93,7 @@ example_data \%>\%
  res <- semantic_enrichment(post_qc_data, example_ontology,
  example_mapping_file, root = "root")
  # see Note section of documentation for information on possible warnings.
-
+}
 }
 \seealso{
 Other high level functionality: 

@@ -50,6 +50,7 @@ A warning may be shown regarding the '.add' argument being deprecated, this is
   an effect on the functionality of eHDPrep.
 }
 \examples{
+\dontrun{
 require(magrittr)
 require(dplyr)
 data(example_ontology)
@@ -86,7 +87,8 @@ example_ontology \%>\%
  # see Note section of documentation for information on possible warnings.
 
 # summary of result:
-tibble::glimpse(res) 
+tibble::glimpse(res)
+}
 }
 \seealso{
 Other semantic enrichment functions: 

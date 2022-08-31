@@ -439,6 +439,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' require(tibble)
 #' 
 #' data(example_data)
@@ -471,7 +472,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #'  res <- semantic_enrichment(post_qc_data, example_ontology,
 #'  example_mapping_file, root = "root")
 #'  # see Note section of documentation for information on possible warnings.
-#' 
+#' }
 semantic_enrichment <- function(data, ontology, mapping_file, mode = "in", root, ...) {
   
   # accept both paths and R data frames for mapping_file
