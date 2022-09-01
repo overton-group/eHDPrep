@@ -50,7 +50,6 @@ A warning may be shown regarding the '.add' argument being deprecated, this is
   an effect on the functionality of eHDPrep.
 }
 \examples{
-\dontrun{
 require(magrittr)
 require(dplyr)
 data(example_ontology)
@@ -72,14 +71,26 @@ tibble::tribble(~"var", ~"datatype",
 "free_text", "freetext") -> data_types
 
 # create post-QC data
-example_data \%>\% 
+example_data \%>\%
   merge_cols(diabetes_type, diabetes, "diabetes_merged", rm_in_vars = TRUE) \%>\%
   apply_quality_ctrl(patient_id, data_types,
                      bin_cats =c("No" = "Yes", "rural" = "urban"),
                      to_numeric_matrix = TRUE) \%>\%
                      suppressMessages() ->
                      post_qc_data
-                     
+
+# minimal example on first four coloums of example data:
+dplyr::slice(example_ontology, 1:7,24) \%>\%
+   join_vars_to_ontol(example_mapping_file[1:3,], root = "root") \%>\%
+   metavariable_info() \%>\%
+   metavariable_agg(post_qc_data[1:10,1:4]) -> res
+ # see Note section of documentation for information on possible warnings.
+
+# summary of result:
+tibble::glimpse(res)
+
+\dontrun{
+# full example:
 example_ontology \%>\%
    join_vars_to_ontol(example_mapping_file, root = "root") \%>\%
    metavariable_info() \%>\%

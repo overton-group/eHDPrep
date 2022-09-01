@@ -439,14 +439,13 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' require(tibble)
-#' 
-#' data(example_data)
+#' require(magrittr)
+#' require(dplyr)
 #' data(example_ontology)
 #' data(example_mapping_file)
+#' data(example_data)
 #' 
-#' # define datatypes
+#' #' # define datatypes
 #' tibble::tribble(~"var", ~"datatype",
 #' "patient_id", "id",
 #' "tumoursize", "numeric",
@@ -459,16 +458,27 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' "SNP_a", "genotype",
 #' "SNP_b", "genotype",
 #' "free_text", "freetext") -> data_types
-#' 
+#'
 #' # create post-QC data
-#' example_data %>% 
+#' example_data %>%
 #'   merge_cols(diabetes_type, diabetes, "diabetes_merged", rm_in_vars = TRUE) %>%
 #'   apply_quality_ctrl(patient_id, data_types,
 #'                      bin_cats =c("No" = "Yes", "rural" = "urban"),
 #'                      to_numeric_matrix = TRUE) %>%
 #'                      suppressMessages() ->
 #'                      post_qc_data
-#'  
+#'
+#' # minimal example on first four coloums of example data:
+#' semantic_enrichment(post_qc_data[1:10,1:4],
+#'                     dplyr::slice(example_ontology, 1:7,24),
+#'                     example_mapping_file[1:3,], root = "root") -> res
+#' # see Note section of documentation for information on possible warnings.
+#'
+#' # summary of result:
+#' tibble::glimpse(res)
+#'
+#' \dontrun{
+#' # full example:
 #'  res <- semantic_enrichment(post_qc_data, example_ontology,
 #'  example_mapping_file, root = "root")
 #'  # see Note section of documentation for information on possible warnings.
