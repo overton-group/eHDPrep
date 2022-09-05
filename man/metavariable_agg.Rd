@@ -93,7 +93,7 @@ dplyr::slice(example_ontology, 1:7,24) \%>\%
 # summary of result:
 tibble::glimpse(res)
 
-\dontrun{
+\donttest{
 # full example:
 example_ontology \%>\%
    join_vars_to_ontol(example_mapping_file, root = "root") \%>\%

@@ -28,7 +28,7 @@ First row is interpreted as column headers by default. For more details see
 }
 \examples{
 \dontrun{
-   # This code will not run
+   # This code will not run as it requires an xlsx file
    # ./dataset.xlsx should be replaced with path to user's dataset
    
    # excel

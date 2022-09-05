@@ -166,14 +166,13 @@ res$vars_with_zero_entropy
 
 To apply quality control to a dataset in one function, as `apply_quality_ctrl()` does, it is important to ensure variables are processed appropriately according to their data type. 'R' and 'eHDPrep' suggest data types with `assume_var_classes()` which writes the results to a .csv file. The user can amend this externally and import back into 'R' with `import_var_classes()`.
 
-```{r, eval = FALSE}
-
-assume_var_classes(data = example_data, out_file = "./datatypes.csv")
+```{r}
+tmp = tempfile(fileext = ".csv")
+assume_var_classes(data = example_data, out_file = tmp)
 
 # (user makes manual edits externally)
 
-import_var_classes(file = "./datatypes.csv")
-
+import_var_classes(file = tmp)
 ```
 
 The permitted datatypes are: `"id", "numeric", "double", "integer", "character", "factor", "ordinal", "ordinal_tstage, "ordinal_nstage", "genotype", "freetext", "logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. 'eHDPrep' provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.

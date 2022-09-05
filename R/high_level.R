@@ -477,7 +477,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' # summary of result:
 #' tibble::glimpse(res)
 #'
-#' \dontrun{
+#' \donttest{
 #' # full example:
 #'  res <- semantic_enrichment(post_qc_data, example_ontology,
 #'  example_mapping_file, root = "root")

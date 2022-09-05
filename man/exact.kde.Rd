@@ -35,15 +35,6 @@ The density() core function approximation is normally a very good approximation,
 some small values close to zero may become zero rather than just very small.
 This makes it less suitable for mutual information estimation.
 }
-\examples{
-\dontrun{
-x <- c(rnorm(100,sd=2),runif(50),4*rnorm(75,mean=2,sd=4))
-plot(exact.kde(x,bw.nrd0(x),output.domain=NULL),xlab="x",
-     col="black",lty=2,main="Exact vs approximate KDE")
-lines(density(x),col="red",lty=1)
-legend("topright",c("Exact KDE","Approx KDE"),lty=2:1,col=c("black","red"))
-}
-}
 \author{
 Alexander Lyulph Robert Lubbock, Ian Overton
 }

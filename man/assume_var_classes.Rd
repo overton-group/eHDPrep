@@ -4,17 +4,17 @@
 \alias{assume_var_classes}
 \title{Assume variable classes in data}
 \usage{
-assume_var_classes(data, out_file = "./datatypes.csv")
+assume_var_classes(data, out_file = NULL)
 }
 \arguments{
 \item{data}{data frame}
 
 \item{out_file}{file where variables and their assumed classes are stored for
-user verification. Default: "./datatypes.csv"}
+user verification.}
 }
 \value{
-Writes a .csv file in the working directory (default ‘datatypes.csv’)
-  containing the variables and their assumed data types / classes.
+Writes a .csv file containing the variables and their assumed 
+data types / classes.
 }
 \description{
 Classes/data types of data variables are assumed with this function and
@@ -23,12 +23,9 @@ corrected and imported using \code{\link{import_var_classes}}.
 }
 \examples{
 # example below assumes incorrectly for several variables
-## Not run:
-\dontrun{
-   data(example_data)
-   assume_var_classes(example_data)
-}
-## End(Not run)
+tmp = tempfile(fileext = ".csv")
+data(example_data)
+assume_var_classes(example_data, tmp)
 }
 \seealso{
 \code{\link[eHDPrep]{import_var_classes}}

@@ -22,13 +22,11 @@ datatypes are one of ("id", "numeric", "double", "integer", "character",
 level 'eHDPrep' functions.
 }
 \examples{
-## Not run:
-\dontrun{
-   data(example_data)
-   assume_var_classes(example_data)
-   import_var_classes()
- }
-## End(Not run)
+tmp = tempfile(fileext = ".csv")
+data(example_data)
+assume_var_classes(example_data, tmp)
+import_var_classes(tmp)
+
 }
 \seealso{
 \code{\link[eHDPrep]{assume_var_classes}}

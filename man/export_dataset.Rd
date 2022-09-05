@@ -19,6 +19,11 @@ export_dataset(x, file, format = "csv", ...)
 Save dataset in .csv or .tsv format. A wrapper function for \code{readr}'s
 \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}.
 }
+\examples{
+data(example_data)
+tmp = tempfile(fileext = ".csv")
+export_dataset(example_data, tmp)
+}
 \seealso{
 \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
 

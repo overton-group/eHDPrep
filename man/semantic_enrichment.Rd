@@ -98,7 +98,7 @@ semantic_enrichment(post_qc_data[1:10,1:4],
 # summary of result:
 tibble::glimpse(res)
 
-\dontrun{
+\donttest{
 # full example:
  res <- semantic_enrichment(post_qc_data, example_ontology,
  example_mapping_file, root = "root")

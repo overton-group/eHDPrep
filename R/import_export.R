@@ -42,7 +42,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#'    # This code will not run
+#'    # This code will not run as it requires an xlsx file
 #'    # ./dataset.xlsx should be replaced with path to user's dataset
 #'    
 #'    # excel
@@ -59,14 +59,14 @@ import_dataset <- function(file, format = "excel", ...) {
   } else if (format == "tsv") {
     readr::read_tsv(file = file, ...)
   }
-    else if (format == "csv") {
-      readr::read_csv(file = file, ...)
-
-    } else {
-      stop(
-        "`format` must be one of 'csv' or 'tsv'.", call. = FALSE)
-    }
-
+  else if (format == "csv") {
+    readr::read_csv(file = file, ...)
+    
+  } else {
+    stop(
+      "`format` must be one of 'csv' or 'tsv'.", call. = FALSE)
+  }
+  
 }
 
 
@@ -82,27 +82,24 @@ import_dataset <- function(file, format = "excel", ...) {
 #'
 #' @param data data frame
 #' @param out_file file where variables and their assumed classes are stored for
-#'   user verification. Default: "./datatypes.csv"
+#'   user verification.
 #'
-#' @return Writes a .csv file in the working directory (default ‘datatypes.csv’)
-#'   containing the variables and their assumed data types / classes.
+#' @return Writes a .csv file containing the variables and their assumed 
+#' data types / classes.
 #' @seealso \code{\link[eHDPrep]{import_var_classes}}
 #' @export
 #'
 #' @examples
 #' # example below assumes incorrectly for several variables
-#' ## Not run:
-#' \dontrun{
-#'    data(example_data)
-#'    assume_var_classes(example_data)
-#' }
-#' ## End(Not run)
-assume_var_classes <- function(data, out_file = "./datatypes.csv") {
+#' tmp = tempfile(fileext = ".csv")
+#' data(example_data)
+#' assume_var_classes(example_data, tmp)
+assume_var_classes <- function(data, out_file = NULL) {
   data %>%
     purrr::map_chr(class) %>%
     tibble::enframe(name = "var", value = "datatype") ->
     classes
-
+  
   readr::write_csv(classes, file = out_file, na = "")
 }
 
@@ -123,13 +120,11 @@ assume_var_classes <- function(data, out_file = "./datatypes.csv") {
 #' @export
 #'
 #' @examples
-#' ## Not run:
-#' \dontrun{
-#'    data(example_data)
-#'    assume_var_classes(example_data)
-#'    import_var_classes()
-#'  }
-#' ## End(Not run)
+#' tmp = tempfile(fileext = ".csv")
+#' data(example_data)
+#' assume_var_classes(example_data, tmp)
+#' import_var_classes(tmp)
+#' 
 import_var_classes <- function(file = "./datatypes.csv") {
   var_classes <- readr::read_csv(file)
   permitted_datatypes <- c("id", "numeric", "double", "integer", "character", "factor",
@@ -137,20 +132,20 @@ import_var_classes <- function(file = "./datatypes.csv") {
   # verify data structure
   if(!((all(names(var_classes) == c("var","datatype"))) &
        (length(names(var_classes)) == 2))) {
-
+    
     stop("File specified by `file` must have two columns.
          They must be named 'var' and 'datatype'", call. = FALSE)
-
+    
   } else if (!all(var_classes$datatype %in% permitted_datatypes)) { # verify datatypes
-
+    
     stop("Values in `datatype` must be one of ",paste0(permitted_datatypes, ", "),"\n",
          paste0("\u2716 ",
                 var_classes$datatype[which(!var_classes$datatype %in% permitted_datatypes)],
-                                     " is not a permitted datatype\n"),
+                " is not a permitted datatype\n"),
          call. = FALSE
     )
   } else{return(var_classes)}
-
+  
 }
 
 #' Find variable names of a specified data type in class_tbl
@@ -166,7 +161,6 @@ import_var_classes <- function(file = "./datatypes.csv") {
 #' @return character vector of variable names matching \code{extract_class}
 #' @noRd
 select_by_datatype <- function(class_tbl, extract_class, negate = FALSE) {
-  # TODO: remove reference to class and replace with data type
   
   if(negate) {
     class_tbl %>%
@@ -177,7 +171,7 @@ select_by_datatype <- function(class_tbl, extract_class, negate = FALSE) {
       dplyr::filter(.data$datatype %in% extract_class) %>%
       dplyr::pull(.data$var)
   }
-
+  
 }
 
 ###
@@ -195,10 +189,14 @@ select_by_datatype <- function(class_tbl, extract_class, negate = FALSE) {
 #' @seealso \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
 #' @family import to/export from 'R' functions
 #' @export
+#' @examples
+#' data(example_data)
+#' tmp = tempfile(fileext = ".csv")
+#' export_dataset(example_data, tmp)
 
 export_dataset <- function(x, file, format = "csv", ...) {
   stopifnot(format %in% c("csv","tsv"))
-
+  
   if(format == "csv") {
     readr::write_csv(x, file, ...)
   } else if (format == "tsv") {
