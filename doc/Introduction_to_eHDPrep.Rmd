@@ -1,5 +1,5 @@
 ---
-title: "eHDPrep: an R package for Electronic Health Data Quality Control and Semantic Enrichment"
+title: "'eHDPrep': an 'R' package for Electronic Health Data Quality Control and Semantic Enrichment"
 author: "Tom Toner, Ian Overton"
 output:
   pdf_document:
@@ -8,13 +8,6 @@ output:
     extra_dependencies:
     - underscore
     - fancyhdr
-  knitr:::html_vignette:
-    toc: yes
-    number_sections: yes
-    link-citations: yes
-
-
-
 header-includes:
 - \usepackage{float}
 - \floatplacement{figure}{H}
@@ -51,7 +44,7 @@ options(pillar.sigfig = 2)
 library(eHDPrep)
 ```
 # Quick Start
-For quality control of health datasets, there are several high-level functions in eHDPrep:
+For quality control of health datasets, there are several high-level functions in 'eHDPrep':
 
 1. [`import_dataset()`](#data-import) - import the dataset in .csv, .tsv, or .xlsx format.
 
@@ -63,11 +56,11 @@ For quality control of health datasets, there are several high-level functions i
 
 5. [`export_dataset()`](#data-export) - export dataset to .csv or .tsv format.
 
-eHDPrep also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment).
+'eHDPrep' also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment).
 
 # Introduction
 
-Data preparation is a key foundation for reliable analysis of health data, eHDPrep has been developed for this purpose. The functionality is broadly divided between two themes:
+Data preparation is a key foundation for reliable analysis of health data, 'eHDPrep' has been developed for this purpose. The functionality is broadly divided between two themes:
 
 -   [Quality Control] (QC)
 -   [Semantic Enrichment] (SE)
@@ -78,7 +71,7 @@ Additionally, two "levels" of functions are provided:
 
 -   "Low-level" functions require more user interaction, but can be parameterised more extensively to accommodate specific aspects of a dataset. Some of the "low-level" functions are not provided in the "high-level" functions because they require additional user guidance; for example the merging function: `merge_cols()` (see [Merge variables]).
 
-Finally, this package is built using several packages from the [tidyverse](https://www.tidyverse.org/) and follows its structures and grammars [@wickham2019a]. Therefore, the `data` object can typically be [piped](https://magrittr.tidyverse.org/reference/pipe.html) through eHDPrep's functions which will be modified as described in the function's documentation and returned. We recommend that users have experience with `magrittr`'s pipe operator and core tidyverse packages before using eHDPrep.
+Finally, this package is built using several packages from the ['tidyverse'](https://www.tidyverse.org/) and follows its structures and grammars [@wickham2019a]. Therefore, the `data` object can typically be [piped](https://magrittr.tidyverse.org/reference/pipe.html) through the functions of 'eHDPrep' which will be modified as described in the function's documentation and returned. We recommend that users have experience with the pipe operator and core 'tidyverse' packages before using 'eHDPrep'.
 
 # Data
 
@@ -101,7 +94,7 @@ Quality control can be performed with little code using the high-level functions
 
 ### Data Import
 
-eHDPrep provides methods to import a dataset into R from several file types where functionality from `readxl` and `readr` is wrapped into the function `import_dataset()`:
+'eHDPrep' provides methods to import a dataset into 'R' from several file types where functionality from `readxl` and `readr` is wrapped into the function `import_dataset()`:
 
 ```{r, eval = FALSE}
 # Not run, just examples:
@@ -171,7 +164,7 @@ res$vars_with_zero_entropy
 
 ### Apply quality control
 
-To apply quality control to a dataset in one function, as `apply_quality_ctrl()` does, it is important to ensure variables are processed appropriately according to their data type. R and eHDPrep suggest data types with `assume_var_classes()` which writes the results to a .csv file. The user can amend this externally and import back into R with `import_var_classes()`.
+To apply quality control to a dataset in one function, as `apply_quality_ctrl()` does, it is important to ensure variables are processed appropriately according to their data type. 'R' and 'eHDPrep' suggest data types with `assume_var_classes()` which writes the results to a .csv file. The user can amend this externally and import back into 'R' with `import_var_classes()`.
 
 ```{r, eval = FALSE}
 
@@ -183,7 +176,7 @@ import_var_classes(file = "./datatypes.csv")
 
 ```
 
-The permitted datatypes are: `"id", "numeric", "double", "integer", "character", "factor", "ordinal", "ordinal_tstage, "ordinal_nstage", "genotype", "freetext", "logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. eHDPrep provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
+The permitted datatypes are: `"id", "numeric", "double", "integer", "character", "factor", "ordinal", "ordinal_tstage, "ordinal_nstage", "genotype", "freetext", "logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. 'eHDPrep' provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
 
 The data types for `example_data` are shown below:
 
@@ -317,7 +310,7 @@ This is useful for preparation for later analysis, including machine learning ap
 
 ### Review of all quality control
 
-eHDPrep provides functionality for users to review the results of quality control operations that have been applied to the input data. `review_quality_ctrl()` provides information of quality control modifications at multiple levels of detail.
+'eHDPrep' provides functionality for users to review the results of quality control operations that have been applied to the input data. `review_quality_ctrl()` provides information of quality control modifications at multiple levels of detail.
 
 ```{r}
 qc_review <- review_quality_ctrl(before_tbl = example_data,
@@ -368,7 +361,7 @@ export_dataset(x = post_QC_example_data,
 
 ## Low level functions
 
-This section describes functions that can provide more granular access to the eHDPrep quality control operations. While the functionality is largely available within 'high-level' functions, directly calling low-level functions provides greater scope to adjust individual parameter values and allows for finer-grained assessment of each step in the quality control process. Operations that may only be performed using low-level functions are: `merge_cols()`, `compare_info_content()`, `compare_info_content_plt()` (see [Merge variables]).
+This section describes functions that can provide more granular access to the 'eHDPrep' quality control operations. While the functionality is largely available within 'high-level' functions, directly calling low-level functions provides greater scope to adjust individual parameter values and allows for finer-grained assessment of each step in the quality control process. Operations that may only be performed using low-level functions are: `merge_cols()`, `compare_info_content()`, `compare_info_content_plt()` (see [Merge variables]).
 
 ### Measure completeness
 
@@ -387,7 +380,7 @@ plot_completeness(data = example_data, id_var = patient_id, plot = "rows")
 
 <!-- ------------------------------------------------------------------------ -->
 
-An overview of the dataset completeness is generated by `completeness_heatmap()` which utilises `pheatmap` [@kolde2019]. Additional parameters are passed to `pheatmap()` through `...` (see `?pheatmap` for all options). Additional parameters are supplied in creating the heatmap below where the row names are hidden because they clutter the plot. The completeness\
+An overview of the dataset completeness is generated by `completeness_heatmap()` which utilises 'pheatmap' [@kolde2019]. Additional parameters are passed to `pheatmap()` through `...` (see `?pheatmap` for all options). Additional parameters are supplied in creating the heatmap below where the row names are hidden because they clutter the plot. The completeness\
 heatmap may be useful for identifying structural patterns in the missingness, for example\
 indicative of non-random missingness.There are three underlying methods which are used to encode the data so that non-numeric data can be visualised:
 
@@ -507,9 +500,9 @@ In the above bar chart, the variable `diabetes` has higher information content t
 
 ### Encoding missing values
 
-Missing values can be recorded in several ways (e.g. "unknown", "missing"). R uses `NA` as a standard representation of missing values which allows for the user and packages to process them appropriately (e.g. `mean(x, na.rm = T)`).
+Missing values can be recorded in several ways (e.g. "unknown", "missing"). 'R' uses `NA` as a standard representation of missing values which allows for the user and packages to process them appropriately (e.g. `mean(x, na.rm = T)`).
 
-eHDPrep can convert values representing missingness to NA with two functions:
+'eHDPrep' can convert values representing missingness to NA with two functions:
 
 -   `strings_to_NA()` will encode a series of predefined strings which represent missingness or specific strings specified in the argument `strings_to_replace` as `NA`.
 
@@ -548,7 +541,7 @@ encode_cats(data = example_data, marital_status) %>%
 
 ### Encoding ordinal data {#encode-ordinal-data}
 
-The relationships in ordinal variables can be encoded numerically while preserving the labels in R with 'ordered factors' using `encode_ordinals()`. The numeric relations can later be extracted if fully numeric variables are required. The `ord_levels` parameter should describe the order of categories in ascending order:
+The relationships in ordinal variables can be encoded numerically while preserving the labels in 'R' with 'ordered factors' using `encode_ordinals()`. The numeric relations can later be extracted if fully numeric variables are required. The `ord_levels` parameter should describe the order of categories in ascending order:
 
 ```{r}
 example_data %>%
@@ -573,7 +566,7 @@ encode_genotypes(data = example_data, SNP_a, SNP_b) %>%
 
 ### Extract information from free text variables
 
-Medical notes and other free text variables can contain additional information but require Natural Language Processing (NLP). Information on the presence of words, phrases, or groups of proximal words can be extracted with the functionality below; utilising the Quanteda package [@benoit2018]. A knowledge of NLP terminology can be beneficial however the crucial term for this functionality is 'skipgram' which, in this context, is a series of words in a string which can have interrupting words ('skips') between them (see examples in `?quanteda::tokens_skipgrams`). The high-level function `extract_freetext()` can be applied to extract skipgrams in free text variables by their frequency.
+Medical notes and other free text variables can contain additional information but require Natural Language Processing (NLP). Information on the presence of words, phrases, or groups of proximal words can be extracted with the functionality below; utilising the 'quanteda' package [@benoit2018]. A knowledge of NLP terminology can be beneficial however the crucial term for this functionality is 'skipgram' which, in this context, is a series of words in a string which can have interrupting words ('skips') between them (see examples in `?quanteda::tokens_skipgrams`). The high-level function `extract_freetext()` can be applied to extract skipgrams in free text variables by their frequency.
 
 There are three underlying stages of extracting skipgrams:
 
@@ -716,7 +709,7 @@ SE requires three input objects:
 
     -   All variables must be numeric because SE attempts to aggregate values.
 
-2.  An ontology in R as a `igraph` or `tidygraph` object.
+2.  An ontology in 'R' as a 'igraph' or 'tidygraph' object.
 
     -   `example_ontology` is a synthetic ontology we have created to demonstrate the semantic commonalities in `example_data`.
 

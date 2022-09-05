@@ -1,19 +1,19 @@
 #    Copyright (C) 2022 Queens University Belfast
 #    
-#    This file is part of eHDPrep
+#    This file is part of 'eHDPrep'
 #
-#    eHDPrep is free software: you can redistribute it and/or modify
+#    'eHDPrep' is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    eHDPrep is distributed in the hope that it will be useful,
+#    'eHDPrep' is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with eHDPrep. If not, see <http://www.gnu.org/licenses/>.
+#    along with 'eHDPrep'. If not, see <http://www.gnu.org/licenses/>.
 
 # needed for "where" function
 utils::globalVariables("where")
@@ -280,7 +280,7 @@ completeness_heatmap <- function(data, id_var, annotation_tbl = NULL, method = 1
   # this will order these variables by their assigned annotation
 
   if (!is.null(annotation_tbl)) {
-    # convert first col to rownames, as required by pheatmap
+    # convert first col to rownames, as required by 'pheatmap'
     annotation_tbl <- column_to_rownames(annotation_tbl, names(annotation_tbl)[1])
     annot_ordering <- rownames(annotation_tbl)[rownames(annotation_tbl) %in% names(data)]
     annot_ordering <- annot_ordering[-which(annot_ordering == dplyr::as_label(id_var))]

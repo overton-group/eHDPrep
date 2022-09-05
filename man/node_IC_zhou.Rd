@@ -7,7 +7,7 @@
 node_IC_zhou(graph, mode = "in", root, k = 0.5)
 }
 \arguments{
-\item{graph}{\code{tidygraph} directed graph.}
+\item{graph}{\code{\link[tidygraph:tidygraph]{tidygraph}} directed graph.}
 
 \item{mode}{Character constant specifying the directionality of the edges.
 One of "in" or "out".}

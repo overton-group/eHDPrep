@@ -18,7 +18,7 @@ Performs tests on a graph object in preparation for semantic enrichment.
 \details{
 The tests are:
 \enumerate{
-   \item Is graph coercible to \code{\link{tidygraph}} format?
+   \item Is graph coercible to \code{\link[tidygraph:tidygraph]{tidygraph}} format?
    \item Is graph directed?
    \item Does graph contains one component (is one ontology)?
 }

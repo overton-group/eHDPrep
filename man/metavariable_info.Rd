@@ -8,7 +8,7 @@ metavariable_info(graph, mode = "in")
 }
 \arguments{
 \item{graph}{Graph containing ontological and dataset nodes. Must be in
-\code{\link{tidygraph}} format or coercible to this format.}
+\code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.}
 
 \item{mode}{Character constant specifying the directionality of the edges.
 One of: "in" or "out".}

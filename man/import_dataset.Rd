@@ -2,7 +2,7 @@
 % Please edit documentation in R/import_export.R
 \name{import_dataset}
 \alias{import_dataset}
-\title{Import data into R}
+\title{Import data into 'R'}
 \usage{
 import_dataset(file, format = "excel", ...)
 }
@@ -45,7 +45,7 @@ First row is interpreted as column headers by default. For more details see
   importing .xls or .xlsx files, \code{\link[readr]{read_csv}} for .csv
   files, \code{\link[readr]{read_tsv}} for .tsv files
 
-Other import to/export from R functions: 
+Other import to/export from 'R' functions: 
 \code{\link{export_dataset}()}
 }
-\concept{import to/export from R functions}
+\concept{import to/export from 'R' functions}

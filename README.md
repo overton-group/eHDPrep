@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of eHDPrep is to provide robust quality control and semantic
+The goal of ‘eHDPrep’ is to provide robust quality control and semantic
 enrichment tools for preparation of health datasets. High-level and
 low-level functionality are included for general and specialist R users,
 respectively. A detailed vignette can be accessed using:
@@ -14,7 +14,7 @@ respectively. A detailed vignette can be accessed using:
 
 ## Installation
 
-You can install the released version of eHDPrep from
+You can install the released version of ‘eHDPrep’ from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
@@ -30,7 +30,7 @@ devtools::install_github("overton-group/eHDPrep")
 
 ## Example
 
-eHDPrep can prepare health data for analysis with several approaches.
+‘eHDPrep’ can prepare health data for analysis with several approaches.
 For example, standardising strings representing missing values to `NA`:
 
 ``` r
@@ -48,8 +48,8 @@ unique(eHDPrep::strings_to_NA(example_data, strings_to_replace = "equivocal")$t_
 
 ## System Requirements
 
-Some additional system dependencies are required for eHDPrep. These are
-detailed below:
+Some additional system dependencies are required for ‘eHDPrep’. These
+are detailed below:
 
 ### Ubuntu
 

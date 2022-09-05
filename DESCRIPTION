@@ -11,7 +11,7 @@ Authors@R: c(person("Tom", "Toner", role = c("aut"),
               )
 Maintainer: Ian Overton <I.Overton@qub.ac.uk>
 Description: A tool for the preparation and enrichment of health datasets for analysis. Provides functionality for assessing data quality and for improving the reliability and machine interpretability of a dataset. 
-     eHDPrep also enables semantic enrichment of a dataset where metavariables are discovered from the relationships between input variables determined from user-provided ontologies.
+     'eHDPrep' also enables semantic enrichment of a dataset where metavariables are discovered from the relationships between input variables determined from user-provided ontologies.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

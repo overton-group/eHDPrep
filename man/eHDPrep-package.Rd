@@ -4,11 +4,11 @@
 \name{eHDPrep-package}
 \alias{eHDPrep}
 \alias{eHDPrep-package}
-\title{eHDPrep: Quality Control and Semantic Enrichment of Datasets}
+\title{'eHDPrep': Quality Control and Semantic Enrichment of Datasets}
 \description{
-eHDPrep is a tool for the preparation and enrichment of health datasets for
+'eHDPrep' is a tool for the preparation and enrichment of health datasets for
 analysis. It provides functionality for assessing data quality and for
-improving the reliability and machine interpretability of a dataset. eHDPrep
+improving the reliability and machine interpretability of a dataset. 'eHDPrep'
 also enables semantic enrichment of a dataset where metavariables are
 discovered from the relationships between input variables determined from
 user-provided ontologies.

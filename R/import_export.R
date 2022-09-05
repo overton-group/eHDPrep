@@ -1,24 +1,24 @@
 #    Copyright (C) 2022 Queens University Belfast
 #    
-#    This file is part of eHDPrep
+#    This file is part of 'eHDPrep'
 #
-#    eHDPrep is free software: you can redistribute it and/or modify
+#    'eHDPrep' is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    eHDPrep is distributed in the hope that it will be useful,
+#    'eHDPrep' is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with eHDPrep. If not, see <http://www.gnu.org/licenses/>.
+#    along with 'eHDPrep'. If not, see <http://www.gnu.org/licenses/>.
 
 ###
 ##### Import dataset #####
 ###
-#' Import data into R
+#' Import data into 'R'
 #'
 #' Imports a rectangular single table into \R from a .xls, .xlsx, .csv, or .tsv file.
 #' 
@@ -38,7 +38,7 @@
 #' @seealso \code{\link[readxl]{read_excel}} for additional parameters for
 #'   importing .xls or .xlsx files, \code{\link[readr]{read_csv}} for .csv
 #'   files, \code{\link[readr]{read_tsv}} for .tsv files
-#' @family import to/export from R functions
+#' @family import to/export from 'R' functions
 #' @export
 #' @examples
 #' \dontrun{
@@ -111,7 +111,7 @@ assume_var_classes <- function(data, out_file = "./datatypes.csv") {
 #' Reads in output of \code{\link{assume_var_classes}}, ensures all specified
 #' datatypes are one of ("id", "numeric", "double", "integer", "character",
 #' "factor","ordinal", "genotype", "freetext", "logical") as required for high
-#' level eHDPrep functions.
+#' level 'eHDPrep' functions.
 #'
 #' @param file character string. Path to output of
 #'   \code{\link{assume_var_classes}} which should be manually verified outside
@@ -193,7 +193,7 @@ select_by_datatype <- function(class_tbl, extract_class, negate = FALSE) {
 #' @inheritParams readr::write_csv
 #' @importFrom readr write_csv write_tsv
 #' @seealso \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
-#' @family import to/export from R functions
+#' @family import to/export from 'R' functions
 #' @export
 
 export_dataset <- function(x, file, format = "csv", ...) {

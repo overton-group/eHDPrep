@@ -19,7 +19,7 @@ data frame containing the data type values of variables, as described
 Reads in output of \code{\link{assume_var_classes}}, ensures all specified
 datatypes are one of ("id", "numeric", "double", "integer", "character",
 "factor","ordinal", "genotype", "freetext", "logical") as required for high
-level eHDPrep functions.
+level 'eHDPrep' functions.
 }
 \examples{
 ## Not run:

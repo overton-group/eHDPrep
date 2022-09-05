@@ -1,24 +1,24 @@
 #    Copyright (C) 2022 Queens University Belfast
 #
-#    This file is part of eHDPrep
+#    This file is part of 'eHDPrep'
 #
-#    eHDPrep is free software: you can redistribute it and/or modify
+#    'eHDPrep' is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    eHDPrep is distributed in the hope that it will be useful,
+#    'eHDPrep' is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with eHDPrep. If not, see <http://www.gnu.org/licenses/>.
+#    along with 'eHDPrep'. If not, see <http://www.gnu.org/licenses/>.
 
 #' Merge columns in data frame
 #'
 #' Merges two columns in a single data frame. The merging draws on the
-#' functionality of \code{dplyr}'s \code{\link[dplyr]{coalesce}} where missing
+#' functionality of \code{'dplyr'}'s \code{\link[dplyr]{coalesce}} where missing
 #' values from one vector are replaced by corresponding values in a second
 #' variable. The name of the merged variable is specified in
 #' \code{merge_var_name}. \code{primary_var} and \code{secondary_var} can be

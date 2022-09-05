@@ -1,19 +1,19 @@
-#    Copyright (C) 2021 Queens University Belfast
+#    Copyright (C) 2022 Queens University Belfast
 #    
-#    This file is part of eHDPrep
+#    This file is part of 'eHDPrep'
 #
-#    eHDPrep is free software: you can redistribute it and/or modify
+#    'eHDPrep' is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    eHDPrep is distributed in the hope that it will be useful,
+#    'eHDPrep' is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with eHDPrep. If not, see <http://www.gnu.org/licenses/>.
+#    along with 'eHDPrep'. If not, see <http://www.gnu.org/licenses/>.
 
 ###
 ##### assess quality #####
@@ -401,7 +401,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' data variables are aggregated row-wise by their maximum, minimum, mean, sum,
 #' and product. Meta-variables with zero entropy (no information) are not
 #' appended to the data.
-#' See the "Semantic Enrichment" section in eHDPrep's vignette for more
+#' See the "Semantic Enrichment" section in the vignette of 'eHDPrep' for more
 #' information: \code{vignette("Introduction_to_eHDPrep", package = "eHDPrep")}
 #' 
 #' This function requires three inputs:
@@ -415,7 +415,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' @param data Numeric data frame or matrix containing variables present in
 #'   the mapping file.
 #' @param ontology Graph containing the chosen ontology. Must be in
-#'   \code{\link{tidygraph}} format or coercible to this format.
+#'   test format or coercible to this format.
 #' @param mapping_file Path to csv file or data frame containing mapping
 #'   information. Should contain two columns only. The first column should
 #'   contain column names, present in the data frame. The second column should
@@ -424,11 +424,11 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #'   from.
 #' @inheritParams metavariable_info
 #' @note A warning may be shown regarding the '.add' argument being deprecated, this is
-#'   belived to be an issue with tidygraph which may be resolved in a future release: 
+#'   believed to be an issue with 'tidygraph' which may be resolved in a future release: 
 #'   <https://github.com/thomasp85/tidygraph/issues/131>. Another warning may be shown regarding the 'neimode' argument being deprecated, this is
-#'   belived to be an issue with tidygraph which may be resolved in a future release: 
+#'   believed to be an issue with 'tidygraph' which may be resolved in a future release: 
 #'   <https://github.com/thomasp85/tidygraph/issues/156>. These warning messages are not believed to have
-#'   an effect on the functionality of eHDPrep.
+#'   an effect on the functionality of 'eHDPrep'.
 #' @param ... additional arguments to pass to \code{\link[readr]{read_csv}}
 #' 
 #' @importFrom dplyr as_tibble

@@ -11,7 +11,7 @@ semantic_enrichment(data, ontology, mapping_file, mode = "in", root, ...)
 the mapping file.}
 
 \item{ontology}{Graph containing the chosen ontology. Must be in
-\code{\link{tidygraph}} format or coercible to this format.}
+test format or coercible to this format.}
 
 \item{mapping_file}{Path to csv file or data frame containing mapping
 information. Should contain two columns only. The first column should
@@ -40,7 +40,7 @@ labelled using the syntax: \code{MV_[label_attr]_[Aggregation function]}. The
 data variables are aggregated row-wise by their maximum, minimum, mean, sum,
 and product. Meta-variables with zero entropy (no information) are not
 appended to the data.
-See the "Semantic Enrichment" section in eHDPrep's vignette for more
+See the "Semantic Enrichment" section in the vignette of 'eHDPrep' for more
 information: \code{vignette("Introduction_to_eHDPrep", package = "eHDPrep")}
 
 This function requires three inputs:
@@ -53,11 +53,11 @@ the data frame with nodes in the ontology object}
 }
 \note{
 A warning may be shown regarding the '.add' argument being deprecated, this is
-  belived to be an issue with tidygraph which may be resolved in a future release: 
+  believed to be an issue with 'tidygraph' which may be resolved in a future release: 
   <https://github.com/thomasp85/tidygraph/issues/131>. Another warning may be shown regarding the 'neimode' argument being deprecated, this is
-  belived to be an issue with tidygraph which may be resolved in a future release: 
+  believed to be an issue with 'tidygraph' which may be resolved in a future release: 
   <https://github.com/thomasp85/tidygraph/issues/156>. These warning messages are not believed to have
-  an effect on the functionality of eHDPrep.
+  an effect on the functionality of 'eHDPrep'.
 }
 \examples{
 require(magrittr)

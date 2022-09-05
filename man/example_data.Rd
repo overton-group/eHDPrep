@@ -16,7 +16,7 @@ A data frame with 1,000 rows and 10 variables: \describe{
   \item{marital_status}{character. Patient marital status category}
   \item{SNP_a}{character. Single Nucleotide Polymorphism (SNP) of the
   patient} \item{SNP_b}{character. Another SNP of the patient}
-  \item{free_text}{character. sentences from the stringr package as an
+  \item{free_text}{character. sentences from the 'stringr' package as an
   example of short free text variables} }
 }
 \source{
@@ -27,6 +27,6 @@ example_data
 }
 \description{
 A dataset containing synthetic example values to demonstrate functionality of
-eHDprep
+'eHDprep'
 }
 \keyword{datasets}

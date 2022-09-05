@@ -8,7 +8,7 @@ join_vars_to_ontol(ontol_graph, var2entity_tbl, mode = "in", root, k = 0.5)
 }
 \arguments{
 \item{ontol_graph}{Graph containing the chosen ontology. Must be in
-\code{tidygraph} format or coercible to this format.}
+\code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.}
 
 \item{var2entity_tbl}{Edge table containing dataset variable names in first
 column and entities in ontologies to which they are mapped in the second

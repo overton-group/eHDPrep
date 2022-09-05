@@ -17,7 +17,7 @@ example_ontology
 A small custom network graph to demonstrate semantic enrichment.
 }
 \details{
-Contains semantic links of variables in eHDPrep's `example_data` following
+Contains semantic links of variables in 'eHDPrep''s `example_data` following
 quality control.
 }
 \keyword{datasets}

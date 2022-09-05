@@ -7,7 +7,7 @@
 \format{
 A data frame: \describe{
 \item{variable}{character. names of variables in post-QC `example_data`.}
-\item{onto_entity}{character. names of mapped entiteis in `example_onto`.}
+\item{onto_entity}{character. names of mapped entities in `example_onto`.}
 }
 }
 \source{
@@ -21,6 +21,6 @@ A data frame containing mappings between variables in `example_data` and
 `example_onto`. Used to demonstrate semantic enrichment.
 }
 \details{
-Maps variables in eHDPrep's `example_data` to eHDPrep's `example_ontology`.
+Maps variables in `example_data` to `example_ontology` in 'eHDPrep'.
 }
 \keyword{datasets}

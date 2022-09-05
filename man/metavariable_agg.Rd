@@ -42,12 +42,16 @@ data. See examples for where this function should be applied in the semantic
 enrichment workflow.
 }
 \note{
-A warning may be shown regarding the '.add' argument being deprecated, this is
-  belived to be an issue with tidygraph which may be resolved in a future release: 
-  <https://github.com/thomasp85/tidygraph/issues/131>. Another warning may be shown regarding the 'neimode' argument being deprecated, this is
-  belived to be an issue with tidygraph which may be resolved in a future release: 
-  <https://github.com/thomasp85/tidygraph/issues/156>. These warning messages are not believed to have
-  an effect on the functionality of eHDPrep.
+A warning may be shown regarding the '.add' argument being deprecated,
+  this is believed to be an issue with
+  \code{\link[tidygraph:tidygraph]{tidygraph}} which may be resolved in a
+  future release: <https://github.com/thomasp85/tidygraph/issues/131>.
+  Another warning may be shown regarding the 'neimode' argument being
+  deprecated, this is believed to be an issue with
+  \code{\link[tidygraph:tidygraph]{tidygraph}} which may be resolved in a
+  future release: <https://github.com/thomasp85/tidygraph/issues/156>. These
+  warning messages are not believed to have an effect on the functionality of
+  'eHDPrep'.
 }
 \examples{
 require(magrittr)
@@ -84,7 +88,7 @@ dplyr::slice(example_ontology, 1:7,24) \%>\%
    join_vars_to_ontol(example_mapping_file[1:3,], root = "root") \%>\%
    metavariable_info() \%>\%
    metavariable_agg(post_qc_data[1:10,1:4]) -> res
- # see Note section of documentation for information on possible warnings.
+# see Note section of documentation for information on possible warnings.
 
 # summary of result:
 tibble::glimpse(res)

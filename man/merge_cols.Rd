@@ -34,7 +34,7 @@ data frame with coalesced \code{primary_var} and \code{secondary_var}
 }
 \description{
 Merges two columns in a single data frame. The merging draws on the
-functionality of \code{dplyr}'s \code{\link[dplyr]{coalesce}} where missing
+functionality of \code{'dplyr'}'s \code{\link[dplyr]{coalesce}} where missing
 values from one vector are replaced by corresponding values in a second
 variable. The name of the merged variable is specified in
 \code{merge_var_name}. \code{primary_var} and \code{secondary_var} can be

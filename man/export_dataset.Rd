@@ -22,7 +22,7 @@ Save dataset in .csv or .tsv format. A wrapper function for \code{readr}'s
 \seealso{
 \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
 
-Other import to/export from R functions: 
+Other import to/export from 'R' functions: 
 \code{\link{import_dataset}()}
 }
-\concept{import to/export from R functions}
+\concept{import to/export from 'R' functions}

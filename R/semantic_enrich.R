@@ -1,19 +1,19 @@
 #    Copyright (C) 2022 Queens University Belfast
 #    
-#    This file is part of eHDPrep
+#    This file is part of 'eHDPrep'
 #
-#    eHDPrep is free software: you can redistribute it and/or modify
+#    'eHDPrep' is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
-#    eHDPrep is distributed in the hope that it will be useful,
+#    'eHDPrep' is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    You should have received a copy of the GNU General Public License
-#    along with eHDPrep. If not, see <http://www.gnu.org/licenses/>.
+#    along with 'eHDPrep'. If not, see <http://www.gnu.org/licenses/>.
 
 # needed for "where" function
 utils::globalVariables("where")
@@ -24,7 +24,7 @@ utils::globalVariables("where")
 #' 
 #' The tests are:
 #' \enumerate{
-#'    \item Is graph coercible to \code{\link{tidygraph}} format?
+#'    \item Is graph coercible to \code{\link[tidygraph:tidygraph]{tidygraph}} format?
 #'    \item Is graph directed?
 #'    \item Does graph contains one component (is one ontology)?
 #' }
@@ -132,7 +132,7 @@ validate_mapping_tbl <- function(mapping_tbl, data, ontol_graph) {
 #' Computes the information content for each node in a directed graph using the
 #' method developed by  by Lord \emph{et al.}.
 #'
-#' @param graph \code{tidygraph} directed graph.
+#' @param graph \code{\link[tidygraph:tidygraph]{tidygraph}} directed graph.
 #' @param mode Character constant specifying the directionality of the edges.
 #' @note For use in semantic enrichment, this should be applied before joining
 #'   an ontology with variable nodes.
@@ -175,7 +175,7 @@ node_info_content <- function(graph, mode = "in") {
 #' Computes the information content for each node in a directed graph according
 #' to the equation developed by Zhou \emph{et al.} (2008).
 #'
-#' @param graph \code{tidygraph} directed graph.
+#' @param graph \code{\link[tidygraph:tidygraph]{tidygraph}} directed graph.
 #' @param mode Character constant specifying the directionality of the edges.
 #'   One of "in" or "out".
 #' @param root name of root node identifier in column 1 to calculate node depth
@@ -246,7 +246,7 @@ node_IC_zhou <- function(graph, mode = "in", root, k = 0.5) {
 #' "Annotation Ancestor".
 #' }
 #' @param ontol_graph Graph containing the chosen ontology. Must be in
-#'   \code{tidygraph} format or coercible to this format.
+#'   \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.
 #' @param var2entity_tbl Edge table containing dataset variable names in first
 #'   column and entities in ontologies to which they are mapped in the second
 #'   column.
@@ -312,7 +312,7 @@ join_vars_to_ontol <- function(ontol_graph, var2entity_tbl, mode = "in", root, k
 #' }
 #' @seealso \code{\link{node_IC_zhou}}
 #' @param graph Graph containing ontological and dataset nodes. Must be in
-#' \code{\link{tidygraph}} format or coercible to this format.
+#' \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.
 #' @param mode Character constant specifying the directionality of the edges.
 #'   One of: "in" or "out".
 #' @family semantic enrichment functions
@@ -418,12 +418,16 @@ metavariable_info <- function(graph, mode = "in") {
 #' Metavariables with zero entropy (no information) are not appended to the
 #' data. See examples for where this function should be applied in the semantic
 #' enrichment workflow.
-#' @note A warning may be shown regarding the '.add' argument being deprecated, this is
-#'   belived to be an issue with tidygraph which may be resolved in a future release: 
-#'   <https://github.com/thomasp85/tidygraph/issues/131>. Another warning may be shown regarding the 'neimode' argument being deprecated, this is
-#'   belived to be an issue with tidygraph which may be resolved in a future release: 
-#'   <https://github.com/thomasp85/tidygraph/issues/156>. These warning messages are not believed to have
-#'   an effect on the functionality of eHDPrep.
+#' @note A warning may be shown regarding the '.add' argument being deprecated,
+#'   this is believed to be an issue with
+#'   \code{\link[tidygraph:tidygraph]{tidygraph}} which may be resolved in a
+#'   future release: <https://github.com/thomasp85/tidygraph/issues/131>.
+#'   Another warning may be shown regarding the 'neimode' argument being
+#'   deprecated, this is believed to be an issue with
+#'   \code{\link[tidygraph:tidygraph]{tidygraph}} which may be resolved in a
+#'   future release: <https://github.com/thomasp85/tidygraph/issues/156>. These
+#'   warning messages are not believed to have an effect on the functionality of
+#'   'eHDPrep'.
 #'  
 #' @param graph Graph containing ontological and dataset nodes. Must be in
 #'   \code{\link{tidygraph}} format or coercible to this format. Must have been
