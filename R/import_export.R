@@ -188,6 +188,7 @@ select_by_datatype <- function(class_tbl, extract_class, negate = FALSE) {
 #' @importFrom readr write_csv write_tsv
 #' @seealso \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
 #' @family import to/export from 'R' functions
+#' @return \code{x} saved to \code{file} in selected \code{format}
 #' @export
 #' @examples
 #' data(example_data)

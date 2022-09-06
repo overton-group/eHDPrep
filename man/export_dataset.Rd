@@ -15,6 +15,9 @@ export_dataset(x, file, format = "csv", ...)
 
 \item{...}{parameters to pass to \code{\link[readr]{write_csv}} or \code{\link[readr]{write_tsv}}.}
 }
+\value{
+\code{x} saved to \code{file} in selected \code{format}
+}
 \description{
 Save dataset in .csv or .tsv format. A wrapper function for \code{readr}'s
 \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}.
