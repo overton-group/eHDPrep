@@ -1,7 +1,7 @@
 Package: eHDPrep
 Type: Package
 Title: Quality Control and Semantic Enrichment of Datasets
-Version: 1.2
+Version: 1.2.1
 Authors@R: c(person("Tom", "Toner", role = c("aut"),
                     email = "ttoner03@qub.ac.uk",
                     comment = c(ORCID = "0000-0001-8059-5822")),
