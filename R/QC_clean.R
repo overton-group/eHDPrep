@@ -186,18 +186,6 @@ nums_to_NA <- function (data, ..., nums_to_replace = NULL) {
 ##'   2. Alternatively, numeric vector if \code{numeric_out} parameter is
 ##'   \code{TRUE}.
 ##' @importFrom forcats fct_relevel
-##' @examples
-##' data(example_data)
-##' # return factor vector
-##' eHDPrep:::encode_bin_cat_vec(example_data$hypertension)
-##'
-##' # return numeric vector
-##' eHDPrep:::encode_bin_cat_vec(example_data$hypertension, numeric_out = TRUE)
-##'
-##' # use custom values
-##' eHDPrep:::encode_bin_cat_vec(example_data$rural_urban,
-##'                              values = c("rural" = "urban"))
-##' 
 encode_bin_cat_vec <- function(x, values = NULL, numeric_out = FALSE) {
   if(is.factor(x)){ x <- as.character(x)} else{x} # convert factor inputs to character
 
@@ -359,10 +347,6 @@ encode_ordinals <- function(data, ord_levels, ..., strict_levels = TRUE) {
 ##' @importFrom magrittr %>%
 ##' @importFrom dplyr recode
 ##' @importFrom forcats fct_infreq
-##' @examples
-##' data(example_data)
-##' vec <- example_data[,"SNP_a",drop = TRUE]
-##' eHDPrep:::encode_genotype_vec(vec)
 encode_genotype_vec <- function(x) {
   
   # make uppercase
@@ -444,11 +428,6 @@ encode_genotypes <- function(data, ...) {
 #' @importFrom tidyr pivot_wider
 #' @importFrom  tibble rownames_to_column
 #' @return tibble
-#' 
-#'
-#' @examples
-#' vec <- c("blue", "red", "green", "red", "green")
-#' eHDPrep:::onehot_vec(vec, "example")
 onehot_vec <- function(x, prefix) {
   prefix <- ifelse(missing(prefix),deparse(substitute(x)),prefix)
 

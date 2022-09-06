@@ -180,10 +180,6 @@ plot_completeness <- function(data, id_var, plot = c("variables","rows")) {
 #'
 #' @param data data frame.
 #' @return Numeric vector of length 1
-#'
-#' @examples
-#' data(mtcars)
-#' eHDPrep:::distant_neg_val(mtcars)
 distant_neg_val <- function(data) {
   if (all(apply(data, 2, is.numeric)) == FALSE) {
     stop("All variables must be numeric", call. = FALSE)

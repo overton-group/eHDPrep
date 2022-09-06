@@ -18,7 +18,3 @@ process. Calculates minimum of values in numeric vector (ignoring NAs). If
 all values in numeric vector are \code{NA}, returns \code{NA} (rather than
 Inf),
 }
-\examples{
-x <- c(1,2,3)
-eHDPrep:::min_catchNAs(x)
-}

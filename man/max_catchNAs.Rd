@@ -17,7 +17,3 @@ This low-level function is deployed as part of the semantic enrichment
 process.Calculates maximum of values in numeric vector (ignoring NAs). If all
 values in input vector are \code{NA}, returns \code{NA} (rather than -Inf),
 }
-\examples{
-x <- c(1,2,3)
-eHDPrep:::max_catchNAs(x)
-}

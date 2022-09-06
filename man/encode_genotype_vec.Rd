@@ -21,8 +21,3 @@ frequent SNP allele is 1, second most frequent value is 2, and least frequent
 values is 3). This method embeds the numeric relationship between the SNP
 allele frequencies while preserving value labels.
 }
-\examples{
-data(example_data)
-vec <- example_data[,"SNP_a",drop = TRUE]
-eHDPrep:::encode_genotype_vec(vec)
-}

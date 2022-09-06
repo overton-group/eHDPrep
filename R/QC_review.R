@@ -46,14 +46,6 @@
 ##' @importFrom kableExtra cell_spec
 ##' @return Table with cell colours specified.
 ##' @seealso \code{\link[knitr]{kable}} \code{\link[kableExtra]{cell_spec}}
-##' @examples
-##' require(knitr)
-##' require(kableExtra)
-##' require(magrittr)
-##' # create dataframe with a logical variable and non-logical variable
-##' data.frame(lgls = c(TRUE,TRUE,FALSE,NA), non_lgls = c("true","true","false","NA")) %>%
-##' eHDPrep:::cellspec_lgl() %>%
-##' kable(escape = FALSE)
 cellspec_lgl <- function(.data, rg = FALSE) {
 
   format <- ifelse(knitr::is_latex_output(), "latex", "html")

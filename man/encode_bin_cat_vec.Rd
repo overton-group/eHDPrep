@@ -32,16 +32,3 @@ provided, the default list will be used: \code{"No"="Yes", "No/unknown" =
 "Yes", "no/unknown" = "Yes", "Non-user" = "User", "Never" = "Ever", "WT" =
 "MT"}.
 }
-\examples{
-data(example_data)
-# return factor vector
-eHDPrep:::encode_bin_cat_vec(example_data$hypertension)
-
-# return numeric vector
-eHDPrep:::encode_bin_cat_vec(example_data$hypertension, numeric_out = TRUE)
-
-# use custom values
-eHDPrep:::encode_bin_cat_vec(example_data$rural_urban,
-                             values = c("rural" = "urban"))
-
-}

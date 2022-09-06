@@ -32,10 +32,6 @@ utils::globalVariables("where")
 #' @param graph graph object to validate.
 #'
 #' @return input graph or validation errors
-#' @examples 
-#' data(example_ontology)
-#' eHDPrep:::validate_ontol_nw(example_ontology)
-#' 
 validate_ontol_nw <- function(graph) {
   if(!tidygraph::with_graph(tidygraph::as_tbl_graph(graph),
                            tidygraph::graph_is_directed())) {
@@ -64,13 +60,6 @@ validate_ontol_nw <- function(graph) {
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
 #' @return Any warnings and the mapping table returned invisibly
-#' @examples 
-#' data(example_mapping_file)
-#' data(example_data)
-#' data(example_ontology)
-#' 
-#' # warns that some variables don't correspond between the data and the mapping file:
-#' eHDPrep:::validate_mapping_tbl(example_mapping_file, example_data, example_ontology)
 validate_mapping_tbl <- function(mapping_tbl, data, ontol_graph) {
   mapping_tbl %>%
     dplyr::mutate(matching_vals = .[[1]] == .[[2]],
@@ -588,9 +577,6 @@ normalize <- function(x, na.rm = TRUE) {
 #' 
 #' @param x numeric vector
 #' @return sum of \code{x}
-#' @examples
-#' x <- c(1,2,3)
-#' eHDPrep:::sum_catchNAs(x)
 
 sum_catchNAs <- function(x) {
   if(all(is.na(x))) {
@@ -606,13 +592,6 @@ sum_catchNAs <- function(x) {
 #' 
 #' @param x numeric vector
 #' @return mean of \code{x}
-#' @examples
-#' x <- c(1,2,3)
-#' eHDPrep:::mean_catchNAs(x)
-#' 
-#' # with NA present:
-#' x <- c(1,2,3, NA)
-#' eHDPrep:::mean_catchNAs(x)
 mean_catchNAs <- function(x) {
   if(all(is.na(x))) {
     return(as.numeric(NA))
@@ -627,9 +606,6 @@ mean_catchNAs <- function(x) {
 #'
 #' @param x numeric vector
 #' @return maximum value of \code{x}
-#' @examples
-#' x <- c(1,2,3)
-#' eHDPrep:::max_catchNAs(x)
 max_catchNAs <- function(x) {
   if(all(is.na(x))) {
     return(as.numeric(NA))
@@ -645,9 +621,6 @@ max_catchNAs <- function(x) {
 #'
 #' @param x numeric vector
 #' @return minimum value of \code{x}
-#' @examples
-#' x <- c(1,2,3)
-#' eHDPrep:::min_catchNAs(x)
 min_catchNAs <- function(x) {
   if(all(is.na(x))) {
     return(as.numeric(NA))
@@ -663,20 +636,8 @@ min_catchNAs <- function(x) {
 #' 
 #' @param x numeric vector
 #' @return product of \code{x}
-#' @examples
-#' x <- c(1,2,3)
-#' eHDPrep:::prod_catchNAs(x)
 prod_catchNAs <- function(x) {
   if(all(is.na(x))) {
     return(as.numeric(NA))
   } else{prod(x, na.rm = TRUE)}
 }
-
-#' import ggraph (used in vignette)
-#' @keywords internal
-#' @importFrom 
-
-
-
-
-

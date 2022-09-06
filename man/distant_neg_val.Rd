@@ -16,7 +16,3 @@ Numeric vector of length 1
 Returns a numeric value which is distant from the values in \code{data} using
 the following equation: \deqn{output = -2 * (max(data)-min(data)))}
 }
-\examples{
-data(mtcars)
-eHDPrep:::distant_neg_val(mtcars)
-}

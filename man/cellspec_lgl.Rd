@@ -37,15 +37,6 @@ There are four cell types considered:
 Note: When passed to \code{kable()}, the \code{escape} parameter should be
 \code{FALSE} for colours to be rendered correctly.
 }
-\examples{
-require(knitr)
-require(kableExtra)
-require(magrittr)
-# create dataframe with a logical variable and non-logical variable
-data.frame(lgls = c(TRUE,TRUE,FALSE,NA), non_lgls = c("true","true","false","NA")) \%>\%
-eHDPrep:::cellspec_lgl() \%>\%
-kable(escape = FALSE)
-}
 \seealso{
 \code{\link[knitr]{kable}} \code{\link[kableExtra]{cell_spec}}
 }

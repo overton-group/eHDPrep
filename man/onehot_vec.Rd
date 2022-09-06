@@ -18,7 +18,3 @@ tibble
 Uses one-hot encoding to convert nominal vectors to a tibble containing
 variables for each of the unique values in input vector.
 }
-\examples{
-vec <- c("blue", "red", "green", "red", "green")
-eHDPrep:::onehot_vec(vec, "example")
-}

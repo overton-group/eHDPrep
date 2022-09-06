@@ -17,11 +17,3 @@ This low-level function is deployed as part of the semantic enrichment
 process. Averages values in numeric vector (ignoring NAs). If all values in
 numeric vector are \code{NA}, returns \code{NA} (rather than NaN),
 }
-\examples{
-x <- c(1,2,3)
-eHDPrep:::mean_catchNAs(x)
-
-# with NA present:
-x <- c(1,2,3, NA)
-eHDPrep:::mean_catchNAs(x)
-}

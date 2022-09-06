@@ -23,8 +23,3 @@ The tests are:
    \item Does graph contains one component (is one ontology)?
 }
 }
-\examples{
-data(example_ontology)
-eHDPrep:::validate_ontol_nw(example_ontology)
-
-}

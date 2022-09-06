@@ -16,7 +16,3 @@ sum of \code{x}
 sums values in x (ignoring NAs). If all values in x are \code{NA}, returns
 \code{NA} (rather than 0),
 }
-\examples{
-x <- c(1,2,3)
-eHDPrep:::sum_catchNAs(x)
-}

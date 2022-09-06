@@ -24,11 +24,3 @@ Any warnings and the mapping table returned invisibly
 Applies tests to a mapping table to ensure it is valid for use with
 the data frame and ontological graph, in preparation for semantic enrichment.
 }
-\examples{
-data(example_mapping_file)
-data(example_data)
-data(example_ontology)
-
-# warns that some variables don't correspond between the data and the mapping file:
-eHDPrep:::validate_mapping_tbl(example_mapping_file, example_data, example_ontology)
-}

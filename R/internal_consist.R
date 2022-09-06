@@ -49,7 +49,7 @@
 #' @importFrom purrr map_int map_lgl
 #' @return Error message or successful validation message is printed.
 #'   The dataset is returned invisibly.
-#'@family internal consistency functions
+#' @family internal consistency functions
 #' @export
 #' @examples
 #' require(tibble)
