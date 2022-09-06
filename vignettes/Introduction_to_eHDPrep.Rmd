@@ -28,6 +28,8 @@ vignette: >
 ---
 
 ```{r, include=FALSE}
+old_opts <- options()
+old_knitr_opts <- knitr::opts_chunk$get()
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -929,6 +931,12 @@ example_ontology %>%
 ## summary of output
 tibble::glimpse(qc_se_data)
 
+```
+
+```{r, include=FALSE}
+# restore original options
+options(old_opts)
+knitr::opts_chunk$set(old_knitr_opts)
 ```
 
 # References
