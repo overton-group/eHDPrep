@@ -374,7 +374,7 @@ mod_track <- function(before_tbl, after_tbl,
   # return plot or tbl (based on plot parameter)
   if (plot) {
     out_tbl %>%
-      dplyr::select(!! id_var, .data$mod_type) %>% # select ID and modification type
+      dplyr::select(!! id_var, "mod_type") %>% # select ID and modification type
       #dplyr::filter(.data$mod_type != "None") %>%
       dplyr::group_by_all() %>%
       dplyr::tally() %>%
