@@ -91,7 +91,7 @@ row_completeness <- function(data, id_var) {
     # transpose tibble
     tidyr::pivot_longer(-!!id_var, names_to="Variable", values_to=".tempvals") %>%
     tidyr::pivot_wider(names_from = !!id_var, values_from=".tempvals") %>%
-    dplyr::select(-.data$Variable) %>% # remove variable name column
+    dplyr::select(-"Variable") %>% # remove variable name column
     purrr::map_dfr(sum) %>% # sum NAs by row
     tidyr::pivot_longer(dplyr::everything(),
                         names_to = dplyr::as_label(id_var),

@@ -443,7 +443,7 @@ onehot_vec <- function(x, prefix) {
                        names_prefix = paste0(prefix,"_"),
                        names_repair = "universal") %>%
     suppressMessages() %>%
-    dplyr::select(-.data$rowname)
+    dplyr::select(-"rowname")
 }
 
 
@@ -637,7 +637,7 @@ ordinal_label_levels <- function(data, out_path = NULL) {
   data_ord %>%
     dplyr::mutate(dplyr::across(dplyr::everything(), as.numeric)) %>%
     tidyr::pivot_longer(dplyr::everything(), names_to = "variable", values_to = "level") %>%
-    dplyr::select(.data$level) ->
+    dplyr::select("level") ->
     levels 
   
   dplyr::bind_cols(labels, levels) %>%

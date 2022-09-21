@@ -318,7 +318,7 @@ identify_inconsistency <- function(data = NULL, consis_tbl = NULL, id_var = NULL
         !(.data$a_ischar) & .data$b_ischar ~ "num_chr",
         !(.data$a_ischar) & !(.data$b_ischar) ~ "num_num",
         TRUE ~ "unknown_compar")) %>%
-      dplyr::select(-c(.data$a_ischar, .data$b_ischar)) %>%
+      dplyr::select(-c("a_ischar", "b_ischar")) %>%
       # iterate over each row and compare depending on compare_type
       dplyr::mutate(range_incon =
                       purrr::pmap(list(
