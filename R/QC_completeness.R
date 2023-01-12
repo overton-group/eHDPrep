@@ -253,7 +253,9 @@ distant_neg_val <- function(data) {
 #' "SNP_b", "genotype",
 #' "free_text", "freetext") -> data_types
 #' 
-#' completeness_heatmap(example_data,patient_id, annotation_tbl = data_types)
+#' hm <- completeness_heatmap(example_data,patient_id, annotation_tbl = data_types)
+#' plot.new()
+#' hm
 completeness_heatmap <- function(data, id_var, annotation_tbl = NULL, method = 1, 
                                  show_rownames = FALSE, ...) {
   # fallback IDs, if not provided

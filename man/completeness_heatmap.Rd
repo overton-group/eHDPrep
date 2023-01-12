@@ -71,7 +71,9 @@ tibble::tribble(~"var", ~"datatype",
 "SNP_b", "genotype",
 "free_text", "freetext") -> data_types
 
-completeness_heatmap(example_data,patient_id, annotation_tbl = data_types)
+hm <- completeness_heatmap(example_data,patient_id, annotation_tbl = data_types)
+plot.new()
+hm
 }
 \references{
 Kolde R (2019). _pheatmap: Pretty Heatmaps_. R package version 1.0.12,
