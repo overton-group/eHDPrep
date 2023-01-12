@@ -18,6 +18,14 @@ user-provided ontologies.
 Ian Overton \email{I.Overton@qub.ac.uk} (\url{https://orcid.org/0000-0003-1158-8527})
 }
 
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/overton-group/eHDPrep}
+  \item Report bugs at \url{https://github.com/overton-group/eHDPrep/issues}
+}
+
+}
 \author{
 Tom Toner \email{ttoner03@qub.ac.uk} (\url{https://orcid.org/0000-0001-8059-5822}),
  Ian Overton \email{I.Overton@qub.ac.uk} (\url{https://orcid.org/0000-0003-1158-8527})
