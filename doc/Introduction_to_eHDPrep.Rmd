@@ -710,13 +710,13 @@ SE requires three input objects:
 
     -   All variables must be numeric because SE attempts to aggregate values.
 
-2.  An ontology in 'R' as a 'igraph' or 'tidygraph' object.
+2.  An ontology as a graph ('igraph' or 'tidygraph'), a data frame containing an edge table, or a path to an edge table in a csv file.
 
     -   `example_ontology` is a synthetic ontology we have created to demonstrate the semantic commonalities in `example_data`.
 
     -   At present, users must supply an ontology themselves. There are several potential ontologies for health data including SNOMED CT, the Gene Ontology, the Disease Ontology, and the Human Phenotype Ontology [@millar2016; @geneontologyconsortium2019; @schriml2019; @köhler2021].
 
-3.  A mapping file (csv or data frame) which links variables in the data with entities in the ontology.
+3.  A mapping file (csv path or data frame) which links variables in the data with entities in the ontology.
 
     -   `example_mapping_file` is used to demonstrate SE here.
     -   The variable name must not be identical to the ontological entity to which it is mapped (e.g. variable `hypertension` cannot be mapped to a ontological entity `hypertension`). This is not typically a problem as most ontologies use a numeric naming system unlikely to be used for variable names.

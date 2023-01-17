@@ -18,8 +18,10 @@ semantic_enrichment(
 \item{data}{Numeric data frame or matrix containing variables present in
 the mapping file.}
 
-\item{ontology}{Graph containing the chosen ontology. Must be in
-\code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.}
+\item{ontology}{One of: \itemize{\item Path to ontology edge table in .csv format (String)\item Edge
+table in data frame format \item Graph containing the chosen ontology -
+must be in \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible
+to this format.}}
 
 \item{mapping_file}{Path to csv file or data frame containing mapping
 information. Should contain two columns only. The first column should
@@ -35,7 +37,7 @@ from.}
 \item{label_attr}{Node attribute containing labels used for column names when
 creating metavariable aggregations. Default: "name"}
 
-\item{...}{additional arguments to pass to \code{\link[readr]{read_csv}}}
+\item{...}{additional arguments to pass to \code{\link[readr]{read_csv}} when reading `mapping_file`.}
 }
 \value{
 Semantically enriched dataset

@@ -706,3 +706,88 @@ prod_catchNAs <- function(x) {
     return(as.numeric(NA))
   } else{prod(x, na.rm = TRUE)}
 }
+
+#' Convert edge table to tidygraph graph
+#' 
+#' A edge table, as a data frame, is converted to a directed tidygraph
+#' \code{\link[tidygraph:tidygraph]{tidygraph}}. Column 1 of the edge table is
+#' interpreted as a "from" column, Column 2 is interpreted as a "to" column, and
+#' any further columns are interpreted as attributes of the entity/node recorded
+#' in column 1. Incomplete cases are removed from the edge table (rows) to avoid
+#' redundancy
+#' 
+#' @param edge_tbl data frame containing 'from' nodes in column 1 and 'to' nodes
+#'   in column 2 so that all nodes go 'towards' the root node
+#'
+#' @return \code{\link[tidygraph:tidygraph]{tidygraph}} representation of the edge table
+#' @export
+#'
+#' @examples
+#' # basic edge table
+#' edge_tbl <- tibble::tribble(~from, ~to,
+#' "Nstage", "TNM",
+#' "Tstage", "TNM",
+#' "Tumoursize", "property_of_tumour",
+#' "Tstage", "property_of_tumour",
+#' "property_of_tumour", "property_of_cancer",
+#' "TNM", "property_of_cancer",
+#' "property_of_cancer", "disease",
+#' "disease", "root",
+#' "root", NA)
+#' 
+#' graph <- edge_tbl_to_graph(edge_tbl)
+#' 
+#' graph
+#' 
+#' plot(graph)
+#' 
+#' 
+#' # edge table with node attributes
+#' ## note that root node is included in final row to include its label
+#' edge_tbl <- tibble::tribble(~from, ~to, ~label,
+#' "Nstage", "TNM", "N stage",
+#' "Tstage", "TNM", "T stage",
+#' "Tumoursize", "property_of_tumour", "Tumour size",
+#' "Tstage", "property_of_tumour", "T stage",
+#' "property_of_tumour", "property_of_cancer", "Property of tumour",
+#' "TNM", "property_of_cancer", "TNM",
+#' "property_of_cancer", "disease", "Property of cancer",
+#' "disease", "root", "Disease",
+#' "root", NA, "Ontology Root")
+#' graph <- edge_tbl_to_graph(edge_tbl)
+#' 
+#' graph
+#' 
+#' plot(graph)
+#' 
+edge_tbl_to_graph <- function(edge_tbl) {
+  
+  if(!is.data.frame(edge_tbl)) {
+    stop("`edge_tbl' must be a data frame")
+  } else {}
+  
+  graph <- edge_tbl %>%
+    dplyr::select(1,2) %>%
+    dplyr::filter(stats::complete.cases(.)) %>%
+    tidygraph::as_tbl_graph(directed = TRUE)
+  
+  # add node attributes
+  if (ncol(edge_tbl) > 2) {
+    message("More than two columns detected in `edge_tbl`. These will be joined to the graph as node attributes")
+    
+    node_attr <- edge_tbl %>%
+      rename(.from = 1) %>% # rename first column
+      dplyr::select(-2) %>% # remove 'to' (second) column
+      dplyr::distinct(dplyr::across(dplyr::everything())) # retain only distinct rows
+    
+    graph <- graph %>%
+      tidygraph::left_join(node_attr, by = c(name = ".from")) %>%
+      mutate()
+      
+  } else{}
+  
+  # quick validation
+  validate_ontol_nw(graph)
+  
+  return(graph)
+}

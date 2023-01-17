@@ -25,7 +25,8 @@ edge_tbl <- tibble::tribble(~from, ~to,
                 "gene_A", "pathway_1",
                 "gene_B", "pathway_1",
                 "pathway_1", "metabolic_pathway",
-                "metabolic_pathway", "root")
+                "metabolic_pathway", "root",
+                "root", NA)
 
 example_ontology <- tidygraph::as_tbl_graph(edge_tbl)
 
