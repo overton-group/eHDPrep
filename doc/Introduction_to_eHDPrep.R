@@ -1,4 +1,6 @@
 ## ---- include=FALSE-----------------------------------------------------------
+old_opts <- options()
+old_knitr_opts <- knitr::opts_chunk$get()
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -57,14 +59,13 @@ res$internal_inconsistency
 ## -----------------------------------------------------------------------------
 res$vars_with_zero_entropy
 
-## ---- eval = FALSE------------------------------------------------------------
-#  
-#  assume_var_classes(data = example_data, out_file = "./datatypes.csv")
-#  
-#  # (user makes manual edits externally)
-#  
-#  import_var_classes(file = "./datatypes.csv")
-#  
+## -----------------------------------------------------------------------------
+tmp = tempfile(fileext = ".csv")
+assume_var_classes(data = example_data, out_file = tmp)
+
+# (user makes manual edits externally)
+
+import_var_classes(file = tmp)
 
 ## ---- echo = FALSE------------------------------------------------------------
 # create an example class_tbl object
@@ -487,6 +488,9 @@ metavariables_nw %>%
     coord_flip()
 
 ## -----------------------------------------------------------------------------
+metavariable_variable_descendants(metavariables_nw)
+
+## -----------------------------------------------------------------------------
 example_ontology %>%
     join_vars_to_ontol(var2entity_tbl = example_mapping_file, root = "root") %>%
     metavariable_info() %>%
@@ -496,4 +500,9 @@ example_ontology %>%
 ## summary of output
 tibble::glimpse(qc_se_data)
 
+
+## ---- include=FALSE-----------------------------------------------------------
+# restore original options
+options(old_opts)
+knitr::opts_chunk$set(old_knitr_opts)
 

@@ -108,6 +108,7 @@ tibble::glimpse(res)
 \seealso{
 Other semantic enrichment functions: 
 \code{\link{join_vars_to_ontol}()},
-\code{\link{metavariable_info}()}
+\code{\link{metavariable_info}()},
+\code{\link{metavariable_variable_descendants}()}
 }
 \concept{semantic enrichment functions}

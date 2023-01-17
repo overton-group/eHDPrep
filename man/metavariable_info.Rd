@@ -4,7 +4,7 @@
 \alias{metavariable_info}
 \title{Compute Metavariable Information}
 \usage{
-metavariable_info(graph, mode = "in")
+metavariable_info(graph, mode = "in", IC_threshold = 0)
 }
 \arguments{
 \item{graph}{Graph containing ontological and dataset nodes. Must be in
@@ -12,6 +12,9 @@ metavariable_info(graph, mode = "in")
 
 \item{mode}{Character constant specifying the directionality of the edges.
 One of: "in" or "out".}
+
+\item{IC_threshold}{Metavariables with IC less than this value will be
+omitted from output. Default = 0 (no omission).}
 }
 \value{
 A modified graph object with additional node attributes pertaining to their
@@ -54,6 +57,7 @@ metavariable_info(joined_ontol)
 
 Other semantic enrichment functions: 
 \code{\link{join_vars_to_ontol}()},
-\code{\link{metavariable_agg}()}
+\code{\link{metavariable_agg}()},
+\code{\link{metavariable_variable_descendants}()}
 }
 \concept{semantic enrichment functions}

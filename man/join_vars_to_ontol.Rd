@@ -50,6 +50,7 @@ node_IC_zhou
 
 Other semantic enrichment functions: 
 \code{\link{metavariable_agg}()},
-\code{\link{metavariable_info}()}
+\code{\link{metavariable_info}()},
+\code{\link{metavariable_variable_descendants}()}
 }
 \concept{semantic enrichment functions}

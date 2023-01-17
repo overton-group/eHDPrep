@@ -4,14 +4,22 @@
 \alias{semantic_enrichment}
 \title{Semantic enrichment}
 \usage{
-semantic_enrichment(data, ontology, mapping_file, mode = "in", root, ...)
+semantic_enrichment(
+  data,
+  ontology,
+  mapping_file,
+  mode = "in",
+  root,
+  label_attr = "name",
+  ...
+)
 }
 \arguments{
 \item{data}{Numeric data frame or matrix containing variables present in
 the mapping file.}
 
 \item{ontology}{Graph containing the chosen ontology. Must be in
-test format or coercible to this format.}
+\code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.}
 
 \item{mapping_file}{Path to csv file or data frame containing mapping
 information. Should contain two columns only. The first column should
@@ -23,6 +31,9 @@ One of: "in" or "out".}
 
 \item{root}{name of root node identifier in column 1 to calculate node depth
 from.}
+
+\item{label_attr}{Node attribute containing labels used for column names when
+creating metavariable aggregations. Default: "name"}
 
 \item{...}{additional arguments to pass to \code{\link[readr]{read_csv}}}
 }

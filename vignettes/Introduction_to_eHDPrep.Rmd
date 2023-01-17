@@ -917,6 +917,19 @@ metavariables_nw %>%
 
 Note how variable sets 5 and 8 each have two nodes which share the same set of variables. The information content, calculated during `join_vars_to_ontol()`, of these nodes is compared and the node with the highest information content is used to label the set.
 
+Additionally, a minimum threshold can be applied to the information content to exclude less informative (less specific) meta-variables from subsequent aggregation with the `IC_threshold` parameter).
+
+### Review meta-variables' source variables
+
+Information describing dataset variables which have been identified as ontological descendants for each meta-variable is contained in the output of `metavariable_info()`. Reviewing this information can be important in understanding how meta-variables were constructed. This is particularly true for meta-variables with a low information content as their label will be less specific to the dataset variables.
+
+`metavariable_variable_descendants()` distils this information from the output of `metavariable_info()` into a table where each row describes one most informative common ancestor (the precursor to meta-variable aggregations), its information content, and one of its descendant/source variables which was used in its creation.
+
+```{r}
+metavariable_variable_descendants(metavariables_nw)
+```
+
+
 ### Generate semantic aggregations
 
 With the sets of variables identified and the meta-variable used to label each set confirmed, the next step is to perform the aggregations. This functionality requires the previously described low-level SE functions and is overlaps with the `semantic_enrichment()` function, but does not carry out some of the checks.

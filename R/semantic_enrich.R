@@ -304,6 +304,8 @@ join_vars_to_ontol <- function(ontol_graph, var2entity_tbl, mode = "in", root, k
 #' \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.
 #' @param mode Character constant specifying the directionality of the edges.
 #'   One of: "in" or "out".
+#' @param IC_threshold Metavariables with IC less than this value will be
+#'   omitted from output. Default = 0 (no omission).
 #' @family semantic enrichment functions
 #' @importFrom tidygraph mutate map_local_int as_tibble filter graph_order
 #'   select pull map_local_lgl map_local arrange group_by ungroup
@@ -322,8 +324,8 @@ join_vars_to_ontol <- function(ontol_graph, var2entity_tbl, mode = "in", root, k
 #' join_vars_to_ontol(example_mapping_file, root = "root") -> joined_ontol
 #' 
 #' metavariable_info(joined_ontol)
-metavariable_info <- function(graph, mode = "in") {
-  message("Identifying semantic commonalities through metavariables...")
+metavariable_info <- function(graph, mode = "in", IC_threshold = 0) {
+  message("Identifying semantic commonalities...")
   start_time <- Sys.time()
   graph %>%
     # Minimum distance of each node to a variable node
@@ -383,14 +385,77 @@ metavariable_info <- function(graph, mode = "in") {
                         .data$information_content == max(dplyr::cur_data()$information_content)) %>%
     tidygraph::ungroup() ->
     res
+  
 
-  nrow(filter(res, .data$highest_IC & .data$is_metavariable))
+  if (IC_threshold > 0) {
+    original_nrow <- nrow(as_tibble(filter(res, .data$highest_IC & .data$is_metavariable)))
+    
+    res <- filter(res, .data$information_content >= IC_threshold)
+    thresholded_nrow <- nrow(as_tibble(filter(res, .data$highest_IC & .data$is_metavariable)))
+    nrow_removed <- original_nrow - thresholded_nrow 
+    
+    IC_threshold_msg <- paste0("\n", nrow_removed, " semantic commonalities were omitted as they did not meet the IC threshold (", IC_threshold, ").")
+    
+  } else {IC_threshold_msg = ""}
+
   message("Complete. Duration: ", as.character(round(as.numeric(Sys.time()-start_time),2)), " secs.\n",
           nrow(as_tibble(filter(res, .data$highest_IC & .data$is_metavariable))),
-          " semantic commonalities found (via most informative common ancestors).")
+          " semantic commonalities found (via common ontological ancestors).", IC_threshold_msg)
 
-  res
+  return(res)
 }
+
+
+#' Extract metavariables' descendant variables
+#'
+#' Formats the output of \code{\link{metavariable_info}} for easier
+#' interpretation of each metavariable's descendant variables
+#'
+#' Not part of the standard semantic enrichment pipeline as this function just
+#' produces a simplified version of the output of \code{\link{metavariable_info}}.
+#' 
+#' The output of \code{\link{metavariable_info}} is converted to a tibble,
+#' filtered to only include metavariables with highest information content for
+#' the variable set. The tibble has three columns describing a metavariable, its
+#' information content, and its descendant variables.
+#' 
+#' @seealso \code{\link{node_IC_zhou}}
+#' @param metavariable_info_output Output tibble of
+#'   \code{\link{metavariable_info}}
+#' @family semantic enrichment functions
+#' @importFrom tibble tibble
+#' @importFrom tidyr unnest
+#' @importFrom dplyr filter select arrange desc
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @return A tibble describing each metavariable, its
+#'   information content, and its descendant variables
+#' @export
+#'
+#' @examples
+#' data(example_ontology)
+#' require(magrittr)
+#' example_ontology %>%
+#' join_vars_to_ontol(example_mapping_file, root = "root") -> joined_ontol
+#'
+#' mv_info <- metavariable_info(joined_ontol)
+#' metavariable_variable_descendants(mv_info)
+metavariable_variable_descendants <- function(metavariable_info_output) {
+
+  out <- metavariable_info_output %>%
+    tibble::as_tibble() %>%
+    dplyr::filter(.data$is_metavariable & .data$highest_IC) %>%
+    dplyr::select(1, 2, 6) %>%
+    dplyr::arrange(dplyr::desc(.data$information_content)) %>%
+    rename(metavariable = .data$name) %>%
+    tidyr::unnest(.data$variable_descendants) %>%
+    rename(descendant_variable = .data$name)
+  
+  return(out)
+  
+}
+
+
 
 #' Aggregate Data by Metavariable
 #'
@@ -491,7 +556,7 @@ metavariable_agg <- function(graph, data, label_attr ="name", normalize_vals = T
   start_time <- Sys.time()
   start_ncol <- ncol(data)
   
-  message("Aggregating variables by semantic commonalities and appending to `data`...")
+  message("Aggregating variables with semantic commonalities to metavariables\nand appending to `data`...\nMetavariables will be labelled by the most informative common ancestor.")
   
   # filter graph to only Most Informative Common Ancestors (MICAs)
   graph %>%
@@ -551,8 +616,8 @@ metavariable_agg <- function(graph, data, label_attr ="name", normalize_vals = T
   }
   
   message("Complete. Duration: ", as.character(round(as.numeric(Sys.time()-start_time),2)), " secs.\n",
-          "The dataset has been enriched with ", ncol(data) - start_ncol, " new variables\n(",
-          zev, " new variables were not appended as they had zero entropy).")
+          "The dataset has been enriched with ", ncol(data) - start_ncol, " metavariables\n(",
+          zev, " metavariables were not appended as they had zero entropy).")
   
   return(data)
 }

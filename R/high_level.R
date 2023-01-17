@@ -415,7 +415,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' @param data Numeric data frame or matrix containing variables present in
 #'   the mapping file.
 #' @param ontology Graph containing the chosen ontology. Must be in
-#'   test format or coercible to this format.
+#'   \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible to this format.
 #' @param mapping_file Path to csv file or data frame containing mapping
 #'   information. Should contain two columns only. The first column should
 #'   contain column names, present in the data frame. The second column should
@@ -423,6 +423,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' @param root name of root node identifier in column 1 to calculate node depth
 #'   from.
 #' @inheritParams metavariable_info
+#' @inheritParams metavariable_agg
 #' @note A warning may be shown regarding the '.add' argument being deprecated, this is
 #'   believed to be an issue with 'tidygraph' which may be resolved in a future release: 
 #'   <https://github.com/thomasp85/tidygraph/issues/131>. Another warning may be shown regarding the 'neimode' argument being deprecated, this is
@@ -483,7 +484,7 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #'  example_mapping_file, root = "root")
 #'  # see Note section of documentation for information on possible warnings.
 #' }
-semantic_enrichment <- function(data, ontology, mapping_file, mode = "in", root, ...) {
+semantic_enrichment <- function(data, ontology, mapping_file, mode = "in", root, label_attr = "name", ...) {
   
   # accept both paths and R data frames for mapping_file
   if (missing(mapping_file)) {
@@ -502,6 +503,6 @@ semantic_enrichment <- function(data, ontology, mapping_file, mode = "in", root,
   ontology %>%
     join_vars_to_ontol(mapping_file, root = root, mode = mode) %>%
     metavariable_info(mode) %>%
-    metavariable_agg(data)
+    metavariable_agg(data, label_attr)
 
 }
