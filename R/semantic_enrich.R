@@ -617,7 +617,7 @@ metavariable_agg <- function(graph, data, label_attr ="name", normalize_vals = T
   
   message("Complete. Duration: ", as.character(round(as.numeric(Sys.time()-start_time),2)), " secs.\n",
           "The dataset has been enriched with ", ncol(data) - start_ncol, " metavariables\n(",
-          zev, " metavariables were not appended as they had zero entropy).")
+          zev, " metavariables had zero entropy and were therefore not appended).")
   
   return(data)
 }
