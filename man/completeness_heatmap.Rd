@@ -47,15 +47,19 @@ values for clustering (present values = 1; missing values = 0). Cells are
 coloured by presence (yellow = missing; blue = present). }
 }
 \note{
-If the heatmap overlaps with other plots on the current device, it 
-is recommended that users run the \code{\link[grid]{grid.newpage}} 
-function to ensure a clean page is used for this plot.
+See examples of how to plot using plot.new(). This is ensure a new plot
+  is created for the heatmap
 }
 \examples{
 data(example_data)
-completeness_heatmap(example_data,patient_id)
 
-# with variable-level annotations
+# heatmap without variable category annotations:
+hm <- completeness_heatmap(example_data,patient_id)
+plot.new() # ensure new plot is created
+hm
+
+
+# heatmap with variable category annotations:
 ## create a dataframe containing variable annotations
 tibble::tribble(~"var", ~"datatype",
 "patient_id", "id",
@@ -72,7 +76,7 @@ tibble::tribble(~"var", ~"datatype",
 "free_text", "freetext") -> data_types
 
 hm <- completeness_heatmap(example_data,patient_id, annotation_tbl = data_types)
-plot.new()
+plot.new() # ensure new plot is created
 hm
 }
 \references{
