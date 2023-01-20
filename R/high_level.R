@@ -405,17 +405,17 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' information: \code{vignette("Introduction_to_eHDPrep", package = "eHDPrep")}
 #' 
 #' @param data Numeric data frame or matrix containing variables present in
-#'   the mapping file.
+#'   the mapping file. Required.
 #' @param ontology One of: \itemize{\item Path to ontology edge table in .csv format (String)\item Edge
 #'   table in data frame format \item Graph containing the chosen ontology -
 #'   must be in \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible
-#'   to this format.}
+#'   to this format.}. Required. 
 #' @param mapping_file Path to csv file or data frame containing mapping
 #'   information. Should contain two columns only. The first column should
 #'   contain column names, present in the data frame. The second column should
-#'   contain the name of entities present in the ontology object.
+#'   contain the name of entities present in the ontology object. Required.
 #' @param root name of root node identifier in column 1 to calculate node depth
-#'   from.
+#'   from. Required.
 #' @inheritParams metavariable_info
 #' @inheritParams metavariable_agg
 #' @note A warning may be shown regarding the '.add' argument being deprecated, this is

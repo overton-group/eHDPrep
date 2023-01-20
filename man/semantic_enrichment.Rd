@@ -16,23 +16,23 @@ semantic_enrichment(
 }
 \arguments{
 \item{data}{Numeric data frame or matrix containing variables present in
-the mapping file.}
+the mapping file. Required.}
 
 \item{ontology}{One of: \itemize{\item Path to ontology edge table in .csv format (String)\item Edge
 table in data frame format \item Graph containing the chosen ontology -
 must be in \code{\link[tidygraph:tidygraph]{tidygraph}} format or coercible
-to this format.}}
+to this format.}. Required.}
 
 \item{mapping_file}{Path to csv file or data frame containing mapping
 information. Should contain two columns only. The first column should
 contain column names, present in the data frame. The second column should
-contain the name of entities present in the ontology object.}
+contain the name of entities present in the ontology object. Required.}
 
 \item{mode}{Character constant specifying the directionality of the edges.
 One of: "in" or "out".}
 
 \item{root}{name of root node identifier in column 1 to calculate node depth
-from.}
+from. Required.}
 
 \item{label_attr}{Node attribute containing labels used for column names when
 creating metavariable aggregations. Default: "name"}
