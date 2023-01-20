@@ -58,7 +58,9 @@ For quality control of health datasets, there are several high-level functions i
 
 5. [`export_dataset()`](#data-export) - export dataset to .csv or .tsv format.
 
-'eHDPrep' also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment).
+A synthetic example dataset `example_data` is used in this vignette and examples to demonstrate functionality.
+
+'eHDPrep' also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment) where meta-variables are discovered from the semantic relationships between input variables as recorded in user-provided ontologies. A small ontology is provided (`example_ontology`) to demonstrate functionality.
 
 # Introduction
 
