@@ -55,14 +55,6 @@ and product. Meta-variables with zero entropy (no information) are not
 appended to the data.
 See the "Semantic Enrichment" section in the vignette of 'eHDPrep' for more
 information: \code{vignette("Introduction_to_eHDPrep", package = "eHDPrep")}
-
-This function requires three inputs:
-\describe{
-\item{data}{a numeric data frame or matrix}
-\item{ontology}{an ontology in the form of a directed network graph}
-\item{mapping_file}{A mapping file/data frame linking variables in
-the data frame with nodes in the ontology object}
-}
 }
 \note{
 A warning may be shown regarding the '.add' argument being deprecated, this is

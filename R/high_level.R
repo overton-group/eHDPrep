@@ -404,14 +404,6 @@ review_quality_ctrl <- function(before_tbl, after_tbl, id_var) {
 #' See the "Semantic Enrichment" section in the vignette of 'eHDPrep' for more
 #' information: \code{vignette("Introduction_to_eHDPrep", package = "eHDPrep")}
 #' 
-#' This function requires three inputs:
-#' \describe{
-#' \item{data}{a numeric data frame or matrix}
-#' \item{ontology}{an ontology in the form of a directed network graph}
-#' \item{mapping_file}{A mapping file/data frame linking variables in
-#' the data frame with nodes in the ontology object}
-#' }
-#'
 #' @param data Numeric data frame or matrix containing variables present in
 #'   the mapping file.
 #' @param ontology One of: \itemize{\item Path to ontology edge table in .csv format (String)\item Edge
