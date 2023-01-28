@@ -152,15 +152,14 @@ nums_to_NA <- function (data, ..., nums_to_replace = NULL) {
   if (missing(...)) {
     data %>%
       dplyr::mutate(dplyr::across(where(is.numeric),
-                                  NA_clean,
-                                  nums_to_replace)
+                                  function(x) NA_clean(x, nums_to_replace))
                     )
   } else {
     vars <- dplyr::enquos(...)
 
     data %>%
       dplyr::mutate(dplyr::across(.cols = c(!!! vars),
-                                  .fns = NA_clean, nums_to_replace)
+                                  .fns = function(x) NA_clean(x, nums_to_replace))
                     )
   }
 }
@@ -248,13 +247,11 @@ encode_bin_cat_vec <- function(x, values = NULL, numeric_out = FALSE) {
 
 encode_binary_cats <- function(data, ..., values = NULL) {
   warn_missing_dots(missing(...))
-  values <- dplyr::enquo(values)
   vars <- dplyr::enquos(...)
 
   data %>%
     dplyr::mutate(dplyr::across(c(!!! vars),
-                                encode_bin_cat_vec,
-                                values = !! values))
+                                function(x) encode_bin_cat_vec(x, values = values)))
 }
 
 ##' Encode ordinal variables
