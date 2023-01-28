@@ -292,7 +292,7 @@ identify_inconsistency <- function(data = NULL, consis_tbl = NULL, id_var = NULL
       dplyr::mutate(lgl_incon = .data$lgl_values %>%
                       purrr::map(. %>%
                                    purrr::map_lgl(function(x) !eval(rlang::parse_expr(x))))) %>%
-      dplyr::mutate(lgl_values = dplyr::na_if(.data$lgl_values, "NA")) ->
+      dplyr::mutate(lgl_values = dplyr::na_if(.data$lgl_values, list("NA"))) ->
       consis_tbl
   } else{}
 
