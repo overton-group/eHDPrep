@@ -20,7 +20,7 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports:
   ggplot2 (>= 3.3.3),
-  dplyr (>= 1.0.3),
+  dplyr (>= 1.1.0),
   forcats (>= 0.5.0),
   stringr (>= 1.4.0),
   purrr (>= 0.3.4),
