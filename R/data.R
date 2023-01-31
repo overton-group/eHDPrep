@@ -56,7 +56,23 @@
 #'
 #' @format A data frame: \describe{
 #' \item{variable}{character. names of variables in post-QC `example_data`.}
-#' \item{onto_entity}{character. names of mapped entities in `example_onto`.}
+#' \item{onto_entity}{character. names of mapped entities in `example_ontology`.}
 #' }
 #' @source synthetic
 "example_mapping_file"
+
+
+#' Example ontology as an edge table for semantic enrichment
+#' 
+#' A data frame describing semantic links (edges) between entities in
+#' `example_ontology`. Used to demonstrate semantic enrichment.
+#'
+#' Used in documentation and creation of `example_ontology` in 'eHDPrep'.
+#'
+#' @format A data frame: \describe{
+#' \item{from}{character. Names of semantic concepts which have a directed relationship to concepts in `to` column.}
+#' \item{to}{character. Names of semantic concepts which have a directed relationship to concepts in `from` column.}
+#' }
+#' @source synthetic
+"example_edge_tbl"
+

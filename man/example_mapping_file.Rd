@@ -7,7 +7,7 @@
 \format{
 A data frame: \describe{
 \item{variable}{character. names of variables in post-QC `example_data`.}
-\item{onto_entity}{character. names of mapped entities in `example_onto`.}
+\item{onto_entity}{character. names of mapped entities in `example_ontology`.}
 }
 }
 \source{
