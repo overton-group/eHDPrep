@@ -19,6 +19,10 @@ library(eHDPrep)
 data(example_data)
 tibble::glimpse(example_data)
 
+## ----echo=FALSE, fig.cap="Suggested workflow of low-level quality control functions in eHDPrep. Dashed lines and boxes represent optional steps.", fig.align='center'----
+# ![](./images/Figure_1.png)
+knitr::include_graphics("./images/Figure_1.png")
+
 ## ---- eval = FALSE------------------------------------------------------------
 #  # Not run, just examples:
 #  #excel
@@ -29,7 +33,7 @@ tibble::glimpse(example_data)
 #  data <- import_dataset(file = "./dataset.tsv", format = "tsv")
 #  
 
-## -----------------------------------------------------------------------------
+## ----fig.show = "hide"--------------------------------------------------------
 data(example_data)
 
 # create a consistency table containing consistency rules
@@ -40,15 +44,14 @@ ct <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundarie
 
 res <- assess_quality(data = example_data, id_var = patient_id, consis_tbl = ct)
 
-res$completeness$variable_completeness
+## -----------------------------------------------------------------------------
 res$completeness$row_completeness
+res$completeness$variable_completeness
 
-
-## ---- fig.height=3, out.width = "100%"----------------------------------------
+## ---- fig.height=3, out.width = "100%", fig.cap="Percentage completeness (x-axis) by count (y-axis) for both rows (red) and variables (purple) of `example_data`."----
 res$completeness$completeness_plot
 
-
-## ---- fig.height=5, out.width = "100%"----------------------------------------
+## ---- fig.height=5, out.width = "100%", fig.cap="Completeness heatmap for `example_data`. Yellow cells represent missing values and blue cells represent non-missing values."----
 plot.new()
 res$completeness$completeness_heatmap
 
@@ -165,7 +168,7 @@ qc_review$value_level_changes
 qc_review$value_level_changes %>% 
   dplyr::distinct(across(!patient_id))
 
-## ---- out.width = "100%", fig.height=3----------------------------------------
+## ---- out.width = "100%", fig.height=3, fig.cap = "Proportion of values modified per patient in `example_data` following quality control. This plot summarises the modifications made to the data during quality control."----
 qc_review$value_level_changes_plt
 
 ## ---- eval = FALSE------------------------------------------------------------
@@ -178,30 +181,34 @@ qc_review$value_level_changes_plt
 #                 file = "./post_QC_example_data.csv",
 #                 format = "tsv")
 
-## ---- fig.height=3------------------------------------------------------------
+## ---- fig.height=3, fig.cap="Percentage completeness (x-axis) by count (y-axis) for variables of `example_data.`"----
 variable_completeness(example_data)
 
 row_completeness(data = example_data, id_var = patient_id)
 
 plot_completeness(data = example_data, id_var = patient_id, plot = "variables")
 
+## ---- fig.height=3, fig.cap="Percentage completeness (x-axis) by count (y-axis) for rows of `example_data`."----
 plot_completeness(data = example_data, id_var = patient_id, plot = "rows")
 
-
-## -----------------------------------------------------------------------------
-# show_rownames is pased to pheatmap() through ...
-completeness_heatmap(data = strings_to_NA(example_data),
+## ---- fig.height=5, fig.show='hold', fig.cap="Completeness heatmap of `example_data` after pre-defined strings have been converted to `NA`. Yellow cells represent missing values and blue cells represent non-missing values."----
+# show_rownames is passed to pheatmap() through the `...` parameter
+hm <- completeness_heatmap(data = strings_to_NA(example_data),
                      id_var = patient_id, 
                      show_rownames = F)
+plot.new()
+hm
 
-## -----------------------------------------------------------------------------
-completeness_heatmap(data = strings_to_NA(example_data),
+## ---- fig.height=5, fig.show='hold', fig.cap="Completeness heatmap of `example_data` after pre-defined strings have been converted to `NA`. Yellow cells represent missing values and blue cells represent non-missing values. Variables are annotated by their data type."----
+hm <- completeness_heatmap(data = strings_to_NA(example_data),
                      id_var = patient_id, 
                      show_rownames = FALSE,
                      annotation_tbl = data_types)
+plot.new()
+hm
 
 
-## ---- fig.height=3------------------------------------------------------------
+## ---- fig.height=3, fig.cap="Density plot comparing percentage row completeness of `example_data` before specified strings have been converted to `NA` (purple) and after (green)."----
 compare_completeness(tbl_a = example_data, tbl_b = strings_to_NA(example_data),
                      dim = 1, tbl_a_lab = "example_data",
                      tbl_b_lab = "strings_to_NA(\nexample_data\n)")
@@ -227,7 +234,7 @@ merge <- merge_cols(data = example_data,
                     merge_var_name = "diabetes_merged")
 
 
-## ---- fig.height=5------------------------------------------------------------
+## ---- fig.height=3, fig.cap="Comparison of information content between two input variables and each input variable's mutual information with the merged variable (output). This plot can inform variable merging strategies. Mutual information of `merge$diabetes` with `output` is lower than information content of `merge$diabetes` which informs the user that some information loss has occurred in this merging strategy."----
 merge_IC <- compare_info_content(input1 = merge$diabetes,
                                  input2 = merge$diabetes_type,
                                  composite = merge$diabetes_merged)
@@ -320,7 +327,7 @@ count_compare(before_tbl = example_data,
           cols2compare = c("diabetes", "diabetes_type", "diabetes_merged"),
           kableout = F)
 
-## ---- fig.height=3------------------------------------------------------------
+## ---- fig.height=3, fig.cap="Proportion of values modified per patient in `example_data` following conversion of specific values to `NA`."----
 #variable level modifications
 report_var_mods(before_tbl = example_data,
                 after_tbl = example_data_merged)
@@ -360,6 +367,9 @@ post_qc_data %>%
   ordinal_label_levels()
 
 
+## ----echo=FALSE, fig.cap="Workflow of low-level semantic enrichment functions in eHDPrep. The dashed lines and box represent an optional step.", fig.align='center'----
+knitr::include_graphics("./images/Figure_6.png")
+
 ## ---- eval=T------------------------------------------------------------------
 example_data %>%
   # first merge diabetes variables
@@ -379,7 +389,7 @@ example_data %>%
 data(example_ontology)
 example_ontology
 
-## ---- out.width = "100%"------------------------------------------------------
+## ---- out.width = "100%", fig.cap="Visualisation of `example_ontology` using the ggraph package."----
 require(ggplot2)
 ggraph::ggraph(example_ontology, layout = "sugiyama") +
     ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
@@ -431,11 +441,18 @@ qc_se_data %>%
   num_MVs
 
 ## -----------------------------------------------------------------------------
+example_edge_tbl
+
+## -----------------------------------------------------------------------------
+example_ontology <- edge_tbl_to_graph(example_edge_tbl)
+example_ontology
+
+## -----------------------------------------------------------------------------
 joined_nw <- join_vars_to_ontol(ontol_graph = example_ontology,
                                 var2entity_tbl = example_mapping_file,
                                 root = "root", k = 0.5)
 
-## ---- out.width = "100%", fig.width=11----------------------------------------
+## ---- out.width = "100%", fig.width=11, fig.cap="Visualisation of `example_ontology` using the ggraph package, coloured by the category of the node."----
 ggraph::ggraph(joined_nw, layout = "sugiyama") +
     ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
                        colour = "slategray3") +
@@ -448,7 +465,7 @@ ggraph::ggraph(joined_nw, layout = "sugiyama") +
     theme(legend.position = c(0.08, 0.85))
     
 
-## ---- out.width = "100%", fig.width=9, warning=FALSE--------------------------
+## ---- out.width = "100%", fig.width=9, warning=FALSE, fig.cap="Visualisation of `example_ontology` using the ggraph package, coloured by the category of the node. Node size is proportional to node information content. Node labels denote node information content. Dataset variable nodes (right hand side of figure) are not visible as information content is only applicable to ontological entities."----
 ggraph::ggraph(joined_nw, layout = "sugiyama") +
     ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
                        colour = "slategray3") +
@@ -467,7 +484,7 @@ example_ontology %>%
   metavariable_info() ->
   metavariables_nw
 
-## ----out.width="100%", fig.width=9--------------------------------------------
+## ----out.width="100%", fig.width=9, fig.cap="Visualisation of `example_ontology` using the ggraph package. Ontological entities which link two or more dataset variables as descendants are labelled with numeric identifiers for the set of variables linked. Variable sets 5 and 8 variables are shown to have multiple common ancestors. This demonstrates the need to consider the information content of common ancestors so that the most informative common ancestor is used in the labelling of meta-variables."----
 metavariables_nw %>%
   # annotations are also considered a set. This isn't helpful for this visualisation
   # Therefore, the sets of non-meta-variables are removed below

@@ -17,6 +17,7 @@ header-includes:
 - \usepackage{booktabs}
 - \usepackage[titles]{tocloft}
 - \usepackage{longtable}
+- \usepackage[labelfont=bf]{caption}
 urlcolor: blue
 toc-title: Contents
 bibliography: references.bib
@@ -58,9 +59,9 @@ For quality control of health datasets, there are several high-level functions i
 
 5. [`export_dataset()`](#data-export) - export dataset to .csv or .tsv format.
 
-A synthetic example dataset `example_data` is used in this vignette and examples to demonstrate functionality.
+A synthetic example dataset, `example_data`, is used in this vignette and examples to demonstrate functionality.
 
-'eHDPrep' also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment) where meta-variables are discovered from the semantic relationships between input variables as recorded in user-provided ontologies. A small ontology is provided (`example_ontology`) to demonstrate functionality.
+'eHDPrep' also provides functionality for semantic enrichment with [`semantic_enrichment()`](#semantic-enrichment) where meta-variables are discovered from the semantic relationships between input variables as recorded in user-provided ontologies. A small ontology, `example_ontology`, is included with the package.
 
 # Introduction
 
@@ -88,9 +89,13 @@ tibble::glimpse(example_data)
 
 # Quality control
 
-The quality control functions aim to assess, improve, and compare the quality of a dataset along multiple quality dimensions: completeness, validity, accuracy, consistency, and uniqueness [@roebuck2011]. A suggested workflow for quality control is shown below. The order of these steps is defined by dependency, where later steps benefit from earlier steps. Dashed lines and boxes represent optional steps.
+The quality control functions aim to assess, improve, and compare the quality of a dataset along multiple quality dimensions: completeness, validity, accuracy, consistency, and uniqueness [@roebuck2011]. A suggested workflow for quality control is shown below. The order of these steps is defined by dependency, where later steps benefit from earlier steps. 
 
-![](./images/Figure_1.png)
+```{r echo=FALSE, fig.cap="Suggested workflow of low-level quality control functions in eHDPrep. Dashed lines and boxes represent optional steps.", fig.align='center'}
+# ![](./images/Figure_1.png)
+knitr::include_graphics("./images/Figure_1.png")
+```
+
 
 ## High level functions
 
@@ -131,7 +136,7 @@ An initial assessment of a dataset's quality provides a good basis for its seman
 
 3.  A character vector of variables with no entropy (contains only one unique value; see @shannonMathematicalTheoryCommunication1948a).
 
-```{r}
+```{r fig.show = "hide"}
 data(example_data)
 
 # create a consistency table containing consistency rules
@@ -141,18 +146,18 @@ ct <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundarie
                       "diabetes_type", "diabetes", NA, "Type II", "Yes") 
 
 res <- assess_quality(data = example_data, id_var = patient_id, consis_tbl = ct)
+```
 
-res$completeness$variable_completeness
+```{r}
 res$completeness$row_completeness
-
+res$completeness$variable_completeness
 ```
 
-```{r, fig.height=3, out.width = "100%"}
+```{r, fig.height=3, out.width = "100%", fig.cap="Percentage completeness (x-axis) by count (y-axis) for both rows (red) and variables (purple) of `example_data`."}
 res$completeness$completeness_plot
-
 ```
 
-```{r, fig.height=5, out.width = "100%"}
+```{r, fig.height=5, out.width = "100%", fig.cap="Completeness heatmap for `example_data`. Yellow cells represent missing values and blue cells represent non-missing values."}
 plot.new()
 res$completeness$completeness_heatmap
 ```
@@ -339,13 +344,11 @@ qc_review$value_level_changes %>%
 ```
 Note in the above that "gc" has been encoded, via [encode_genotypes()](#encode-genotype-snp-data), as "C/G" to create a standard representation of this SNP allele. Positional information for SNP allele should be recorded elsewhere, if required.
 
-The `value_level_changes_plt` element visualises the content of the `value_level_changes` element. It is a bar plot with rows on the x-axis and the proportion of each row's values which were modified (removed, substituted, or added) on the y-axis:
+The `value_level_changes_plt` element visualises the content of the `value_level_changes` element. It is a bar plot with rows on the x-axis and the proportion of each row's values which were modified (removed, substituted, or added) on the y-axis. This can be useful when many changes have occurred and the source table contains a large amount of data.
 
-```{r, out.width = "100%", fig.height=3}
+```{r, out.width = "100%", fig.height=3, fig.cap = "Proportion of values modified per patient in `example_data` following quality control. This plot summarises the modifications made to the data during quality control."}
 qc_review$value_level_changes_plt
 ```
-
-This can be useful when many changes have occurred and the source table contains a large amount of data.
 
 ### Data export
 
@@ -370,16 +373,18 @@ This section describes functions that can provide more granular access to the 'e
 
 Completeness in variables and rows can be calculated in tibbles and visualised in a bar plot as shown below:
 
-```{r, fig.height=3}
+```{r, fig.height=3, fig.cap="Percentage completeness (x-axis) by count (y-axis) for variables of `example_data.`"}
 variable_completeness(example_data)
 
 row_completeness(data = example_data, id_var = patient_id)
 
 plot_completeness(data = example_data, id_var = patient_id, plot = "variables")
-
-plot_completeness(data = example_data, id_var = patient_id, plot = "rows")
-
 ```
+
+```{r, fig.height=3, fig.cap="Percentage completeness (x-axis) by count (y-axis) for rows of `example_data`."}
+plot_completeness(data = example_data, id_var = patient_id, plot = "rows")
+```
+
 
 <!-- ------------------------------------------------------------------------ -->
 
@@ -391,20 +396,24 @@ indicative of non-random missingness.There are three underlying methods which ar
 2.  Same as 1 but cells are coloured by the values input to the clustering algorithm (instead of missing or present).
 3.  Boolean values are used for clustering (present values = 1; missing values = 0). Cells are coloured by presence (yellow = missing; blue = present).
 
-```{r}
-# show_rownames is pased to pheatmap() through ...
-completeness_heatmap(data = strings_to_NA(example_data),
+```{r, fig.height=5, fig.show='hold', fig.cap="Completeness heatmap of `example_data` after pre-defined strings have been converted to `NA`. Yellow cells represent missing values and blue cells represent non-missing values."}
+# show_rownames is passed to pheatmap() through the `...` parameter
+hm <- completeness_heatmap(data = strings_to_NA(example_data),
                      id_var = patient_id, 
                      show_rownames = F)
+plot.new()
+hm
 ```
 
 Variable-level annotations can be provided with the `annotation_tbl` parameter to further characterise completeness patterns. Below, the `data_types` tibble is used:
 
-```{r}
-completeness_heatmap(data = strings_to_NA(example_data),
+```{r, fig.height=5, fig.show='hold', fig.cap="Completeness heatmap of `example_data` after pre-defined strings have been converted to `NA`. Yellow cells represent missing values and blue cells represent non-missing values. Variables are annotated by their data type."}
+hm <- completeness_heatmap(data = strings_to_NA(example_data),
                      id_var = patient_id, 
                      show_rownames = FALSE,
                      annotation_tbl = data_types)
+plot.new()
+hm
 
 ```
 
@@ -416,7 +425,7 @@ completeness following quality control because the input `example_data` encoded\
 missingness as strings (for example 'not recorded') which were converted to `NA` values\
 during quality control.
 
-```{r, fig.height=3}
+```{r, fig.height=3, fig.cap="Density plot comparing percentage row completeness of `example_data` before specified strings have been converted to `NA` (purple) and after (green)."}
 compare_completeness(tbl_a = example_data, tbl_b = strings_to_NA(example_data),
                      dim = 1, tbl_a_lab = "example_data",
                      tbl_b_lab = "strings_to_NA(\nexample_data\n)")
@@ -489,7 +498,7 @@ By default, the input variables (e.g. `diabetes` and `diabetes_type`) are preser
 
 `compare_info_content` and `compare_info_content_plt` can support merging strategies by identifying when a pairwise merge operation results in loss of information:
 
-```{r, fig.height=5}
+```{r, fig.height=3, fig.cap="Comparison of information content between two input variables and each input variable's mutual information with the merged variable (output). This plot can inform variable merging strategies. Mutual information of `merge$diabetes` with `output` is lower than information content of `merge$diabetes` which informs the user that some information loss has occurred in this merging strategy."}
 merge_IC <- compare_info_content(input1 = merge$diabetes,
                                  input2 = merge$diabetes_type,
                                  composite = merge$diabetes_merged)
@@ -647,7 +656,7 @@ count_compare(before_tbl = example_data,
 
 Documentation of quality control modifications is important for writing methodology and summarising changes. The remaining quality control review functions are intended for review once all quality control has been implemented, as in [Review quality control], but can be used at any point; as below with `report_var_mods()` and `mod_plot()` comparing the merging operation example and a `strings_to_NA()` example with the original data:
 
-```{r, fig.height=3}
+```{r, fig.height=3, fig.cap="Proportion of values modified per patient in `example_data` following conversion of specific values to `NA`."}
 #variable level modifications
 report_var_mods(before_tbl = example_data,
                 after_tbl = example_data_merged)
@@ -702,7 +711,9 @@ post_qc_data %>%
 
 Data frames are semantically disorganised because no information on the semantic relationships between variables is present. Biomedical ontologies contain extensive semantic information between concepts across medical domains. The semantic commonalities of a dataset's variables can be incorporated with semantic enrichment (SE). The added information may improve performance of later analysis. An overview of the workflow for SE is shown below where the "Normalise Values" box is dashed as it is an optional step:
 
-![](./images/Figure_6.png "semantic enrichment workflow")
+```{r echo=FALSE, fig.cap="Workflow of low-level semantic enrichment functions in eHDPrep. The dashed lines and box represent an optional step.", fig.align='center'}
+knitr::include_graphics("./images/Figure_6.png")
+```
 
 ## Required inputs
 
@@ -754,7 +765,7 @@ example_ontology
 
 `example_ontology` is visualised in the network graph below:
 
-```{r, out.width = "100%"}
+```{r, out.width = "100%", fig.cap="Visualisation of `example_ontology` using the ggraph package."}
 require(ggplot2)
 ggraph::ggraph(example_ontology, layout = "sugiyama") +
     ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
@@ -833,6 +844,20 @@ In summary, the SE process added `r num_aggs` aggregation variables to the datas
 
 There are some exported lower level functions which users may find useful to see the intermediate steps of SE. The should be carried out in the order shown below:
 
+### Convert edge table to ontology
+
+Semantic enrichment in eHDPrep requires an ontology, represented as a igraph/tidygraph object. As ontologies can also be represented as edge tables, eHDPrep provides a function, `edge_tbl_to_graph`, to convert an edge table to a graph object. Edge tables are typically stored on disk and should first be read into R as a data frame and then supplied to `edge_tbl_to_graph`:
+
+```{r}
+example_edge_tbl
+```
+
+```{r}
+example_ontology <- edge_tbl_to_graph(example_edge_tbl)
+example_ontology
+```
+Node attributes can be included in the edge table (see `?edge_tbl_to_graph`) to be used as labels during meta-variable aggregation (`label_attr` parameter in `metavariable_agg`).
+
 ### Join ontology and data variable names
 
 Nodes representing variable names in the dataset can be joined to the ontology to which they have been mapped with `join_vars_to_ontol()`. Prior to joining, this function calculates the information content of each ontological entity using the equation below, developed by @zhou2008:
@@ -851,7 +876,7 @@ joined_nw <- join_vars_to_ontol(ontol_graph = example_ontology,
 
 This network, with the variable names added as nodes, can be visualised as below. The `node_category` node attribute can be used to colour the nodes:
 
-```{r, out.width = "100%", fig.width=11}
+```{r, out.width = "100%", fig.width=11, fig.cap="Visualisation of `example_ontology` using the ggraph package, coloured by the category of the node."}
 ggraph::ggraph(joined_nw, layout = "sugiyama") +
     ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
                        colour = "slategray3") +
@@ -869,7 +894,7 @@ Node information content can be visualised, as below. Information content is not
 
 This calculation benefits SE as the common ancestor of a set of variable nodes with the highest information content is chosen to label the group. In the middle branch from the root node, there are two annotation ancestor nodes which are multiple common ancestors of two variables (`SNP_a` and `SNP_b`). The node with the higher information content, `pathway_1`, is chosen to label the semantic commonality between these variables over the less informative node, `metabolic_pathway`.
 
-```{r, out.width = "100%", fig.width=9, warning=FALSE}
+```{r, out.width = "100%", fig.width=9, warning=FALSE, fig.cap="Visualisation of `example_ontology` using the ggraph package, coloured by the category of the node. Node size is proportional to node information content. Node labels denote node information content. Dataset variable nodes (right hand side of figure) are not visible as information content is only applicable to ontological entities."}
 ggraph::ggraph(joined_nw, layout = "sugiyama") +
     ggraph::geom_edge_diagonal(arrow = arrow(length = unit(3, 'mm')),
                        colour = "slategray3") +
@@ -896,7 +921,7 @@ example_ontology %>%
   metavariables_nw
 ```
 
-```{r out.width="100%", fig.width=9}
+```{r out.width="100%", fig.width=9, fig.cap="Visualisation of `example_ontology` using the ggraph package. Ontological entities which link two or more dataset variables as descendants are labelled with numeric identifiers for the set of variables linked. Variable sets 5 and 8 variables are shown to have multiple common ancestors. This demonstrates the need to consider the information content of common ancestors so that the most informative common ancestor is used in the labelling of meta-variables."}
 metavariables_nw %>%
   # annotations are also considered a set. This isn't helpful for this visualisation
   # Therefore, the sets of non-meta-variables are removed below
