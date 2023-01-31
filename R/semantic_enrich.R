@@ -445,7 +445,7 @@ metavariable_variable_descendants <- function(metavariable_info_output) {
   out <- metavariable_info_output %>%
     tibble::as_tibble() %>%
     dplyr::filter(.data$is_metavariable & .data$highest_IC) %>%
-    dplyr::select(1, 2, 6) %>%
+    dplyr::select(.data$name, .data$information_content, .data$variable_descendants) %>%
     dplyr::arrange(dplyr::desc(.data$information_content)) %>%
     rename(metavariable = .data$name) %>%
     tidyr::unnest(.data$variable_descendants) %>%
