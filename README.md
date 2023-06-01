@@ -4,6 +4,9 @@
 # eHDPrep
 
 <!-- badges: start -->
+[![Downloads](https://cranlogs.r-pkg.org/badges/grand-total/eHDPrep)](https://cranlogs.r-pkg.org/badges/grand-total/eHDPrep)
+[![CRAN status](https://www.r-pkg.org/badges/version/eHDPrep)](https://cran.r-project.org/package=eHDPrep)
+[![R-CMD-check](https://github.com/overton-group/eHDPrep/actions/workflows/r.yml/badge.svg)](https://github.com/overton-group/eHDPrep/actions/workflows/r.yml/badge.svg)
 <!-- badges: end -->
 
 The goal of ‘eHDPrep’ is to provide robust quality control and semantic
