@@ -1,0 +1,23 @@
+citHeader("To cite eHDPrep in publications use:")
+
+citEntry(entry="article",  
+  title  = "Strategies and techniques for quality control and semantic enrichment with multimodal data: a case study in colorectal cancer with eHDPrep",
+  author = personList(person(given="Tom M.",    family="Toner"),
+                      person(given="Rashi",     family="Pancholi"),
+                      person(given="Paul",      family="Miller"),
+                      person(given="Thorsten",  family="Forster"),
+                      person(given="Helen G.",  family="Coleman"),
+                      person(given="Ian M.",    family="Overton")),
+  journal = "GigaScience",
+  volume = "12",
+  year = "2023",
+  month = "05",
+  textVersion = paste("Tom M Toner and others, Strategies and techniques for quality control and semantic enrichment with
+                      multimodal data: a case study in colorectal cancer with eHDPrep, GigaScience, Volume 12, 2023, giad030,
+                      https://doi.org/10.1093/gigascience/giad030"),
+  abstract = "Integration of data from multiple domains can greatly enhance the quality and applicability of knowledge generated in analysis workflows. However, working with health data is challenging, requiring careful preparation in order to support meaningful interpretation and robust results. Ontologies encapsulate relationships between variables that can enrich the semantic content of health datasets to enhance interpretability and inform downstream analyses.We developed an R package for electronic health data preparation, 'eHDPrep', demonstrated upon a multimodal colorectal cancer dataset (661 patients, 155 variables; Colo-661); a further demonstrator is taken from The Cancer Genome Atlas (459 patients, 94 variables; TCGA-COAD). eHDPrep offers user-friendly methods for quality control, including internal consistency checking and redundancy removal with information-theoretic variable merging. Semantic enrichment functionality is provided, enabling generation of new informative “meta-variables” according to ontological common ancestry between variables, demonstrated with SNOMED CT and the Gene Ontology in the current study. eHDPrep also facilitates numerical encoding, variable extraction from free text, completeness analysis, and user review of modifications to the dataset. eHDPrep provides effective tools to assess and enhance data quality, laying the foundation for robust performance and interpretability in downstream analyses. Application to multimodal colorectal cancer datasets resulted in improved data quality, structuring, and robust encoding, as well as enhanced semantic information. We make eHDPrep available as an R package from CRAN (https://cran.r-project.org/package=eHDPrep) and GitHub (https://github.com/overton-group/eHDPrep).",
+  issn = "2047-217X",
+  doi = "10.1093/gigascience/giad030",
+  url = "https://doi.org/10.1093/gigascience/giad030",
+  note = "giad030",
+  eprint = "https://academic.oup.com/gigascience/article-pdf/doi/10.1093/gigascience/giad030/50383140/giad030.pdf")
