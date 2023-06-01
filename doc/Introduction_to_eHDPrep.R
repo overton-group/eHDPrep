@@ -234,7 +234,7 @@ merge <- merge_cols(data = example_data,
                     merge_var_name = "diabetes_merged")
 
 
-## ---- fig.height=3, fig.cap="Comparison of information content between two input variables and each input variable's mutual information with the merged variable (output). This plot can inform variable merging strategies. Mutual information of `merge$diabetes` with `output` is lower than information content of `merge$diabetes` which informs the user that some information loss has occurred in this merging strategy."----
+## ---- fig.height=3, fig.cap="Comparison of information content between two input variables and each input variable's mutual information with the merged variable (output). This plot can inform variable merging strategies. Mutual information of `merge\\$diabetes` with `output` is lower than information content of `merge\\$diabetes` which informs the user that some information loss has occurred in this merging strategy."----
 merge_IC <- compare_info_content(input1 = merge$diabetes,
                                  input2 = merge$diabetes_type,
                                  composite = merge$diabetes_merged)

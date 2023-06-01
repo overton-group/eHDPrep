@@ -65,7 +65,7 @@ A synthetic example dataset, `example_data`, is used in this vignette and exampl
 
 # Introduction
 
-Data preparation is a key foundation for reliable analysis of health data, 'eHDPrep' has been developed for this purpose. The functionality is broadly divided between two themes:
+Data preparation is a key foundation for reliable analysis of health data, 'eHDPrep' has been developed for this purpose [@10.1093/gigascience/giad030]. The functionality is broadly divided between two themes:
 
 -   [Quality Control] (QC)
 -   [Semantic Enrichment] (SE)
@@ -498,7 +498,7 @@ By default, the input variables (e.g. `diabetes` and `diabetes_type`) are preser
 
 `compare_info_content` and `compare_info_content_plt` can support merging strategies by identifying when a pairwise merge operation results in loss of information:
 
-```{r, fig.height=3, fig.cap="Comparison of information content between two input variables and each input variable's mutual information with the merged variable (output). This plot can inform variable merging strategies. Mutual information of `merge$diabetes` with `output` is lower than information content of `merge$diabetes` which informs the user that some information loss has occurred in this merging strategy."}
+```{r, fig.height=3, fig.cap="Comparison of information content between two input variables and each input variable's mutual information with the merged variable (output). This plot can inform variable merging strategies. Mutual information of `merge\\$diabetes` with `output` is lower than information content of `merge\\$diabetes` which informs the user that some information loss has occurred in this merging strategy."}
 merge_IC <- compare_info_content(input1 = merge$diabetes,
                                  input2 = merge$diabetes_type,
                                  composite = merge$diabetes_merged)
