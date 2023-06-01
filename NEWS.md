@@ -1,5 +1,10 @@
 # eHDPrep (development version)
 
+# eHDPrep 1.3.3
+
+* Fixed typo in vignette
+* Added CITATION file and added reference to citation in vignette
+
 # eHDPrep 1.3.2
 
 ## General
