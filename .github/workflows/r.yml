@@ -1,53 +1,103 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-#
-# See https://github.com/r-lib/actions/tree/master/examples#readme for
-# additional example workflows available for the R community.
+# # This workflow uses actions that are not certified by GitHub.
+# # They are provided by a third-party and are governed by
+# # separate terms of service, privacy policy, and support
+# # documentation.
+# #
+# # See https://github.com/r-lib/actions/tree/master/examples#readme for
+# # additional example workflows available for the R community.
 
-name: R
+# name: R
 
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+
+# permissions:
+#   contents: read
+
+# jobs:
+#   build-check:
+#     runs-on: ${{ matrix.config.os }}
+    
+#     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+    
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         config:
+#           - {os: macos-latest,   r: '3.6.0'}
+#           - {os: macos-latest,   r: 'release'}
+#           - {os: windows-latest, r: '3.6.0'}
+#           - {os: windows-latest, r: 'release'}
+#           - {os: ubuntu-latest,   r: '3.6.0'}
+#           - {os: ubuntu-latest,   r: 'release'}
+
+#     steps:
+#       - uses: actions/checkout@v3
+#       - uses: r-lib/actions/setup-pandoc@v2
+#       - uses: r-lib/actions/setup-tinytex@v2
+#       - run: tlmgr --version
+#       - name: Set up R ${{ matrix.r-version }}
+#         uses: r-lib/actions/setup-r@v2
+#         with:
+#           r-version: ${{ matrix.r-version }}
+#       - name: Install dependencies
+#         uses: r-lib/actions/setup-r-dependencies@v2
+#         with:
+#           extra-packages: any::rcmdcheck
+#           needs: check
+#       - name: Check
+#         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
+#         shell: Rscript {0}
+
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [ "main" ]
+    branches: [main, master]
   pull_request:
-    branches: [ "main" ]
+    branches: [main, master]
 
-permissions:
-  contents: read
+name: R-CMD-check
 
 jobs:
-  build-check:
+  R-CMD-check:
     runs-on: ${{ matrix.config.os }}
-    
+
     name: ${{ matrix.config.os }} (${{ matrix.config.r }})
-    
+
     strategy:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: '3.6.0'}
           - {os: macos-latest,   r: 'release'}
-          - {os: windows-latest, r: '3.6.0'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: '3.6.0'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
 
     steps:
       - uses: actions/checkout@v3
+
       - uses: r-lib/actions/setup-pandoc@v2
-      - uses: r-lib/actions/setup-tinytex@v2
-      - run: tlmgr --version
-      - name: Set up R ${{ matrix.r-version }}
-        uses: r-lib/actions/setup-r@v2
+
+      - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: ${{ matrix.r-version }}
-      - name: Install dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
           needs: check
-      - name: Check
-        run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
-        shell: Rscript {0}
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true
