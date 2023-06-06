@@ -1,7 +1,7 @@
 Package: eHDPrep
 Type: Package
 Title: Quality Control and Semantic Enrichment of Datasets
-Version: 1.3.2.9000
+Version: 1.3.3
 Authors@R: c(person("Tom", "Toner", role = c("aut"),
                     email = "ttoner03@qub.ac.uk",
                     comment = c(ORCID = "0000-0001-8059-5822")),
@@ -10,7 +10,7 @@ Authors@R: c(person("Tom", "Toner", role = c("aut"),
                     comment = c(ORCID = "0000-0003-1158-8527"))
               )
 Maintainer: Ian Overton <I.Overton@qub.ac.uk>
-Description: A tool for the preparation and enrichment of health datasets for analysis. Provides functionality for assessing data quality and for improving the reliability and machine interpretability of a dataset. 
+Description: A tool for the preparation and enrichment of health datasets for analysis (Toner et al. (2023) <doi:10.1093/gigascience/giad030>). Provides functionality for assessing data quality and for improving the reliability and machine interpretability of a dataset. 
      'eHDPrep' also enables semantic enrichment of a dataset where metavariables are discovered from the relationships between input variables determined from user-provided ontologies.
 License: GPL-3
 URL: https://github.com/overton-group/eHDPrep

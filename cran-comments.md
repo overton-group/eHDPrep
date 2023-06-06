@@ -1,12 +1,15 @@
 ## Resubmission
 This is a resubmission. In this version I have:
 
-* Added "--compact-vignettes=gs+qpdf" as `args` in `devtools::release()`.
+* Updated the description field so that the the doi is formatted correctly (removed "?")
 
 ## R CMD check results
- 
-There were no ERRORs, WARNINGs or NOTEs
 
-## Downstream dependencies
+0 errors | 0 warnings | 0 notes
 
-There are currently no downstream dependencies for this package
+## revdepcheck results
+
+We checked 0 reverse dependencies, comparing R CMD check results across CRAN and dev versions of this package.
+
+ * We saw 0 new problems
+ * We failed to check 0 packages
