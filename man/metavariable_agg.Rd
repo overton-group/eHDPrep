@@ -8,7 +8,7 @@ metavariable_agg(graph, data, label_attr = "name", normalize_vals = TRUE)
 }
 \arguments{
 \item{graph}{Graph containing ontological and dataset nodes. Must be in
-\code{\link{tidygraph}} format or coercible to this format. Must have been
+\link[tidygraph]{tidygraph} format or coercible to this format. Must have been
 processed using \code{\link{metavariable_info}}.}
 
 \item{data}{Numeric data frame or matrix containing variables which are also
