@@ -25,7 +25,7 @@ content equation (relative number of hyponyms/descendants and relative node
 depth). Default = 0.5}
 }
 \value{
-A \code{\link{tidygraph}} resulting from the joining of \code{var2entity_tbl}
+A \link[tidygraph]{tidygraph} resulting from the joining of \code{var2entity_tbl}
   and \code{ontol_graph}.
 }
 \description{
