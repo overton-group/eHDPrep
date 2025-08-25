@@ -1,0 +1,2291 @@
+
+R version 4.5.1 (2025-06-13) -- "Great Square Root"
+Copyright (C) 2025 The R Foundation for Statistical Computing
+Platform: aarch64-apple-darwin20
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "eHDPrep"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('eHDPrep')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("apply_quality_ctrl")
+> ### * apply_quality_ctrl
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: apply_quality_ctrl
+> ### Title: Apply quality control measures to a dataset
+> ### Aliases: apply_quality_ctrl
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> require(tibble)
+Loading required package: tibble
+> 
+> # create an example class_tbl object
+> # note that diabetes_type is classes as ordinal and is not modified as its
+> # levels are not pre-coded
+> tibble::tribble(~"var", ~"datatype",
++ "patient_id", "id",
++ "tumoursize", "numeric",
++ "t_stage", "ordinal_tstage",
++ "n_stage", "ordinal_nstage",
++ "diabetes", "factor",
++ "diabetes_type", "ordinal",
++ "hypertension", "factor",
++ "rural_urban", "factor",
++ "marital_status", "factor",
++ "SNP_a", "genotype",
++ "SNP_b", "genotype",
++ "free_text", "freetext") -> data_types
+> 
+> data_QC <- apply_quality_ctrl(example_data, patient_id, data_types, 
++    bin_cats =c("No" = "Yes", "rural" = "urban"),  min_freq = 0.6)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:tibble’
+
+> nameEx("assess_completeness")
+> ### * assess_completeness
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: assess_completeness
+> ### Title: Assess completeness of a dataset
+> ### Aliases: assess_completeness
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> res <- assess_completeness(example_data, patient_id)
+> 
+> # variable completeness table
+> res$variable_completeness
+# A tibble: 12 × 4
+   Variable         NAs NAs_percent Completeness
+   <chr>          <int>       <dbl>        <dbl>
+ 1 diabetes_type    505        50.5         49.5
+ 2 patient_id         0         0          100  
+ 3 tumoursize         0         0          100  
+ 4 t_stage            0         0          100  
+ 5 n_stage            0         0          100  
+ 6 diabetes           0         0          100  
+ 7 hypertension       0         0          100  
+ 8 rural_urban        0         0          100  
+ 9 marital_status     0         0          100  
+10 SNP_a              0         0          100  
+11 SNP_b              0         0          100  
+12 free_text          0         0          100  
+> 
+> # row completeness table
+> res$row_completeness
+# A tibble: 1,000 × 4
+   patient_id   NAs NAs_percent Completeness
+   <chr>      <int>       <dbl>        <dbl>
+ 1 4              1        8.33         91.7
+ 2 6              1        8.33         91.7
+ 3 7              1        8.33         91.7
+ 4 8              1        8.33         91.7
+ 5 9              1        8.33         91.7
+ 6 10             1        8.33         91.7
+ 7 12             1        8.33         91.7
+ 8 15             1        8.33         91.7
+ 9 17             1        8.33         91.7
+10 18             1        8.33         91.7
+# ℹ 990 more rows
+> 
+> # show completeness of rows and variables as a bar plot
+> res$completeness_plot
+> 
+> # show dataset completeness in a clustered heatmap
+> # (this is similar to res$completeness_heatmap but ensures a blank canvas is first created)
+> res$plot_completeness_heatmap(res)
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("assess_quality")
+> ### * assess_quality
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: assess_quality
+> ### Title: Assess quality of a dataset
+> ### Aliases: assess_quality
+> 
+> ### ** Examples
+> 
+> # general example
+> data(example_data)
+> res <- assess_quality(example_data, patient_id)
+> 
+> # example of internal consistency checks on more simple dataset
+> # describing bean counts
+> require(tibble)
+Loading required package: tibble
+> 
+> # creating `data`:
+> beans <- tibble::tibble(red_beans = 1:15,
++ blue_beans = 1:15,
++ total_beans = 1:15*2,
++ red_bean_summary = c(rep("few_beans",9), rep("many_beans",6)))
+> 
+> # creating `consis_tbl`
+> bean_rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
++ "red_beans", "blue_beans", "==", NA, NA,
++ "red_beans", "total_beans", "<=", NA,NA,
++ "red_beans", "red_bean_summary", NA, "1:9", "few_beans",
++ "red_beans", "red_bean_summary", NA, "10:15", "many_beans")
+> 
+> # add some inconsistencies
+> beans[1, "red_bean_summary"] <- "many_beans"
+> beans[1, "red_beans"] <- 10
+> 
+> res <- assess_quality(beans, consis_tbl = bean_rules)
+> 
+> # variable completeness table
+> res$completeness$variable_completeness
+# A tibble: 5 × 4
+  Variable           NAs NAs_percent Completeness
+  <chr>            <int>       <dbl>        <dbl>
+1 rowname              0           0          100
+2 red_beans            0           0          100
+3 blue_beans           0           0          100
+4 total_beans          0           0          100
+5 red_bean_summary     0           0          100
+> 
+> # row completeness table
+> res$completeness$row_completeness
+# A tibble: 15 × 4
+   rowname   NAs NAs_percent Completeness
+   <chr>   <int>       <dbl>        <dbl>
+ 1 1           0           0          100
+ 2 2           0           0          100
+ 3 3           0           0          100
+ 4 4           0           0          100
+ 5 5           0           0          100
+ 6 6           0           0          100
+ 7 7           0           0          100
+ 8 8           0           0          100
+ 9 9           0           0          100
+10 10          0           0          100
+11 11          0           0          100
+12 12          0           0          100
+13 13          0           0          100
+14 14          0           0          100
+15 15          0           0          100
+> 
+> # show completeness of rows and variables as a bar plot
+> res$completeness$completeness_plot
+> 
+> # show dataset completeness in a clustered heatmap
+> res$completeness$plot_completeness_heatmap(res$completeness)
+> 
+> # show any internal inconsistencies
+> res$internal_inconsistency
+# A tibble: 2 × 8
+  var_a     var_b       lgl_test var_a_range var_b_range   row values_a values_b
+  <chr>     <chr>       <chr>    <chr>       <chr>       <int> <chr>    <chr>   
+1 red_beans blue_beans  ==       <NA>        <NA>            1 10       1       
+2 red_beans total_beans <=       <NA>        <NA>            1 10       2       
+> 
+> # show any variables with zero entropy
+> res$vars_with_zero_entropy
+character(0)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:tibble’
+
+> nameEx("assume_var_classes")
+> ### * assume_var_classes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: assume_var_classes
+> ### Title: Assume variable classes in data
+> ### Aliases: assume_var_classes
+> 
+> ### ** Examples
+> 
+> # example below assumes incorrectly for several variables
+> tmp = tempfile(fileext = ".csv")
+> data(example_data)
+> assume_var_classes(example_data, tmp)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("compare_completeness")
+> ### * compare_completeness
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: compare_completeness
+> ### Title: Compare Completeness between Datasets
+> ### Aliases: compare_completeness
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> compare_completeness(example_data, strings_to_NA(example_data), dim = 2,
++                      "raw", "cleaned")
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("compare_info_content")
+> ### * compare_info_content
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: compare_info_content
+> ### Title: Information Content Comparison Table
+> ### Aliases: compare_info_content
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> example_data %>%
++    mutate(diabetes_merged = coalesce(diabetes_type, diabetes)) %>%
++    select(starts_with("diabetes")) ->
++    merged_data
+>    
+> compare_info_content(merged_data$diabetes,
++                      merged_data$diabetes_type,
++                      merged_data$diabetes_merged)
+# A tibble: 5 × 3
+  Information      Variable                  Measure                            
+  <chr>            <chr>                     <chr>                              
+1 1070.7465028214  merged_data$diabetes      "Information Content"              
+2 494.963567687505 merged_data$diabetes_type "Information Content"              
+3 1548.12947181662 output                    "Information Content"              
+4 1035.17075316701 merged_data$diabetes      "Mutual Information Content with\n…
+5 494.9635676875   merged_data$diabetes_type "Mutual Information Content with\n…
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’, ‘package:dplyr’
+
+> nameEx("compare_info_content_plt")
+> ### * compare_info_content_plt
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: compare_info_content_plt
+> ### Title: Information Content Comparison Plot
+> ### Aliases: compare_info_content_plt
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> example_data %>%
++    mutate(diabetes_merged = coalesce(diabetes_type, diabetes)) %>%
++    select(starts_with("diabetes")) ->
++    merged_data
+> 
+> compare_info_content(merged_data$diabetes,
++                      merged_data$diabetes_type,
++                      merged_data$diabetes_merged) %>%
++                      compare_info_content_plt()
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’, ‘package:dplyr’
+
+> nameEx("completeness_heatmap")
+> ### * completeness_heatmap
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: completeness_heatmap
+> ### Title: Completeness Heatmap
+> ### Aliases: completeness_heatmap
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> 
+> # heatmap without variable category annotations:
+> hm <- completeness_heatmap(example_data,patient_id)
+> plot.new() # ensure new plot is created
+> hm
+> 
+> 
+> # heatmap with variable category annotations:
+> ## create a dataframe containing variable annotations
+> tibble::tribble(~"var", ~"datatype",
++ "patient_id", "id",
++ "tumoursize", "numeric",
++ "t_stage", "ordinal_tstage",
++ "n_stage", "ordinal_nstage",
++ "diabetes", "factor",
++ "diabetes_type", "ordinal",
++ "hypertension", "factor",
++ "rural_urban", "factor",
++ "marital_status", "factor",
++ "SNP_a", "genotype",
++ "SNP_b", "genotype",
++ "free_text", "freetext") -> data_types
+> 
+> hm <- completeness_heatmap(example_data,patient_id, annotation_tbl = data_types)
+> plot.new() # ensure new plot is created
+> hm
+> 
+> 
+> 
+> cleanEx()
+> nameEx("count_compare")
+> ### * count_compare
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: count_compare
+> ### Title: Compare unique values before and after data modification
+> ### Aliases: count_compare
+> 
+> ### ** Examples
+> 
+> # merge data as the example modification
+> example_data_merged <- merge_cols(example_data, diabetes_type, diabetes, 
++ "diabetes_merged", rm_in_vars = TRUE)
+> 
+> # review the differences between the input and output of the variable merging step above:
+> count_compare(before_tbl = example_data,
++               after_tbl = example_data_merged,
++                             cols2compare = c("diabetes", "diabetes_type", "diabetes_merged"),
++                             kableout = FALSE)
+$before_tbl
+# A tibble: 7 × 3
+  diabetes diabetes_type     n
+  <chr>    <chr>         <int>
+1 No       <NA>            498
+2 Yes      Type I          247
+3 Yes      Type II         244
+4 missing  <NA>              7
+5 missing  Type I            2
+6 No       Type I            1
+7 missing  Type II           1
+
+$after_tbl
+# A tibble: 4 × 2
+  diabetes_merged     n
+  <chr>           <int>
+1 No                498
+2 Type I            250
+3 Type II           245
+4 missing             7
+
+> 
+> 
+> 
+> cleanEx()
+> nameEx("edge_tbl_to_graph")
+> ### * edge_tbl_to_graph
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: edge_tbl_to_graph
+> ### Title: Convert edge table to tidygraph graph
+> ### Aliases: edge_tbl_to_graph
+> 
+> ### ** Examples
+> 
+> # basic edge table
+> edge_tbl <- tibble::tribble(~from, ~to,
++ "Nstage", "TNM",
++ "Tstage", "TNM",
++ "Tumoursize", "property_of_tumour",
++ "Tstage", "property_of_tumour",
++ "property_of_tumour", "property_of_cancer",
++ "TNM", "property_of_cancer",
++ "property_of_cancer", "disease",
++ "disease", "root",
++ "root", NA)
+> 
+> graph <- edge_tbl_to_graph(edge_tbl)
+> 
+> graph
+# A tbl_graph: 8 nodes and 8 edges
+#
+# A directed acyclic simple graph with 1 component
+#
+# Node Data: 8 × 1 (active)
+  name              
+  <chr>             
+1 Nstage            
+2 Tstage            
+3 Tumoursize        
+4 property_of_tumour
+5 TNM               
+6 property_of_cancer
+7 disease           
+8 root              
+#
+# Edge Data: 8 × 2
+   from    to
+  <int> <int>
+1     1     5
+2     2     5
+3     3     4
+# ℹ 5 more rows
+> 
+> plot(graph)
+> 
+> 
+> # edge table with node attributes
+> ## note that root node is included in final row to include its label
+> edge_tbl <- tibble::tribble(~from, ~to, ~label,
++ "Nstage", "TNM", "N stage",
++ "Tstage", "TNM", "T stage",
++ "Tumoursize", "property_of_tumour", "Tumour size",
++ "Tstage", "property_of_tumour", "T stage",
++ "property_of_tumour", "property_of_cancer", "Property of tumour",
++ "TNM", "property_of_cancer", "TNM",
++ "property_of_cancer", "disease", "Property of cancer",
++ "disease", "root", "Disease",
++ "root", NA, "Ontology Root")
+> graph <- edge_tbl_to_graph(edge_tbl)
+More than two columns detected in `edge_tbl`. These will be joined to the graph as node attributes
+> 
+> graph
+# A tbl_graph: 8 nodes and 8 edges
+#
+# A directed acyclic simple graph with 1 component
+#
+# Node Data: 8 × 2 (active)
+  name               label             
+  <chr>              <chr>             
+1 Nstage             N stage           
+2 Tstage             T stage           
+3 Tumoursize         Tumour size       
+4 property_of_tumour Property of tumour
+5 TNM                TNM               
+6 property_of_cancer Property of cancer
+7 disease            Disease           
+8 root               Ontology Root     
+#
+# Edge Data: 8 × 2
+   from    to
+  <int> <int>
+1     1     5
+2     2     5
+3     3     4
+# ℹ 5 more rows
+> 
+> plot(graph)
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("encode_as_num_mat")
+> ### * encode_as_num_mat
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: encode_as_num_mat
+> ### Title: Convert data frame to numeric matrix
+> ### Aliases: encode_as_num_mat
+> 
+> ### ** Examples
+> 
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> mtcars %>%
++   dplyr::as_tibble(rownames = "id") %>%
++   encode_as_num_mat(id)
+                     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
+Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
+Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
+Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
+Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
+Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
+Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
+Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
+Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
+Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
+Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
+Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
+Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
+Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
+Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
+Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
+Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
+Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
+Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
+Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
+Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
+Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
+Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
+AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
+Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
+Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
+Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
+Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
+Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
+Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
+Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
+Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
+Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’, ‘package:dplyr’
+
+> nameEx("encode_binary_cats")
+> ### * encode_binary_cats
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: encode_binary_cats
+> ### Title: Encode categorical variables as binary factors
+> ### Aliases: encode_binary_cats
+> 
+> ### ** Examples
+> 
+> # use built-in values. Note: rural_urban is not modified
+> # Note: diabetes is not modified because "missing" is interpreted as a third category.
+> # strings_to_NA() should be applied first
+> encode_binary_cats(example_data, hypertension, rural_urban)
+# A tibble: 1,000 × 12
+   patient_id tumoursize t_stage n_stage diabetes diabetes_type hypertension
+        <int>      <dbl> <chr>   <chr>   <chr>    <chr>         <fct>       
+ 1          1       61.7 T3a     N2      Yes      Type I        Yes         
+ 2          2       64.2 T3b     N1      Yes      Type II       Yes         
+ 3          3       47.8 T1      N2      No       Type I        Yes         
+ 4          4       40.9 T3a     N0      No       <NA>          Yes         
+ 5          5       62.1 T4      N1      Yes      Type I        No          
+ 6          6       13.6 T1      N2      No       <NA>          Yes         
+ 7          7       62.6 T1      N2      No       <NA>          No          
+ 8          8       44.5 T3b     N1      No       <NA>          No          
+ 9          9       44.3 T2      N1      No       <NA>          Yes         
+10         10       31.6 T1      N0      No       <NA>          No          
+# ℹ 990 more rows
+# ℹ 5 more variables: rural_urban <chr>, marital_status <chr>, SNP_a <chr>,
+#   SNP_b <chr>, free_text <chr>
+> 
+> # use custom values. Note: rural_urban is now modified as well.
+> encoded_data <- encode_binary_cats(example_data, hypertension, rural_urban,
++                    values = c("No"= "Yes", "rural" = "urban"))
+> 
+> # to demonstrate the new numeric encoding:
+> dplyr::mutate(encoded_data, hypertension_num = as.numeric(hypertension), .keep = "used") 
+# A tibble: 1,000 × 2
+   hypertension hypertension_num
+   <fct>                   <dbl>
+ 1 Yes                         2
+ 2 Yes                         2
+ 3 Yes                         2
+ 4 Yes                         2
+ 5 No                          1
+ 6 Yes                         2
+ 7 No                          1
+ 8 No                          1
+ 9 Yes                         2
+10 No                          1
+# ℹ 990 more rows
+> 
+> 
+> 
+> cleanEx()
+> nameEx("encode_cats")
+> ### * encode_cats
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: encode_cats
+> ### Title: Encode categorical variables using one-hot encoding.
+> ### Aliases: encode_cats
+> 
+> ### ** Examples
+> 
+> require(magrittr)
+Loading required package: magrittr
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> data(example_data)
+> 
+> # encode one variable
+> encode_cats(example_data, marital_status) %>%
++ select(starts_with("marital_status"))
+# A tibble: 1,000 × 4
+   marital_status_divorced marital_status_married marital_status_single
+                     <dbl>                  <dbl>                 <dbl>
+ 1                       0                      1                     0
+ 2                       1                      0                     0
+ 3                       1                      0                     0
+ 4                       0                      0                     1
+ 5                       0                      0                     1
+ 6                       0                      0                     1
+ 7                       0                      1                     0
+ 8                       0                      0                     1
+ 9                       0                      0                     1
+10                       0                      1                     0
+# ℹ 990 more rows
+# ℹ 1 more variable: marital_status_unknown <dbl>
+> 
+> # encode multiple variables
+> encoded <- encode_cats(example_data, diabetes, marital_status)
+> 
+> select(encoded, starts_with("marital_status"))
+# A tibble: 1,000 × 4
+   marital_status_divorced marital_status_married marital_status_single
+                     <dbl>                  <dbl>                 <dbl>
+ 1                       0                      1                     0
+ 2                       1                      0                     0
+ 3                       1                      0                     0
+ 4                       0                      0                     1
+ 5                       0                      0                     1
+ 6                       0                      0                     1
+ 7                       0                      1                     0
+ 8                       0                      0                     1
+ 9                       0                      0                     1
+10                       0                      1                     0
+# ℹ 990 more rows
+# ℹ 1 more variable: marital_status_unknown <dbl>
+> # diabetes_type included below but was not modified:
+> select(encoded, starts_with("diabetes")) 
+# A tibble: 1,000 × 4
+   diabetes_type diabetes_No diabetes_Yes diabetes_missing
+   <chr>               <dbl>        <dbl>            <dbl>
+ 1 Type I                  0            1                0
+ 2 Type II                 0            1                0
+ 3 Type I                  1            0                0
+ 4 <NA>                    1            0                0
+ 5 Type I                  0            1                0
+ 6 <NA>                    1            0                0
+ 7 <NA>                    1            0                0
+ 8 <NA>                    1            0                0
+ 9 <NA>                    1            0                0
+10 <NA>                    1            0                0
+# ℹ 990 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:dplyr’, ‘package:magrittr’
+
+> nameEx("encode_genotypes")
+> ### * encode_genotypes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: encode_genotypes
+> ### Title: Encode genotype/SNP variables in data frame
+> ### Aliases: encode_genotypes
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> 
+> # one variable
+> encode_genotypes(example_data, SNP_a) %>%
++ select(SNP_a)
+# A tibble: 1,000 × 1
+   SNP_a
+   <ord>
+ 1 C/C  
+ 2 C/C  
+ 3 C/C  
+ 4 C/C  
+ 5 G/G  
+ 6 G/G  
+ 7 C/C  
+ 8 G/G  
+ 9 G/G  
+10 G/G  
+# ℹ 990 more rows
+> 
+> # multiple variables
+> encode_genotypes(example_data, SNP_a, SNP_b) %>%
++ select(SNP_a, SNP_b)
+# A tibble: 1,000 × 2
+   SNP_a SNP_b
+   <ord> <ord>
+ 1 C/C   T/T  
+ 2 C/C   A/T  
+ 3 C/C   T/T  
+ 4 C/C   T/T  
+ 5 G/G   T/T  
+ 6 G/G   T/T  
+ 7 C/C   T/T  
+ 8 G/G   T/T  
+ 9 G/G   T/T  
+10 G/G   A/A  
+# ℹ 990 more rows
+> 
+> # using tidyselect helpers
+> encode_genotypes(example_data, dplyr::starts_with("SNP")) %>%
++ select(starts_with("SNP"))
+# A tibble: 1,000 × 2
+   SNP_a SNP_b
+   <ord> <ord>
+ 1 C/C   T/T  
+ 2 C/C   A/T  
+ 3 C/C   T/T  
+ 4 C/C   T/T  
+ 5 G/G   T/T  
+ 6 G/G   T/T  
+ 7 C/C   T/T  
+ 8 G/G   T/T  
+ 9 G/G   T/T  
+10 G/G   A/A  
+# ℹ 990 more rows
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’, ‘package:dplyr’
+
+> nameEx("encode_ordinals")
+> ### * encode_ordinals
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: encode_ordinals
+> ### Title: Encode ordinal variables
+> ### Aliases: encode_ordinals
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> require(magrittr)
+Loading required package: magrittr
+> encode_ordinals(example_data, ord_levels = c("N0","N1","N2"), n_stage)
+# A tibble: 1,000 × 12
+   patient_id tumoursize t_stage n_stage diabetes diabetes_type hypertension
+        <int>      <dbl> <chr>   <ord>   <chr>    <chr>         <chr>       
+ 1          1       61.7 T3a     N2      Yes      Type I        Yes         
+ 2          2       64.2 T3b     N1      Yes      Type II       Yes         
+ 3          3       47.8 T1      N2      No       Type I        Yes         
+ 4          4       40.9 T3a     N0      No       <NA>          Yes         
+ 5          5       62.1 T4      N1      Yes      Type I        No          
+ 6          6       13.6 T1      N2      No       <NA>          Yes         
+ 7          7       62.6 T1      N2      No       <NA>          No          
+ 8          8       44.5 T3b     N1      No       <NA>          No          
+ 9          9       44.3 T2      N1      No       <NA>          Yes         
+10         10       31.6 T1      N0      No       <NA>          No          
+# ℹ 990 more rows
+# ℹ 5 more variables: rural_urban <chr>, marital_status <chr>, SNP_a <chr>,
+#   SNP_b <chr>, free_text <chr>
+> 
+> # Note: "unequivocal" is present in  t_stage but not in `ord_levels`.
+> # with `strict_levels` TRUE, t_stage is unmodified and a warning message is given:
+> 
+> encode_ordinals(example_data,
++    ord_levels = c("T1","T2","T3a", "T3b", "T4"), strict_levels = TRUE, t_stage) %>%
++    select(t_stage)
+Warning: When parameter `strict_levels` is TRUE, all levels must be present in `ord_levels` for variables specified with `...`.
+The following variables have not been modified:
+✖ `t_stage` contains 19 problematic values.
+
+ℹ Ensure missing values (i.e. `NA`) have been included in `ord_levels` if it should be considered.
+# A tibble: 1,000 × 1
+   t_stage
+   <chr>  
+ 1 T3a    
+ 2 T3b    
+ 3 T1     
+ 4 T3a    
+ 5 T4     
+ 6 T1     
+ 7 T1     
+ 8 T3b    
+ 9 T2     
+10 T1     
+# ℹ 990 more rows
+>    
+> # with `strict_levels` FALSE, it is replaced with NA:
+> 
+> encode_ordinals(example_data,
++    ord_levels = c("T1","T2","T3a", "T3b", "T4"), strict_levels = FALSE, t_stage) %>%
++    select(t_stage)
+# A tibble: 1,000 × 1
+   t_stage
+   <ord>  
+ 1 T3a    
+ 2 T3b    
+ 3 T1     
+ 4 T3a    
+ 5 T4     
+ 6 T1     
+ 7 T1     
+ 8 T3b    
+ 9 T2     
+10 T1     
+# ℹ 990 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’, ‘package:dplyr’
+
+> nameEx("entropy")
+> ### * entropy
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: entropy
+> ### Title: Calculate Entropy of a Vector
+> ### Aliases: entropy
+> 
+> ### ** Examples
+> 
+> # no entropy:
+> vec <- c(1,1,1,1,1,1)
+> entropy(vec)
+[1] 0
+> 
+> # entropy
+> vec <- c(1,2,3,4,5,6)
+> entropy(vec)
+[1] 2.584963
+> 
+> 
+> 
+> cleanEx()
+> nameEx("export_dataset")
+> ### * export_dataset
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: export_dataset
+> ### Title: Export data to delimited file
+> ### Aliases: export_dataset
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> tmp = tempfile(fileext = ".csv")
+> export_dataset(example_data, tmp)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("extract_freetext")
+> ### * extract_freetext
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: extract_freetext
+> ### Title: Extract information from free text
+> ### Aliases: extract_freetext
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> extract_freetext(example_data, patient_id, min_freq = 0.6, free_text)
+`skipgrams2append` not provided. Searching for skipgrams with a `min_freq` of 0.6%
+4 skipgrams have been appended the data.
+# A tibble: 1,000 × 15
+   patient_id tumoursize t_stage n_stage diabetes diabetes_type hypertension
+        <dbl>      <dbl> <chr>   <chr>   <chr>    <chr>         <chr>       
+ 1          1       61.7 T3a     N2      Yes      Type I        Yes         
+ 2          2       64.2 T3b     N1      Yes      Type II       Yes         
+ 3          3       47.8 T1      N2      No       Type I        Yes         
+ 4          4       40.9 T3a     N0      No       <NA>          Yes         
+ 5          5       62.1 T4      N1      Yes      Type I        No          
+ 6          6       13.6 T1      N2      No       <NA>          Yes         
+ 7          7       62.6 T1      N2      No       <NA>          No          
+ 8          8       44.5 T3b     N1      No       <NA>          No          
+ 9          9       44.3 T2      N1      No       <NA>          Yes         
+10         10       31.6 T1      N0      No       <NA>          No          
+# ℹ 990 more rows
+# ℹ 8 more variables: rural_urban <chr>, marital_status <chr>, SNP_a <chr>,
+#   SNP_b <chr>, board_will <dbl>, leas_ran <dbl>, sixteen_week <dbl>,
+#   white_back <dbl>
+> 
+> 
+> 
+> cleanEx()
+> nameEx("identify_inconsistency")
+> ### * identify_inconsistency
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: identify_inconsistency
+> ### Title: Identify inconsistencies in a dataset
+> ### Aliases: identify_inconsistency
+> 
+> ### ** Examples
+> 
+> require(tibble)
+Loading required package: tibble
+> # example with synthetic dataset on number of bean counts
+> # there is a lot going on in the function so a simple dataset aids this example
+> #
+> # creating `data`:
+> beans <- tibble::tibble(red_beans = 1:15,
++ blue_beans = 1:15,
++ total_beans = 1:15*2,
++ red_bean_summary = c(rep("few_beans",9), rep("many_beans",6)))
+> #
+> # creating `consis_tbl`
+> bean_rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
++ "red_beans", "blue_beans", "==", NA, NA,
++ "red_beans", "total_beans", "<=", NA,NA,
++ "red_beans", "red_bean_summary", NA, "1:9", "few_beans",
++ "red_beans", "red_bean_summary", NA, "10:15", "many_beans")
+> 
+> identify_inconsistency(beans, bean_rules)
+No inconsistencies were found.
+> 
+> # creating some inconsistencies as examples
+> beans[1, "red_bean_summary"] <- "many_beans"
+> beans[1, "red_beans"] <- 10
+> 
+> identify_inconsistency(beans, bean_rules)
+Warning: One or more inconsistencies were identified. They are shown in the returned tibble.
+# A tibble: 2 × 8
+  var_a     var_b       lgl_test var_a_range var_b_range   row values_a values_b
+  <chr>     <chr>       <chr>    <chr>       <chr>       <int> <chr>    <chr>   
+1 red_beans blue_beans  ==       <NA>        <NA>            1 10       1       
+2 red_beans total_beans <=       <NA>        <NA>            1 10       2       
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:tibble’
+
+> nameEx("import_dataset")
+> ### * import_dataset
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: import_dataset
+> ### Title: Import data into 'R'
+> ### Aliases: import_dataset
+> 
+> ### ** Examples
+> 
+> ## Not run: 
+> ##D    # This code will not run as it requires an xlsx file
+> ##D    # ./dataset.xlsx should be replaced with path to user's dataset
+> ##D    
+> ##D    # excel
+> ##D    import_dataset(file = "./dataset.xlsx", format = "excel")
+> ##D    #csv
+> ##D    import_dataset(file = "./dataset.csv", format = "csv")
+> ##D    #tsv
+> ##D    import_dataset(file = "./dataset.tsv", format = "tsv")
+> ## End(Not run)
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("import_var_classes")
+> ### * import_var_classes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: import_var_classes
+> ### Title: Import corrected variable classes
+> ### Aliases: import_var_classes
+> 
+> ### ** Examples
+> 
+> tmp = tempfile(fileext = ".csv")
+> data(example_data)
+> assume_var_classes(example_data, tmp)
+> import_var_classes(tmp)
+Rows: 12 Columns: 2
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (2): var, datatype
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+# A tibble: 12 × 2
+   var            datatype 
+   <chr>          <chr>    
+ 1 patient_id     integer  
+ 2 tumoursize     numeric  
+ 3 t_stage        character
+ 4 n_stage        character
+ 5 diabetes       character
+ 6 diabetes_type  character
+ 7 hypertension   character
+ 8 rural_urban    character
+ 9 marital_status character
+10 SNP_a          character
+11 SNP_b          character
+12 free_text      character
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("information_content_contin")
+> ### * information_content_contin
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: information_content_contin
+> ### Title: Calculate Information Content (Continuous Variable)
+> ### Aliases: information_content_contin
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> information_content_contin(example_data$tumoursize)
+[1] 6352.474
+> 
+> 
+> 
+> cleanEx()
+> nameEx("information_content_discrete")
+> ### * information_content_discrete
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: information_content_discrete
+> ### Title: Calculate Information Content (Discrete Variable)
+> ### Aliases: information_content_discrete
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> information_content_discrete(example_data$marital_status)
+[1] 1787.851
+> 
+> 
+> 
+> cleanEx()
+> nameEx("join_vars_to_ontol")
+> ### * join_vars_to_ontol
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: join_vars_to_ontol
+> ### Title: Join Mapping Table to Ontology Network Graph
+> ### Aliases: join_vars_to_ontol
+> 
+> ### ** Examples
+> 
+> data(example_ontology)
+> join_vars_to_ontol(example_ontology, example_mapping_file, root = "root", mode = "in")
+This graph was created by an old(er) igraph version.
+ℹ Call `igraph::upgrade_graph()` on it to use with the current igraph version.
+For now we convert it on the fly...
+# A tbl_graph: 36 nodes and 36 edges
+#
+# A directed acyclic simple graph with 1 component
+#
+# Node Data: 36 × 3 (active)
+   name                information_content node_category      
+   <chr>                             <dbl> <fct>              
+ 1 Nstage                           1      Annotation         
+ 2 Tstage                           1      Annotation         
+ 3 Tumoursize                       1      Annotation         
+ 4 property_of_tumour               0.723  Annotation Ancestor
+ 5 TNM                              0.723  Annotation Ancestor
+ 6 property_of_cancer               0.468  Annotation Ancestor
+ 7 disease                          0.0965 Annotation Ancestor
+ 8 high_blood_pressure              0.896  Annotation         
+ 9 heart_disease                    0.641  Annotation Ancestor
+10 diabetes_Type_I                  1      Annotation         
+# ℹ 26 more rows
+#
+# Edge Data: 36 × 2
+   from    to
+  <int> <int>
+1     1     5
+2     2     5
+3     3     4
+# ℹ 33 more rows
+> 
+> 
+> 
+> cleanEx()
+> nameEx("merge_cols")
+> ### * merge_cols
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: merge_cols
+> ### Title: Merge columns in data frame
+> ### Aliases: merge_cols
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> 
+> # preserve input variables (default)
+> res <- merge_cols(example_data, diabetes_type, diabetes)
+> dplyr::select(res, dplyr::starts_with("diabetes"))
+# A tibble: 1,000 × 3
+   diabetes diabetes_type diabetes_type_diabetes_merged
+   <chr>    <chr>         <chr>                        
+ 1 Yes      Type I        Type I                       
+ 2 Yes      Type II       Type II                      
+ 3 No       Type I        Type I                       
+ 4 No       <NA>          No                           
+ 5 Yes      Type I        Type I                       
+ 6 No       <NA>          No                           
+ 7 No       <NA>          No                           
+ 8 No       <NA>          No                           
+ 9 No       <NA>          No                           
+10 No       <NA>          No                           
+# ℹ 990 more rows
+> 
+> # remove input variables
+> res <- merge_cols(example_data, diabetes_type, diabetes, rm_in_vars = TRUE)
+> dplyr::select(res, dplyr::starts_with("diabetes"))
+# A tibble: 1,000 × 1
+   diabetes_type_diabetes_merged
+   <chr>                        
+ 1 Type I                       
+ 2 Type II                      
+ 3 Type I                       
+ 4 No                           
+ 5 Type I                       
+ 6 No                           
+ 7 No                           
+ 8 No                           
+ 9 No                           
+10 No                           
+# ℹ 990 more rows
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("metavariable_agg")
+> ### * metavariable_agg
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: metavariable_agg
+> ### Title: Aggregate Data by Metavariable
+> ### Aliases: metavariable_agg
+> 
+> ### ** Examples
+> 
+> require(magrittr)
+Loading required package: magrittr
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> data(example_ontology)
+> data(example_mapping_file)
+> data(example_data)
+> 
+> #' # define datatypes
+> tibble::tribble(~"var", ~"datatype",
++ "patient_id", "id",
++ "tumoursize", "numeric",
++ "t_stage", "ordinal_tstage",
++ "n_stage", "ordinal_nstage",
++ "diabetes_merged", "character",
++ "hypertension", "factor",
++ "rural_urban", "factor",
++ "marital_status", "factor",
++ "SNP_a", "genotype",
++ "SNP_b", "genotype",
++ "free_text", "freetext") -> data_types
+> 
+> # create post-QC data
+> example_data %>%
++   merge_cols(diabetes_type, diabetes, "diabetes_merged", rm_in_vars = TRUE) %>%
++   apply_quality_ctrl(patient_id, data_types,
++                      bin_cats =c("No" = "Yes", "rural" = "urban"),
++                      to_numeric_matrix = TRUE) %>%
++                      suppressMessages() ->
++                      post_qc_data
+> 
+> # minimal example on first four coloums of example data:
+> dplyr::slice(example_ontology, 1:7,24) %>%
++    join_vars_to_ontol(example_mapping_file[1:3,], root = "root") %>%
++    metavariable_info() %>%
++    metavariable_agg(post_qc_data[1:10,1:4]) -> res
+Aggregating variables with semantic commonalities to metavariables
+and appending to `data`...
+Metavariables will be labelled by the most informative common ancestor.
+Identifying semantic commonalities...
+This graph was created by an old(er) igraph version.
+ℹ Call `igraph::upgrade_graph()` on it to use with the current igraph version.
+For now we convert it on the fly...
+Complete. Duration: 0.14 secs.
+3 semantic commonalities found (via common ontological ancestors).
+Complete. Duration: 0.17 secs.
+The dataset has been enriched with 15 metavariables
+(0 metavariables had zero entropy and were therefore not appended).
+> # see Note section of documentation for information on possible warnings.
+> 
+> # summary of result:
+> tibble::glimpse(res)
+Rows: 10
+Columns: 19
+$ tumoursize                <dbl> 61.71058, 64.18932, 47.81393, 40.93006, 62.1…
+$ t_stage                   <dbl> 3, 4, 1, 3, 5, 1, 1, 4, 2, 1
+$ n_stage                   <dbl> 3, 2, 3, 1, 2, 3, 3, 2, 2, 1
+$ hypertension              <dbl> 2, 2, 2, 2, 1, 2, 1, 1, 2, 1
+$ MV_property_of_tumour_SUM <dbl> 1.4509630, 1.7500000, 0.6760457, 1.0398619, …
+$ MV_property_of_tumour_AVG <dbl> 0.9673087, 1.1666667, 0.4506971, 0.6932413, …
+$ MV_property_of_tumour_MAX <dbl> 1.4509630, 1.7500000, 0.6760457, 1.0398619, …
+$ MV_property_of_tumour_MIN <dbl> 0.5000000, 0.7500000, 0.0000000, 0.5000000, …
+$ MV_property_of_tumour_MUL <dbl> 0.48415161, 2.00976562, 0.00000000, 0.101171…
+$ MV_TNM_SUM                <dbl> 1.50, 1.25, 1.00, 0.50, 1.50, 1.00, 1.00, 1.…
+$ MV_TNM_AVG                <dbl> 1.0000000, 0.8333333, 0.6666667, 0.3333333, …
+$ MV_TNM_MAX                <dbl> 1.50, 1.25, 1.00, 0.50, 1.50, 1.00, 1.00, 1.…
+$ MV_TNM_MIN                <dbl> 0.50, 0.50, 0.00, 0.00, 0.50, 0.00, 0.00, 0.…
+$ MV_TNM_MUL                <dbl> 0.562500000, 0.244140625, 0.000000000, 0.000…
+$ MV_property_of_cancer_SUM <dbl> 2.4509630, 2.2500000, 1.6760457, 1.0398619, …
+$ MV_property_of_cancer_AVG <dbl> 1.2254815, 1.1250000, 0.8380228, 0.5199309, …
+$ MV_property_of_cancer_MAX <dbl> 2.4509630, 2.2500000, 1.6760457, 1.0398619, …
+$ MV_property_of_cancer_MIN <dbl> 0.50, 0.50, 0.00, 0.00, 0.50, 0.00, 0.00, 0.…
+$ MV_property_of_cancer_MUL <dbl> 1.75018475, 1.06787109, 0.00000000, 0.000000…
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:dplyr’, ‘package:magrittr’
+
+> nameEx("metavariable_info")
+> ### * metavariable_info
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: metavariable_info
+> ### Title: Compute Metavariable Information
+> ### Aliases: metavariable_info
+> 
+> ### ** Examples
+> 
+> data(example_ontology)
+> require(magrittr)
+Loading required package: magrittr
+> example_ontology %>%
++ join_vars_to_ontol(example_mapping_file, root = "root") -> joined_ontol
+This graph was created by an old(er) igraph version.
+ℹ Call `igraph::upgrade_graph()` on it to use with the current igraph version.
+For now we convert it on the fly...
+> 
+> metavariable_info(joined_ontol)
+Identifying semantic commonalities...
+Complete. Duration: 0.13 secs.
+9 semantic commonalities found (via common ontological ancestors).
+# A tbl_graph: 36 nodes and 36 edges
+#
+# A directed acyclic simple graph with 1 component
+#
+# Node Data: 36 × 8 (active)
+   name        information_content node_category min_dist_to_var is_metavariable
+   <chr>                     <dbl> <fct>                   <int> <lgl>          
+ 1 Nstage                   1      Annotation                  1 FALSE          
+ 2 Tstage                   1      Annotation                  1 FALSE          
+ 3 Tumoursize               1      Annotation                  1 FALSE          
+ 4 property_o…              0.723  Annotation A…               2 TRUE           
+ 5 TNM                      0.723  Annotation A…               2 TRUE           
+ 6 property_o…              0.468  Annotation A…               3 TRUE           
+ 7 disease                  0.0965 Annotation A…               3 TRUE           
+ 8 high_blood…              0.896  Annotation                  1 FALSE          
+ 9 heart_dise…              0.641  Annotation A…               2 FALSE          
+10 diabetes_T…              1      Annotation                  1 FALSE          
+# ℹ 26 more rows
+# ℹ 3 more variables: variable_descendants <list>, variable_set <int>,
+#   highest_IC <lgl>
+#
+# Edge Data: 36 × 2
+   from    to
+  <int> <int>
+1     1     5
+2     2     5
+3     3     4
+# ℹ 33 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’
+
+> nameEx("metavariable_variable_descendants")
+> ### * metavariable_variable_descendants
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: metavariable_variable_descendants
+> ### Title: Extract metavariables' descendant variables
+> ### Aliases: metavariable_variable_descendants
+> 
+> ### ** Examples
+> 
+> data(example_ontology)
+> require(magrittr)
+Loading required package: magrittr
+> example_ontology %>%
++ join_vars_to_ontol(example_mapping_file, root = "root") -> joined_ontol
+This graph was created by an old(er) igraph version.
+ℹ Call `igraph::upgrade_graph()` on it to use with the current igraph version.
+For now we convert it on the fly...
+> 
+> mv_info <- metavariable_info(joined_ontol)
+Identifying semantic commonalities...
+Complete. Duration: 0.14 secs.
+9 semantic commonalities found (via common ontological ancestors).
+> metavariable_variable_descendants(mv_info)
+# A tibble: 36 × 3
+   metavariable       information_content descendant_variable    
+   <chr>                            <dbl> <chr>                  
+ 1 property_of_tumour               0.723 t_stage                
+ 2 property_of_tumour               0.723 tumoursize             
+ 3 TNM                              0.723 n_stage                
+ 4 TNM                              0.723 t_stage                
+ 5 diabetes_mellitus                0.723 diabetes_merged_Type.I 
+ 6 diabetes_mellitus                0.723 diabetes_merged_Type.II
+ 7 pathway_1                        0.577 SNP_a                  
+ 8 pathway_1                        0.577 SNP_b                  
+ 9 marital_status                   0.532 marital_status_divorced
+10 marital_status                   0.532 marital_status_married 
+# ℹ 26 more rows
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’
+
+> nameEx("mi_content_discrete")
+> ### * mi_content_discrete
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: mi_content_discrete
+> ### Title: Calculate Mutual Information Content
+> ### Aliases: mi_content_discrete
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> mi_content_discrete(example_data$diabetes, example_data$diabetes_type)
+[1] 1.221903
+> 
+> 
+> 
+> cleanEx()
+> nameEx("mod_track")
+> ### * mod_track
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: mod_track
+> ### Title: Data modification tracking
+> ### Aliases: mod_track
+> 
+> ### ** Examples
+> 
+> # merge data as the example modification
+> 
+> require(magrittr)
+Loading required package: magrittr
+> 
+>  # example with one modification type (removal)
+>  # return table
+>   mod_track(example_data, strings_to_NA(example_data), patient_id)
+`vars2compare` not supplied. Attempting to compare all variables...
+# A tibble: 78 × 6
+   patient_id new_var old_var old_value new_value mod_type
+   <chr>      <chr>   <chr>   <chr>     <chr>     <chr>   
+ 1 31         t_stage t_stage equivocal <NA>      Removal 
+ 2 34         t_stage t_stage equivocal <NA>      Removal 
+ 3 44         t_stage t_stage equivocal <NA>      Removal 
+ 4 48         t_stage t_stage equivocal <NA>      Removal 
+ 5 261        t_stage t_stage equivocal <NA>      Removal 
+ 6 263        t_stage t_stage equivocal <NA>      Removal 
+ 7 348        t_stage t_stage equivocal <NA>      Removal 
+ 8 454        t_stage t_stage equivocal <NA>      Removal 
+ 9 468        t_stage t_stage equivocal <NA>      Removal 
+10 569        t_stage t_stage equivocal <NA>      Removal 
+# ℹ 68 more rows
+>  
+>  # return plot
+>   mod_track(example_data, strings_to_NA(example_data), patient_id, plot = TRUE)
+`vars2compare` not supplied. Attempting to compare all variables...
+> 
+>  # example with multiple modification types (removal, substitution and addition)
+> example_data %>%
++    strings_to_NA() %>%
++    merge_cols(diabetes_type, diabetes) ->
++    modded_data
+> 
+> # return table
+> mod_track(example_data, modded_data, patient_id, vars2compare = c("t_stage",
++ "diabetes_type_diabetes_merged" = "diabetes", "diabetes_type_diabetes_merged"
++ = "diabetes_type"), plot = FALSE)
+# A tibble: 1,019 × 6
+   patient_id new_var old_var old_value new_value mod_type
+   <chr>      <chr>   <chr>   <chr>     <chr>     <chr>   
+ 1 31         t_stage t_stage equivocal <NA>      Removal 
+ 2 34         t_stage t_stage equivocal <NA>      Removal 
+ 3 44         t_stage t_stage equivocal <NA>      Removal 
+ 4 48         t_stage t_stage equivocal <NA>      Removal 
+ 5 261        t_stage t_stage equivocal <NA>      Removal 
+ 6 263        t_stage t_stage equivocal <NA>      Removal 
+ 7 348        t_stage t_stage equivocal <NA>      Removal 
+ 8 454        t_stage t_stage equivocal <NA>      Removal 
+ 9 468        t_stage t_stage equivocal <NA>      Removal 
+10 569        t_stage t_stage equivocal <NA>      Removal 
+# ℹ 1,009 more rows
+> 
+> # return plot
+> mod_track(example_data, modded_data, patient_id, vars2compare = c("t_stage",
++ "diabetes_type_diabetes_merged" = "diabetes", "diabetes_type_diabetes_merged"
++ = "diabetes_type"), plot = TRUE)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’
+
+> nameEx("node_IC_zhou")
+> ### * node_IC_zhou
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: node_IC_zhou
+> ### Title: Calculate Node Information Content (Zhou et al 2008 method)
+> ### Aliases: node_IC_zhou
+> 
+> ### ** Examples
+> 
+> data(example_ontology)
+> node_IC_zhou(example_ontology, mode = "in", root = "root")
+This graph was created by an old(er) igraph version.
+ℹ Call `igraph::upgrade_graph()` on it to use with the current igraph version.
+For now we convert it on the fly...
+# A tbl_graph: 24 nodes and 24 edges
+#
+# A directed acyclic simple graph with 1 component
+#
+# Node Data: 24 × 2 (active)
+   name                information_content
+   <chr>                             <dbl>
+ 1 Nstage                           1     
+ 2 Tstage                           1     
+ 3 Tumoursize                       1     
+ 4 property_of_tumour               0.723 
+ 5 TNM                              0.723 
+ 6 property_of_cancer               0.468 
+ 7 disease                          0.0965
+ 8 high_blood_pressure              0.896 
+ 9 heart_disease                    0.641 
+10 diabetes_Type_I                  1     
+# ℹ 14 more rows
+#
+# Edge Data: 24 × 2
+   from    to
+  <int> <int>
+1     1     5
+2     2     5
+3     3     4
+# ℹ 21 more rows
+> 
+> 
+> 
+> cleanEx()
+> nameEx("nums_to_NA")
+> ### * nums_to_NA
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: nums_to_NA
+> ### Title: Replace numeric values in numeric columns with NA
+> ### Aliases: nums_to_NA
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> 
+> # replace all 1,2, and 3 from tumoursize and patient_id with NA.
+> nums_to_NA(data = example_data, tumoursize, patient_id, nums_to_replace = c(1,2,3))
+# A tibble: 1,000 × 12
+   patient_id tumoursize t_stage n_stage diabetes diabetes_type hypertension
+        <int>      <dbl> <chr>   <chr>   <chr>    <chr>         <chr>       
+ 1         NA       61.7 T3a     N2      Yes      Type I        Yes         
+ 2         NA       64.2 T3b     N1      Yes      Type II       Yes         
+ 3         NA       47.8 T1      N2      No       Type I        Yes         
+ 4          4       40.9 T3a     N0      No       <NA>          Yes         
+ 5          5       62.1 T4      N1      Yes      Type I        No          
+ 6          6       13.6 T1      N2      No       <NA>          Yes         
+ 7          7       62.6 T1      N2      No       <NA>          No          
+ 8          8       44.5 T3b     N1      No       <NA>          No          
+ 9          9       44.3 T2      N1      No       <NA>          Yes         
+10         10       31.6 T1      N0      No       <NA>          No          
+# ℹ 990 more rows
+# ℹ 5 more variables: rural_urban <chr>, marital_status <chr>, SNP_a <chr>,
+#   SNP_b <chr>, free_text <chr>
+> 
+> 
+> 
+> cleanEx()
+> nameEx("ordinal_label_levels")
+> ### * ordinal_label_levels
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: ordinal_label_levels
+> ### Title: Extract labels and levels of ordinal variables in a dataset
+> ### Aliases: ordinal_label_levels
+> 
+> ### ** Examples
+> 
+> require(magrittr)  # for %>%
+Loading required package: magrittr
+> 
+> # create an example class_tbl object
+> # note that diabetes_type is classed as ordinal yet is not modified as its
+> # levels are not pre-coded. It should instead be encoded with encode_ordinals().
+> tibble::tribble(~"var", ~"datatype",
++ "patient_id", "id",
++ "tumoursize", "numeric",
++ "t_stage", "ordinal_tstage",
++ "n_stage", "ordinal_nstage",
++ "diabetes", "factor",
++ "diabetes_type", "ordinal",
++ "hypertension", "factor",
++ "rural_urban", "factor",
++ "marital_status", "factor",
++ "SNP_a", "genotype",
++ "SNP_b", "genotype",
++ "free_text", "freetext") -> data_types
+> 
+> # show unqiue values for t_stage in pre-QC example_data 
+> unique(example_data$t_stage)
+[1] "T3a"       "T3b"       "T1"        "T4"        "T2"        "equivocal"
+> 
+> # apply quality control to example_data
+> apply_quality_ctrl(example_data, patient_id, data_types,
++ bin_cats =c("No" = "Yes", "rural" = "urban"),  min_freq = 0.6) %>%
++ ordinal_label_levels -> res
+> 
+> # examine the labels and levels of t_stage in post-QC example_data
+> dplyr::filter(res, variable == "t_stage")
+# A tibble: 6 × 3
+  variable label level
+  <chr>    <chr> <dbl>
+1 t_stage  T1        1
+2 t_stage  T2        2
+3 t_stage  T3a       3
+4 t_stage  T3b       4
+5 t_stage  T4        5
+6 t_stage  <NA>     NA
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:magrittr’
+
+> nameEx("plot_completeness")
+> ### * plot_completeness
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: plot_completeness
+> ### Title: Plot Completeness of a Dataset
+> ### Aliases: plot_completeness
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> plot_completeness(example_data, patient_id, "variables")
+> 
+> 
+> 
+> cleanEx()
+> nameEx("report_var_mods")
+> ### * report_var_mods
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: report_var_mods
+> ### Title: Track changes to dataset variables
+> ### Aliases: report_var_mods
+> 
+> ### ** Examples
+> 
+> example_data_merged <- merge_cols(example_data, diabetes_type,
++ diabetes, "diabetes_merged", rm_in_vars = TRUE)
+> 
+> report_var_mods(example_data, example_data_merged)
+# A tibble: 13 × 2
+   variable        presence 
+   <chr>           <chr>    
+ 1 patient_id      Preserved
+ 2 tumoursize      Preserved
+ 3 t_stage         Preserved
+ 4 n_stage         Preserved
+ 5 diabetes        Removed  
+ 6 diabetes_type   Removed  
+ 7 hypertension    Preserved
+ 8 rural_urban     Preserved
+ 9 marital_status  Preserved
+10 SNP_a           Preserved
+11 SNP_b           Preserved
+12 free_text       Preserved
+13 diabetes_merged Added    
+> 
+> 
+> 
+> cleanEx()
+> nameEx("review_quality_ctrl")
+> ### * review_quality_ctrl
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: review_quality_ctrl
+> ### Title: Review Quality Control
+> ### Aliases: review_quality_ctrl
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> require(tibble)
+Loading required package: tibble
+> 
+> tibble::tribble(~"var", ~"datatype",
++ "patient_id", "id",
++ "tumoursize", "numeric",
++ "t_stage", "ordinal_tstage",
++ "n_stage", "ordinal_nstage",
++ "diabetes", "factor",
++ "diabetes_type", "ordinal",
++ "hypertension", "factor",
++ "rural_urban", "factor",
++ "marital_status", "factor",
++ "SNP_a", "genotype",
++ "SNP_b", "genotype",
++ "free_text", "freetext") -> data_types
+> 
+>    
+> # create QC'ed dataset
+> post_QC_example_data <- apply_quality_ctrl(example_data,
++                                            patient_id,
++                                            data_types,
++                                            bin_cats =c("No" = "Yes",
++                                                        "rural" = "urban"),
++                                            min_freq = 0.6)
+> 
+> # review QC
+> QC_review <- review_quality_ctrl(before_tbl = example_data,
++                     after_tbl = post_QC_example_data,
++                     id_var = patient_id)
+> 
+> # view variable level changes
+> QC_review$variable_level_changes
+# A tibble: 20 × 2
+   variable                presence 
+   <chr>                   <chr>    
+ 1 patient_id              Preserved
+ 2 tumoursize              Preserved
+ 3 t_stage                 Preserved
+ 4 n_stage                 Preserved
+ 5 diabetes                Preserved
+ 6 diabetes_type           Preserved
+ 7 hypertension            Preserved
+ 8 rural_urban             Preserved
+ 9 marital_status          Removed  
+10 SNP_a                   Preserved
+11 SNP_b                   Preserved
+12 free_text               Removed  
+13 board_will              Added    
+14 leas_ran                Added    
+15 sixteen_week            Added    
+16 white_back              Added    
+17 marital_status_divorced Added    
+18 marital_status_married  Added    
+19 marital_status_single   Added    
+20 marital_status_NA       Added    
+> 
+> # view value level changes
+> QC_review$value_level_changes
+# A tibble: 2,029 × 6
+   patient_id new_var old_var old_value new_value mod_type
+   <chr>      <chr>   <chr>   <chr>     <chr>     <chr>   
+ 1 31         t_stage t_stage equivocal <NA>      Removal 
+ 2 34         t_stage t_stage equivocal <NA>      Removal 
+ 3 44         t_stage t_stage equivocal <NA>      Removal 
+ 4 48         t_stage t_stage equivocal <NA>      Removal 
+ 5 261        t_stage t_stage equivocal <NA>      Removal 
+ 6 263        t_stage t_stage equivocal <NA>      Removal 
+ 7 348        t_stage t_stage equivocal <NA>      Removal 
+ 8 454        t_stage t_stage equivocal <NA>      Removal 
+ 9 468        t_stage t_stage equivocal <NA>      Removal 
+10 569        t_stage t_stage equivocal <NA>      Removal 
+# ℹ 2,019 more rows
+> 
+> # view value level changes as a plot
+> QC_review$value_level_changes_plt
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:tibble’
+
+> nameEx("row_completeness")
+> ### * row_completeness
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: row_completeness
+> ### Title: Calculate Row Completeness in a Data Frame
+> ### Aliases: row_completeness
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> row_completeness(example_data, patient_id)
+# A tibble: 1,000 × 4
+   patient_id   NAs NAs_percent Completeness
+   <chr>      <int>       <dbl>        <dbl>
+ 1 4              1        8.33         91.7
+ 2 6              1        8.33         91.7
+ 3 7              1        8.33         91.7
+ 4 8              1        8.33         91.7
+ 5 9              1        8.33         91.7
+ 6 10             1        8.33         91.7
+ 7 12             1        8.33         91.7
+ 8 15             1        8.33         91.7
+ 9 17             1        8.33         91.7
+10 18             1        8.33         91.7
+# ℹ 990 more rows
+> 
+> 
+> 
+> cleanEx()
+> nameEx("semantic_enrichment")
+> ### * semantic_enrichment
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: semantic_enrichment
+> ### Title: Semantic enrichment
+> ### Aliases: semantic_enrichment
+> 
+> ### ** Examples
+> 
+> require(magrittr)
+Loading required package: magrittr
+> require(dplyr)
+Loading required package: dplyr
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> data(example_ontology)
+> data(example_mapping_file)
+> data(example_data)
+> 
+> #' # define datatypes
+> tibble::tribble(~"var", ~"datatype",
++ "patient_id", "id",
++ "tumoursize", "numeric",
++ "t_stage", "ordinal_tstage",
++ "n_stage", "ordinal_nstage",
++ "diabetes_merged", "character",
++ "hypertension", "factor",
++ "rural_urban", "factor",
++ "marital_status", "factor",
++ "SNP_a", "genotype",
++ "SNP_b", "genotype",
++ "free_text", "freetext") -> data_types
+> 
+> # create post-QC data
+> example_data %>%
++   merge_cols(diabetes_type, diabetes, "diabetes_merged", rm_in_vars = TRUE) %>%
++   apply_quality_ctrl(patient_id, data_types,
++                      bin_cats =c("No" = "Yes", "rural" = "urban"),
++                      to_numeric_matrix = TRUE) %>%
++                      suppressMessages() ->
++                      post_qc_data
+> 
+> # minimal example on first four coloums of example data:
+> semantic_enrichment(post_qc_data[1:10,1:4],
++                     dplyr::slice(example_ontology, 1:7,24),
++                     example_mapping_file[1:3,], root = "root") -> res
+This graph was created by an old(er) igraph version.
+ℹ Call `igraph::upgrade_graph()` on it to use with the current igraph version.
+For now we convert it on the fly...
+Aggregating variables with semantic commonalities to metavariables
+and appending to `data`...
+Metavariables will be labelled by the most informative common ancestor.
+Identifying semantic commonalities...
+Complete. Duration: 0.06 secs.
+3 semantic commonalities found (via common ontological ancestors).
+Complete. Duration: 0.09 secs.
+The dataset has been enriched with 15 metavariables
+(0 metavariables had zero entropy and were therefore not appended).
+> # see Note section of documentation for information on possible warnings.
+> 
+> # summary of result:
+> tibble::glimpse(res)
+Rows: 10
+Columns: 19
+$ tumoursize                <dbl> 61.71058, 64.18932, 47.81393, 40.93006, 62.1…
+$ t_stage                   <dbl> 3, 4, 1, 3, 5, 1, 1, 4, 2, 1
+$ n_stage                   <dbl> 3, 2, 3, 1, 2, 3, 3, 2, 2, 1
+$ hypertension              <dbl> 2, 2, 2, 2, 1, 2, 1, 1, 2, 1
+$ MV_property_of_tumour_SUM <dbl> 1.4509630, 1.7500000, 0.6760457, 1.0398619, …
+$ MV_property_of_tumour_AVG <dbl> 0.9673087, 1.1666667, 0.4506971, 0.6932413, …
+$ MV_property_of_tumour_MAX <dbl> 1.4509630, 1.7500000, 0.6760457, 1.0398619, …
+$ MV_property_of_tumour_MIN <dbl> 0.5000000, 0.7500000, 0.0000000, 0.5000000, …
+$ MV_property_of_tumour_MUL <dbl> 0.48415161, 2.00976562, 0.00000000, 0.101171…
+$ MV_TNM_SUM                <dbl> 1.50, 1.25, 1.00, 0.50, 1.50, 1.00, 1.00, 1.…
+$ MV_TNM_AVG                <dbl> 1.0000000, 0.8333333, 0.6666667, 0.3333333, …
+$ MV_TNM_MAX                <dbl> 1.50, 1.25, 1.00, 0.50, 1.50, 1.00, 1.00, 1.…
+$ MV_TNM_MIN                <dbl> 0.50, 0.50, 0.00, 0.00, 0.50, 0.00, 0.00, 0.…
+$ MV_TNM_MUL                <dbl> 0.562500000, 0.244140625, 0.000000000, 0.000…
+$ MV_property_of_cancer_SUM <dbl> 2.4509630, 2.2500000, 1.6760457, 1.0398619, …
+$ MV_property_of_cancer_AVG <dbl> 1.2254815, 1.1250000, 0.8380228, 0.5199309, …
+$ MV_property_of_cancer_MAX <dbl> 2.4509630, 2.2500000, 1.6760457, 1.0398619, …
+$ MV_property_of_cancer_MIN <dbl> 0.50, 0.50, 0.00, 0.00, 0.50, 0.00, 0.00, 0.…
+$ MV_property_of_cancer_MUL <dbl> 1.75018475, 1.06787109, 0.00000000, 0.000000…
+> 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:dplyr’, ‘package:magrittr’
+
+> nameEx("skipgram_append")
+> ### * skipgram_append
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: skipgram_append
+> ### Title: Append Skipgram Presence Variables to Dataset
+> ### Aliases: skipgram_append
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> # identify skipgrams
+> toks_m <- skipgram_identify(x = example_data$free_text,
++                             ids = example_data$patient_id,
++                             max_interrupt_words = 5)
+> # add skipgrams by minimum frequency
+> skipgram_append(toks_m,
++                 id_var = patient_id,
++                 min_freq = 0.6,
++                 data = example_data)
+`skipgrams2append` not provided. Searching for skipgrams with a `min_freq` of 0.6%
+4 skipgrams have been appended the data.
+# A tibble: 1,000 × 16
+   patient_id tumoursize t_stage n_stage diabetes diabetes_type hypertension
+        <dbl>      <dbl> <chr>   <chr>   <chr>    <chr>         <chr>       
+ 1          1       61.7 T3a     N2      Yes      Type I        Yes         
+ 2          2       64.2 T3b     N1      Yes      Type II       Yes         
+ 3          3       47.8 T1      N2      No       Type I        Yes         
+ 4          4       40.9 T3a     N0      No       <NA>          Yes         
+ 5          5       62.1 T4      N1      Yes      Type I        No          
+ 6          6       13.6 T1      N2      No       <NA>          Yes         
+ 7          7       62.6 T1      N2      No       <NA>          No          
+ 8          8       44.5 T3b     N1      No       <NA>          No          
+ 9          9       44.3 T2      N1      No       <NA>          Yes         
+10         10       31.6 T1      N0      No       <NA>          No          
+# ℹ 990 more rows
+# ℹ 9 more variables: rural_urban <chr>, marital_status <chr>, SNP_a <chr>,
+#   SNP_b <chr>, free_text <chr>, board_will <dbl>, leas_ran <dbl>,
+#   sixteen_week <dbl>, white_back <dbl>
+> # add specific skipgrams
+> skipgram_append(toks_m,
++                 id_var = patient_id,
++                 skipgrams2append = c("sixteen_week", "bad_strain"),
++                 data = example_data)
+2 skipgrams have been appended the data.
+# A tibble: 1,000 × 14
+   patient_id tumoursize t_stage n_stage diabetes diabetes_type hypertension
+        <dbl>      <dbl> <chr>   <chr>   <chr>    <chr>         <chr>       
+ 1          1       61.7 T3a     N2      Yes      Type I        Yes         
+ 2          2       64.2 T3b     N1      Yes      Type II       Yes         
+ 3          3       47.8 T1      N2      No       Type I        Yes         
+ 4          4       40.9 T3a     N0      No       <NA>          Yes         
+ 5          5       62.1 T4      N1      Yes      Type I        No          
+ 6          6       13.6 T1      N2      No       <NA>          Yes         
+ 7          7       62.6 T1      N2      No       <NA>          No          
+ 8          8       44.5 T3b     N1      No       <NA>          No          
+ 9          9       44.3 T2      N1      No       <NA>          Yes         
+10         10       31.6 T1      N0      No       <NA>          No          
+# ℹ 990 more rows
+# ℹ 7 more variables: rural_urban <chr>, marital_status <chr>, SNP_a <chr>,
+#   SNP_b <chr>, free_text <chr>, sixteen_week <dbl>, bad_strain <dbl>
+> 
+> 
+> 
+> cleanEx()
+> nameEx("skipgram_freq")
+> ### * skipgram_freq
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: skipgram_freq
+> ### Title: Report Skipgram Frequency
+> ### Aliases: skipgram_freq
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> toks_m <- skipgram_identify(x = example_data$free_text,
++                             ids = example_data$patient_id,
++                             max_interrupt_words = 5)
+> skipgram_freq(toks_m, min_freq = 0.5)
+# A tibble: 41 × 3
+   skipgram     count percentage
+   <chr>        <dbl>      <dbl>
+ 1 board_will       6        0.6
+ 2 leas_ran         6        0.6
+ 3 sixteen_week     6        0.6
+ 4 white_back       6        0.6
+ 5 alway_show       5        0.5
+ 6 bad_strain       5        0.5
+ 7 catch_pink       5        0.5
+ 8 catch_salmon     5        0.5
+ 9 cone_cent        5        0.5
+10 cone_cost        5        0.5
+# ℹ 31 more rows
+> 
+> 
+> 
+> cleanEx()
+> nameEx("skipgram_identify")
+> ### * skipgram_identify
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: skipgram_identify
+> ### Title: Identify Neighbouring Words (Skipgrams) in a free-text vector
+> ### Aliases: skipgram_identify
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> skipgram_identify(x = example_data$free_text,
++                   ids = example_data$patient_id,
++                   max_interrupt_words = 5)
+# A tibble: 1,000 × 1,335
+   doc_id need_grain mule_healthi gold_ring gold_fit ring_fit pierc_ear
+   <chr>       <dbl>        <dbl>     <dbl>    <dbl>    <dbl>     <dbl>
+ 1 1               1            1         0        0        0         0
+ 2 2               0            0         1        1        1         1
+ 3 3               0            0         0        0        0         0
+ 4 4               0            0         0        0        0         0
+ 5 5               0            0         0        0        0         0
+ 6 6               0            0         0        0        0         0
+ 7 7               0            0         0        0        0         0
+ 8 8               0            0         0        0        0         0
+ 9 9               0            0         0        0        0         0
+10 10              0            0         0        0        0         0
+# ℹ 990 more rows
+# ℹ 1,328 more variables: gold_buckl <dbl>, dirti_face <dbl>, tan_shirt <dbl>,
+#   bath_water <dbl>, weak_die <dbl>, weak_flame <dbl>, die_flame <dbl>,
+#   stuf_chair <dbl>, stuf_slip <dbl>, chair_slip <dbl>, move_van <dbl>,
+#   beam_drop <dbl>, workmen_head <dbl>, woven_straw <dbl>, woven_mat <dbl>,
+#   straw_mat <dbl>, worn_floor <dbl>, fish_twist <dbl>, bent_hook <dbl>,
+#   quick_snip <dbl>, abrupt_start <dbl>, clan_gather <dbl>, …
+> 
+> 
+> 
+> cleanEx()
+> nameEx("strings_to_NA")
+> ### * strings_to_NA
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: strings_to_NA
+> ### Title: Replace values in non-numeric columns with NA
+> ### Aliases: strings_to_NA
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> 
+> # original unique values in diabetes column:
+> unique(example_data$diabetes)
+[1] "Yes"     "No"      "missing"
+> # Using default values
+> res <- strings_to_NA(example_data)
+> unique(res$diabetes)
+[1] "Yes" "No"  NA   
+> 
+> 
+> # original unique values in diabetes_type column:
+> unique(example_data$diabetes_type)
+[1] "Type I"  "Type II" NA       
+> # Using custom values
+> res <- strings_to_NA(example_data, strings_to_replace = "Type I")
+> unique(res$diabetes_type)
+[1] NA        "Type II"
+> 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("validate_consistency_tbl")
+> ### * validate_consistency_tbl
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: validate_consistency_tbl
+> ### Title: Validate internal consistency table
+> ### Aliases: validate_consistency_tbl
+> 
+> ### ** Examples
+> 
+> require(tibble)
+Loading required package: tibble
+> # example with synthetic dataset on number of bean counters
+> # there is a lot going on in the function so a simple dataset aids this example
+> #
+> # creating `data`:
+> beans <- tibble::tibble(red_beans = 1:15,
++ blue_beans = 1:15,
++ total_beans = 1:15*2,
++ red_bean_summary = c(rep("few_beans",9), rep("many_beans",6)))
+> #
+> # creating `consis_tbl`
+> bean_rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
++ "red_beans", "blue_beans", "==", NA, NA,
++ "red_beans", "total_beans", "<=", NA,NA,
++ "red_beans", "red_bean_summary", NA, "1:9", "few_beans",
++ "red_beans", "red_bean_summary", NA, "10:15", "many_beans")
+> 
+> validate_consistency_tbl(beans, bean_rules)
+Consistency table is valid.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:tibble’
+
+> nameEx("variable_completeness")
+> ### * variable_completeness
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: variable_completeness
+> ### Title: Calculate Variable Completeness in a Data Frame
+> ### Aliases: variable_completeness
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> variable_completeness(example_data)
+# A tibble: 12 × 4
+   Variable         NAs NAs_percent Completeness
+   <chr>          <int>       <dbl>        <dbl>
+ 1 diabetes_type    505        50.5         49.5
+ 2 patient_id         0         0          100  
+ 3 tumoursize         0         0          100  
+ 4 t_stage            0         0          100  
+ 5 n_stage            0         0          100  
+ 6 diabetes           0         0          100  
+ 7 hypertension       0         0          100  
+ 8 rural_urban        0         0          100  
+ 9 marital_status     0         0          100  
+10 SNP_a              0         0          100  
+11 SNP_b              0         0          100  
+12 free_text          0         0          100  
+> 
+> 
+> 
+> cleanEx()
+> nameEx("variable_entropy")
+> ### * variable_entropy
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: variable_entropy
+> ### Title: Calculate Entropy of Each Variable in Data Frame
+> ### Aliases: variable_entropy
+> 
+> ### ** Examples
+> 
+> a <- matrix(c(c(1,1,1,1,1,1, 1,2,3,4,5,6)),ncol = 2, dimnames =
++ list(seq(1,6), c("no_entropy","entropy")))
+> variable_entropy(as.data.frame(a))
+no_entropy    entropy 
+  0.000000   2.584963 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("zero_entropy_variables")
+> ### * zero_entropy_variables
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: zero_entropy_variables
+> ### Title: Identify variables with zero entropy
+> ### Aliases: zero_entropy_variables
+> 
+> ### ** Examples
+> 
+> data(example_data)
+> zero_entropy_variables(example_data)
+character(0)
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cleanEx()
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  5.325 0.217 5.546 0.002 0.002 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

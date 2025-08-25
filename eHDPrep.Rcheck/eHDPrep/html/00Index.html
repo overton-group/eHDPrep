@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head><title>R: Quality Control and Semantic Enrichment of Datasets</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body><div class="container">
+<h1> Quality Control and Semantic Enrichment of Datasets
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;eHDPrep&rsquo; version 1.3.4.9000</h2>
+
+<ul><li><a href="../DESCRIPTION" type="text/plain; charset=utf-8">DESCRIPTION file</a>.</li>
+<li><a href="../doc/index.html">User guides, package vignettes and other documentation.</a></li>
+<li><a href="../NEWS.md">Package NEWS</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<table style="width: 100%;">
+<tr><td style="width: 25%;"><a href="apply_quality_ctrl.html">apply_quality_ctrl</a></td>
+<td>Apply quality control measures to a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="assess_completeness.html">assess_completeness</a></td>
+<td>Assess completeness of a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="assess_quality.html">assess_quality</a></td>
+<td>Assess quality of a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="assume_var_classes.html">assume_var_classes</a></td>
+<td>Assume variable classes in data</td></tr>
+<tr><td style="width: 25%;"><a href="cellspec_lgl.html">cellspec_lgl</a></td>
+<td>Kable logical data highlighting</td></tr>
+<tr><td style="width: 25%;"><a href="compare_completeness.html">compare_completeness</a></td>
+<td>Compare Completeness between Datasets</td></tr>
+<tr><td style="width: 25%;"><a href="compare_info_content.html">compare_info_content</a></td>
+<td>Information Content Comparison Table</td></tr>
+<tr><td style="width: 25%;"><a href="compare_info_content_plt.html">compare_info_content_plt</a></td>
+<td>Information Content Comparison Plot</td></tr>
+<tr><td style="width: 25%;"><a href="completeness_heatmap.html">completeness_heatmap</a></td>
+<td>Completeness Heatmap</td></tr>
+<tr><td style="width: 25%;"><a href="count_compare.html">count_compare</a></td>
+<td>Compare unique values before and after data modification</td></tr>
+<tr><td style="width: 25%;"><a href="discrete.mi.html">discrete.mi</a></td>
+<td>Calculate mutual information of a matrix of discrete values</td></tr>
+<tr><td style="width: 25%;"><a href="distant_neg_val.html">distant_neg_val</a></td>
+<td>Find highly distant value for data frame</td></tr>
+<tr><td style="width: 25%;"><a href="edge_tbl_to_graph.html">edge_tbl_to_graph</a></td>
+<td>Convert edge table to tidygraph graph</td></tr>
+<tr><td style="width: 25%;"><a href="encode_as_num_mat.html">encode_as_num_mat</a></td>
+<td>Convert data frame to numeric matrix</td></tr>
+<tr><td style="width: 25%;"><a href="encode_binary_cats.html">encode_binary_cats</a></td>
+<td>Encode categorical variables as binary factors</td></tr>
+<tr><td style="width: 25%;"><a href="encode_bin_cat_vec.html">encode_bin_cat_vec</a></td>
+<td>Encode a categorical vector with binary categories</td></tr>
+<tr><td style="width: 25%;"><a href="encode_cats.html">encode_cats</a></td>
+<td>Encode categorical variables using one-hot encoding.</td></tr>
+<tr><td style="width: 25%;"><a href="encode_genotypes.html">encode_genotypes</a></td>
+<td>Encode genotype/SNP variables in data frame</td></tr>
+<tr><td style="width: 25%;"><a href="encode_genotype_vec.html">encode_genotype_vec</a></td>
+<td>Encode a genotype/SNP vector</td></tr>
+<tr><td style="width: 25%;"><a href="encode_ordinals.html">encode_ordinals</a></td>
+<td>Encode ordinal variables</td></tr>
+<tr><td style="width: 25%;"><a href="entropy.html">entropy</a></td>
+<td>Calculate Entropy of a Vector</td></tr>
+<tr><td style="width: 25%;"><a href="exact.kde.html">exact.kde</a></td>
+<td>Exact kernel density estimation</td></tr>
+<tr><td style="width: 25%;"><a href="example_data.html">example_data</a></td>
+<td>Example data for eHDPrep</td></tr>
+<tr><td style="width: 25%;"><a href="example_edge_tbl.html">example_edge_tbl</a></td>
+<td>Example ontology as an edge table for semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="example_mapping_file.html">example_mapping_file</a></td>
+<td>Example mapping file for semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="example_ontology.html">example_ontology</a></td>
+<td>Example ontology as a network graph for semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="export_dataset.html">export_dataset</a></td>
+<td>Export data to delimited file</td></tr>
+<tr><td style="width: 25%;"><a href="extract_freetext.html">extract_freetext</a></td>
+<td>Extract information from free text</td></tr>
+<tr><td style="width: 25%;"><a href="identify_inconsistency.html">identify_inconsistency</a></td>
+<td>Identify inconsistencies in a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="import_dataset.html">import_dataset</a></td>
+<td>Import data into 'R'</td></tr>
+<tr><td style="width: 25%;"><a href="import_var_classes.html">import_var_classes</a></td>
+<td>Import corrected variable classes</td></tr>
+<tr><td style="width: 25%;"><a href="information_content_contin.html">information_content_contin</a></td>
+<td>Calculate Information Content (Continuous Variable)</td></tr>
+<tr><td style="width: 25%;"><a href="information_content_discrete.html">information_content_discrete</a></td>
+<td>Calculate Information Content (Discrete Variable)</td></tr>
+<tr><td style="width: 25%;"><a href="join_vars_to_ontol.html">join_vars_to_ontol</a></td>
+<td>Join Mapping Table to Ontology Network Graph</td></tr>
+<tr><td style="width: 25%;"><a href="max_catchNAs.html">max_catchNAs</a></td>
+<td>Find maximum of vector safely</td></tr>
+<tr><td style="width: 25%;"><a href="mean_catchNAs.html">mean_catchNAs</a></td>
+<td>Find mean of vector safely</td></tr>
+<tr><td style="width: 25%;"><a href="merge_cols.html">merge_cols</a></td>
+<td>Merge columns in data frame</td></tr>
+<tr><td style="width: 25%;"><a href="metavariable_agg.html">metavariable_agg</a></td>
+<td>Aggregate Data by Metavariable</td></tr>
+<tr><td style="width: 25%;"><a href="metavariable_info.html">metavariable_info</a></td>
+<td>Compute Metavariable Information</td></tr>
+<tr><td style="width: 25%;"><a href="metavariable_variable_descendants.html">metavariable_variable_descendants</a></td>
+<td>Extract metavariables' descendant variables</td></tr>
+<tr><td style="width: 25%;"><a href="min_catchNAs.html">min_catchNAs</a></td>
+<td>Find minimum of vector safely</td></tr>
+<tr><td style="width: 25%;"><a href="mi_content_discrete.html">mi_content_discrete</a></td>
+<td>Calculate Mutual Information Content</td></tr>
+<tr><td style="width: 25%;"><a href="mod_track.html">mod_track</a></td>
+<td>Data modification tracking</td></tr>
+<tr><td style="width: 25%;"><a href="node_IC_zhou.html">node_IC_zhou</a></td>
+<td>Calculate Node Information Content (Zhou et al 2008 method)</td></tr>
+<tr><td style="width: 25%;"><a href="normalize.html">normalize</a></td>
+<td>Min max normalization</td></tr>
+<tr><td style="width: 25%;"><a href="nums_to_NA.html">nums_to_NA</a></td>
+<td>Replace numeric values in numeric columns with NA</td></tr>
+<tr><td style="width: 25%;"><a href="onehot_vec.html">onehot_vec</a></td>
+<td>One hot encode a vector</td></tr>
+<tr><td style="width: 25%;"><a href="ordinal_label_levels.html">ordinal_label_levels</a></td>
+<td>Extract labels and levels of ordinal variables in a dataset</td></tr>
+<tr><td style="width: 25%;"><a href="plot_completeness.html">plot_completeness</a></td>
+<td>Plot Completeness of a Dataset</td></tr>
+<tr><td style="width: 25%;"><a href="prod_catchNAs.html">prod_catchNAs</a></td>
+<td>Find product of vector safely</td></tr>
+<tr><td style="width: 25%;"><a href="report_var_mods.html">report_var_mods</a></td>
+<td>Track changes to dataset variables</td></tr>
+<tr><td style="width: 25%;"><a href="review_quality_ctrl.html">review_quality_ctrl</a></td>
+<td>Review Quality Control</td></tr>
+<tr><td style="width: 25%;"><a href="row_completeness.html">row_completeness</a></td>
+<td>Calculate Row Completeness in a Data Frame</td></tr>
+<tr><td style="width: 25%;"><a href="semantic_enrichment.html">semantic_enrichment</a></td>
+<td>Semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="skipgram_append.html">skipgram_append</a></td>
+<td>Append Skipgram Presence Variables to Dataset</td></tr>
+<tr><td style="width: 25%;"><a href="skipgram_freq.html">skipgram_freq</a></td>
+<td>Report Skipgram Frequency</td></tr>
+<tr><td style="width: 25%;"><a href="skipgram_identify.html">skipgram_identify</a></td>
+<td>Identify Neighbouring Words (Skipgrams) in a free-text vector</td></tr>
+<tr><td style="width: 25%;"><a href="strings_to_NA.html">strings_to_NA</a></td>
+<td>Replace values in non-numeric columns with NA</td></tr>
+<tr><td style="width: 25%;"><a href="sum_catchNAs.html">sum_catchNAs</a></td>
+<td>Sum vector safely for semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="validate_consistency_tbl.html">validate_consistency_tbl</a></td>
+<td>Validate internal consistency table</td></tr>
+<tr><td style="width: 25%;"><a href="validate_mapping_tbl.html">validate_mapping_tbl</a></td>
+<td>Validate mapping table for semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="validate_ontol_nw.html">validate_ontol_nw</a></td>
+<td>Validate ontology network for semantic enrichment</td></tr>
+<tr><td style="width: 25%;"><a href="variable.bw.kde.html">variable.bw.kde</a></td>
+<td>Variable bandwidth Kernel Density Estimation</td></tr>
+<tr><td style="width: 25%;"><a href="variable_completeness.html">variable_completeness</a></td>
+<td>Calculate Variable Completeness in a Data Frame</td></tr>
+<tr><td style="width: 25%;"><a href="variable_entropy.html">variable_entropy</a></td>
+<td>Calculate Entropy of Each Variable in Data Frame</td></tr>
+<tr><td style="width: 25%;"><a href="warn_missing_dots.html">warn_missing_dots</a></td>
+<td>Missing dots warning</td></tr>
+<tr><td style="width: 25%;"><a href="zero_entropy_variables.html">zero_entropy_variables</a></td>
+<td>Identify variables with zero entropy</td></tr>
+</table>
+</div></body></html>

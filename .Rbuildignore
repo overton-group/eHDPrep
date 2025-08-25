@@ -4,4 +4,5 @@
 ^data-raw$
 ^doc$
 ^LICENSE\.md$
+^tests/testthat/Rplots\.pdf$
 

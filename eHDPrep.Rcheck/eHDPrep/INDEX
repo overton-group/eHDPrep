@@ -1,0 +1,88 @@
+apply_quality_ctrl      Apply quality control measures to a dataset
+assess_completeness     Assess completeness of a dataset
+assess_quality          Assess quality of a dataset
+assume_var_classes      Assume variable classes in data
+cellspec_lgl            Kable logical data highlighting
+compare_completeness    Compare Completeness between Datasets
+compare_info_content    Information Content Comparison Table
+compare_info_content_plt
+                        Information Content Comparison Plot
+completeness_heatmap    Completeness Heatmap
+count_compare           Compare unique values before and after data
+                        modification
+discrete.mi             Calculate mutual information of a matrix of
+                        discrete values
+distant_neg_val         Find highly distant value for data frame
+edge_tbl_to_graph       Convert edge table to tidygraph graph
+encode_as_num_mat       Convert data frame to numeric matrix
+encode_bin_cat_vec      Encode a categorical vector with binary
+                        categories
+encode_binary_cats      Encode categorical variables as binary factors
+encode_cats             Encode categorical variables using one-hot
+                        encoding.
+encode_genotype_vec     Encode a genotype/SNP vector
+encode_genotypes        Encode genotype/SNP variables in data frame
+encode_ordinals         Encode ordinal variables
+entropy                 Calculate Entropy of a Vector
+exact.kde               Exact kernel density estimation
+example_data            Example data for eHDPrep
+example_edge_tbl        Example ontology as an edge table for semantic
+                        enrichment
+example_mapping_file    Example mapping file for semantic enrichment
+example_ontology        Example ontology as a network graph for
+                        semantic enrichment
+export_dataset          Export data to delimited file
+extract_freetext        Extract information from free text
+identify_inconsistency
+                        Identify inconsistencies in a dataset
+import_dataset          Import data into 'R'
+import_var_classes      Import corrected variable classes
+information_content_contin
+                        Calculate Information Content (Continuous
+                        Variable)
+information_content_discrete
+                        Calculate Information Content (Discrete
+                        Variable)
+join_vars_to_ontol      Join Mapping Table to Ontology Network Graph
+max_catchNAs            Find maximum of vector safely
+mean_catchNAs           Find mean of vector safely
+merge_cols              Merge columns in data frame
+metavariable_agg        Aggregate Data by Metavariable
+metavariable_info       Compute Metavariable Information
+metavariable_variable_descendants
+                        Extract metavariables' descendant variables
+mi_content_discrete     Calculate Mutual Information Content
+min_catchNAs            Find minimum of vector safely
+mod_track               Data modification tracking
+node_IC_zhou            Calculate Node Information Content (Zhou et al
+                        2008 method)
+normalize               Min max normalization
+nums_to_NA              Replace numeric values in numeric columns with
+                        NA
+onehot_vec              One hot encode a vector
+ordinal_label_levels    Extract labels and levels of ordinal variables
+                        in a dataset
+plot_completeness       Plot Completeness of a Dataset
+prod_catchNAs           Find product of vector safely
+report_var_mods         Track changes to dataset variables
+review_quality_ctrl     Review Quality Control
+row_completeness        Calculate Row Completeness in a Data Frame
+semantic_enrichment     Semantic enrichment
+skipgram_append         Append Skipgram Presence Variables to Dataset
+skipgram_freq           Report Skipgram Frequency
+skipgram_identify       Identify Neighbouring Words (Skipgrams) in a
+                        free-text vector
+strings_to_NA           Replace values in non-numeric columns with NA
+sum_catchNAs            Sum vector safely for semantic enrichment
+validate_consistency_tbl
+                        Validate internal consistency table
+validate_mapping_tbl    Validate mapping table for semantic enrichment
+validate_ontol_nw       Validate ontology network for semantic
+                        enrichment
+variable.bw.kde         Variable bandwidth Kernel Density Estimation
+variable_completeness   Calculate Variable Completeness in a Data Frame
+variable_entropy        Calculate Entropy of Each Variable in Data
+                        Frame
+warn_missing_dots       Missing dots warning
+zero_entropy_variables
+                        Identify variables with zero entropy
