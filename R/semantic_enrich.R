@@ -247,7 +247,7 @@ node_IC_zhou <- function(graph, mode = "in", root, k = 0.5) {
 #' @importFrom forcats as_factor fct_relevel
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
-#' @return A \code{\link{tidygraph}} resulting from the joining of \code{var2entity_tbl}
+#' @return A \link[tidygraph]{tidygraph} resulting from the joining of \code{var2entity_tbl}
 #'   and \code{ontol_graph}.
 #' @export
 #' @examples data(example_ontology)
@@ -484,7 +484,7 @@ metavariable_variable_descendants <- function(metavariable_info_output) {
 #'   'eHDPrep'.
 #'  
 #' @param graph Graph containing ontological and dataset nodes. Must be in
-#'   \code{\link{tidygraph}} format or coercible to this format. Must have been
+#'   \link[tidygraph]{tidygraph} format or coercible to this format. Must have been
 #'   processed using \code{\link{metavariable_info}}.
 #' @param data Numeric data frame or matrix containing variables which are also
 #'   in \code{graph}.
