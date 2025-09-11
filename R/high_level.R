@@ -279,20 +279,24 @@ apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_fre
   } else{}
 
   id_var <- dplyr::enquo(id_var)
-  
+
   data %>%
     strings_to_NA(dplyr::all_of(
       select_by_datatype(class_tbl, c("id","numeric", "integer", "double"), negate = TRUE))) %>%
-    encode_binary_cats(dplyr::all_of(select_by_datatype(class_tbl, c("character","factor"))), values = bin_cats) %>%
-    encode_ordinals(ord_levels = c("T1","T2","T3a", "T3b", "T4",NA), strict_levels = T,
-                       dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage"))) %>%
-    encode_ordinals(ord_levels = c("N0","N1","N2",NA), strict_levels = T, 
-                       dplyr::all_of(select_by_datatype(class_tbl, "ordinal_nstage"))) %>%
-    encode_genotypes(dplyr::all_of(select_by_datatype(class_tbl, "genotype"))) %>%
+    {if (length(dplyr::all_of(select_by_datatype(class_tbl, c("character","factor")))) > 0)
+    {encode_binary_cats(., dplyr::all_of(select_by_datatype(class_tbl, c("character","factor"))), values = bin_cats)} else .} %>%
+    {if (length(dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage"))) > 0)
+    {encode_ordinals(., ord_levels = c("T1","T2","T3a", "T3b", "T4",NA), strict_levels = T,
+                     dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage")))} else .} %>%
+    {if (length(dplyr::all_of(select_by_datatype(class_tbl, "ordinal_nstage"))) > 0)
+    {encode_ordinals(., ord_levels = c("N0","N1","N2",NA), strict_levels = T,
+                     dplyr::all_of(select_by_datatype(class_tbl, "ordinal_nstage")))} else .} %>%
+    {if (length(dplyr::all_of(select_by_datatype(class_tbl, "genotype"))) > 0)
+    {encode_genotypes(.,dplyr::all_of(select_by_datatype(class_tbl, "genotype")))} else .} %>%
     {if(length(dplyr::all_of(select_by_datatype(class_tbl, "freetext"))) > 0) {
       extract_freetext(., id_var = !! id_var, min_freq = min_freq,
                        dplyr::all_of(select_by_datatype(class_tbl, "freetext")))
-      } else .} %>%
+    } else .} %>%
     suppressMessages() %>% # extract_freetext discusses input that user cant modify in this function
     encode_cats(dplyr::all_of(select_by_datatype(class_tbl, c("factor","character")))) %>%
     suppressWarnings() -> # encode_cats() will warn of (and ignore) binary cats
@@ -306,6 +310,7 @@ apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_fre
 
   data
 }
+
 
 ###
 ###### review QC #####
