@@ -1,5 +1,13 @@
 # eHDPrep (development version)
 
+# eHDPrep 1.3.5
+
+* Modified the apply_quality_ctrl function to accept data even without genomics variables
+
+# eHDPrep 1.3.4
+
+* Fixed the cross-references issue in man/metavariable_agg.Rd and man/join_vars_to_ontol.Rd
+
 # eHDPrep 1.3.3
 
 * Fixed typo in vignette
