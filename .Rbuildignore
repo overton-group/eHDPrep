@@ -6,3 +6,5 @@
 ^LICENSE\.md$
 ^tests/testthat/Rplots\.pdf$
 
+^.*\.Rproj$
+^\.Rproj\.user$
