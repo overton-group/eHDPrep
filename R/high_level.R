@@ -81,12 +81,25 @@ assess_completeness <- function(data, id_var, plot = TRUE) {
     )
 
   if (plot) {
-    print(compl_plt)
+
+  if (!interactive()) {
+    grDevices::pdf(NULL)
+    on.exit(grDevices::dev.off(), add = TRUE)
+  }
+
+  print(compl_plt)
+
+  if (interactive()) {
     devAskNewPage(ask = TRUE)
-    grid::grid.newpage()
-    print(compl_hm)
+  }
+
+  grid::grid.newpage()
+  print(compl_hm)
+
+  if (interactive()) {
     devAskNewPage(ask = FALSE)
   }
+}
 
   return(invisible(res))
 }
