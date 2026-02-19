@@ -300,9 +300,8 @@ encode_ordinals <- function(data, ord_levels, ..., strict_levels = TRUE) {
     #check for missing levels
     data %>%
       dplyr::select(!!! vars) %>%
-      dplyr::summarise(dplyr::across(everything(), ~any(!.x %in% ord_levels))) %>%
+      dplyr::summarise(dplyr::across(everything(), ~sum(!as.character(.x) %in% ord_levels))) %>%
       # sum number of missing levels
-      dplyr::summarise(dplyr::across(c(!!! vars), sum)) %>%
       tidyr::pivot_longer(dplyr::everything()) %>%
       # filter variables with missing levels
       dplyr::filter(.data$value > 0) ->
