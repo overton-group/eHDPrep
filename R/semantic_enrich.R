@@ -382,7 +382,7 @@ metavariable_info <- function(graph, mode = "in", IC_threshold = 0) {
     tidygraph::group_by(.data$variable_descendants) %>%
     tidygraph::mutate(variable_set = dplyr::cur_group_id()) %>%
     tidygraph::mutate(highest_IC = 
-                        .data$information_content == max(dplyr::cur_data()$information_content)) %>%
+                        .data$information_content == max(dplyr::pick(.data$information_content))) %>%
     tidygraph::ungroup() ->
     res
   
