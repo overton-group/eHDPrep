@@ -501,7 +501,7 @@ encode_cats <- function(data, ...) {
   # using encode_binary_cats()
   data %>%
     # count distinct values
-    dplyr::summarise(dplyr::across(dplyr::all_of(vars), dplyr::n_distinct, na.rm = T)) %>%
+    dplyr::summarise(dplyr::across(dplyr::all_of(vars), ~dplyr::n_distinct(.x, na.rm = T))) %>%
     # are there more than 2 distinct values (per variable)?
     tidyr::pivot_longer(dplyr::everything(), names_to = "var", values_to = "n_unique") %>%
     dplyr::filter(.data$n_unique <= 2) %>%
