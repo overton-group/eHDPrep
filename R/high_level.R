@@ -69,37 +69,29 @@
 assess_completeness <- function(data, id_var, plot = TRUE) {
 
   id_var <- dplyr::enquo(id_var)
-  compl_plt <- plot_completeness(data, !! id_var)
-  compl_hm <- completeness_heatmap(data, !! id_var)
+
+  compl_plt <- plot_completeness(data, !!id_var)
+  compl_hm  <- completeness_heatmap(data, !!id_var)
   
   res <- list(
     "variable_completeness" = variable_completeness(data),
-    "row_completeness" = row_completeness(data, !! id_var),
+    "row_completeness" = row_completeness(data, !!id_var),
     "completeness_plot" = compl_plt,
     "completeness_heatmap" = compl_hm,
-    "plot_completeness_heatmap" = function(i) { grid::grid.newpage(); i$completeness_heatmap } 
-    )
+    "plot_completeness_heatmap" = function(i) { 
+      if (!is.null(grDevices::dev.list())) grid::grid.newpage()
+      i$completeness_heatmap 
+    } 
+  )
 
-  if (plot) {
-
-  if (!interactive()) {
-    grDevices::pdf(NULL)
-    on.exit(grDevices::dev.off(), add = TRUE)
-  }
-
-  print(compl_plt)
-
-  if (interactive()) {
+  # Only print if a graphics device exists
+  if (plot && !is.null(grDevices::dev.list())) {
+    print(compl_plt)
     devAskNewPage(ask = TRUE)
-  }
-
-  grid::grid.newpage()
-  print(compl_hm)
-
-  if (interactive()) {
+    grid::grid.newpage()
+    print(compl_hm)
     devAskNewPage(ask = FALSE)
   }
-}
 
   return(invisible(res))
 }
@@ -114,6 +106,9 @@ assess_completeness <- function(data, id_var, plot = TRUE) {
 #'   data frame (e.g. from dbplyr or dtplyr).
 #' @param id_var An unquoted  expression which corresponds to a variable (column) in
 #'   \code{data} which identifies each row (sample).
+#' @param consis_tbl Optional consistency table.
+#' @param plot Logical. Should completeness plots be printed?
+#'    Defaults to TRUE. Plots are only displayed when a graphics device is active.
 #' @inheritParams validate_consistency_tbl
 #' @inheritSection validate_consistency_tbl Consistency Table Requirements
 #' @return Nested list of quality measurements
@@ -186,7 +181,7 @@ assess_completeness <- function(data, id_var, plot = TRUE) {
 #' 
 #' # show any variables with zero entropy
 #' res$vars_with_zero_entropy
-assess_quality <- function(data, id_var, consis_tbl) {
+assess_quality <- function(data, id_var, consis_tbl, plot = TRUE) {
   
   if(missing(id_var)) {
     data <- tibble::rownames_to_column(data, var = "rowname")
@@ -194,7 +189,7 @@ assess_quality <- function(data, id_var, consis_tbl) {
   } else{id_var <- dplyr::enquo(id_var)}
 
   # assess completeness
-  completeness <- assess_completeness(data, !! id_var, plot = TRUE)
+  completeness <- assess_completeness(data, !! id_var, plot = plot)
 
   # internal consistency
   if (!missing(consis_tbl)) {

@@ -4,7 +4,7 @@
 \alias{assess_quality}
 \title{Assess quality of a dataset}
 \usage{
-assess_quality(data, id_var, consis_tbl)
+assess_quality(data, id_var, consis_tbl, plot = TRUE)
 }
 \arguments{
 \item{data}{A data frame, data frame extension (e.g. a tibble), or a lazy
@@ -13,8 +13,10 @@ data frame (e.g. from dbplyr or dtplyr).}
 \item{id_var}{An unquoted  expression which corresponds to a variable (column) in
 \code{data} which identifies each row (sample).}
 
-\item{consis_tbl}{data frame or tibble containing information on internal
-consistency rules (see "Consistency Table Requirements" section)}
+\item{consis_tbl}{Optional consistency table.}
+
+\item{plot}{Logical. Should completeness plots be printed?
+Defaults to TRUE. Plots are only displayed when a graphics device is active.}
 }
 \value{
 Nested list of quality measurements
