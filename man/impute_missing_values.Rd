@@ -115,10 +115,10 @@ if (requireNamespace("VIM", quietly = TRUE)) {
 }
 }
 \seealso{
-Other high level functionality: 
-\code{\link{apply_quality_ctrl}()},
-\code{\link{assess_quality}()},
-\code{\link{review_quality_ctrl}()},
-\code{\link{semantic_enrichment}()}
+Other high level functionality:
+\code{\link[=apply_quality_ctrl]{apply_quality_ctrl()}},
+\code{\link[=assess_quality]{assess_quality()}},
+\code{\link[=review_quality_ctrl]{review_quality_ctrl()}},
+\code{\link[=semantic_enrichment]{semantic_enrichment()}}
 }
 \concept{high level functionality}

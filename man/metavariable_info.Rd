@@ -55,9 +55,9 @@ metavariable_info(joined_ontol)
 \seealso{
 \code{\link{node_IC_zhou}}
 
-Other semantic enrichment functions: 
-\code{\link{join_vars_to_ontol}()},
-\code{\link{metavariable_agg}()},
-\code{\link{metavariable_variable_descendants}()}
+Other semantic enrichment functions:
+\code{\link[=join_vars_to_ontol]{join_vars_to_ontol()}},
+\code{\link[=metavariable_agg]{metavariable_agg()}},
+\code{\link[=metavariable_variable_descendants]{metavariable_variable_descendants()}}
 }
 \concept{semantic enrichment functions}

@@ -25,11 +25,11 @@ data(example_data)
 variable_completeness(example_data)
 }
 \seealso{
-Other measures of completeness: 
-\code{\link{assess_completeness}()},
-\code{\link{compare_completeness}()},
-\code{\link{completeness_heatmap}()},
-\code{\link{plot_completeness}()},
-\code{\link{row_completeness}()}
+Other measures of completeness:
+\code{\link[=assess_completeness]{assess_completeness()}},
+\code{\link[=compare_completeness]{compare_completeness()}},
+\code{\link[=completeness_heatmap]{completeness_heatmap()}},
+\code{\link[=plot_completeness]{plot_completeness()}},
+\code{\link[=row_completeness]{row_completeness()}}
 }
 \concept{measures of completeness}

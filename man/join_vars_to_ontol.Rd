@@ -48,9 +48,9 @@ join_vars_to_ontol(example_ontology, example_mapping_file, root = "root", mode =
 \seealso{
 node_IC_zhou
 
-Other semantic enrichment functions: 
-\code{\link{metavariable_agg}()},
-\code{\link{metavariable_info}()},
-\code{\link{metavariable_variable_descendants}()}
+Other semantic enrichment functions:
+\code{\link[=metavariable_agg]{metavariable_agg()}},
+\code{\link[=metavariable_info]{metavariable_info()}},
+\code{\link[=metavariable_variable_descendants]{metavariable_variable_descendants()}}
 }
 \concept{semantic enrichment functions}

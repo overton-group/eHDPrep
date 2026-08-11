@@ -30,7 +30,7 @@ export_dataset(example_data, tmp)
 \seealso{
 \code{\link[readr]{write_csv}} and \code{\link[readr]{write_tsv}}
 
-Other import to/export from 'R' functions: 
-\code{\link{import_dataset}()}
+Other import to/export from 'R' functions:
+\code{\link[=import_dataset]{import_dataset()}}
 }
 \concept{import to/export from 'R' functions}

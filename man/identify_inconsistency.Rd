@@ -92,7 +92,7 @@ identify_inconsistency(beans, bean_rules)
 
 }
 \seealso{
-Other internal consistency functions: 
-\code{\link{validate_consistency_tbl}()}
+Other internal consistency functions:
+\code{\link[=validate_consistency_tbl]{validate_consistency_tbl()}}
 }
 \concept{internal consistency functions}
