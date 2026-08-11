@@ -128,8 +128,9 @@ assume_var_classes <- function(data, out_file = NULL, factor_threshold = 5L) {
 #'
 #' Reads in output of \code{\link{assume_var_classes}}, ensures all specified
 #' datatypes are one of ("id", "numeric", "double", "integer", "character",
-#' "factor", "binary", "ordinal", "genotype", "freetext", "logical") as required
-#' for high level 'eHDPrep' functions.
+#' "factor", "binary", "ordinal", "ordinal_tstage", "ordinal_nstage",
+#' "genotype", "freetext", "logical") as required for high level 'eHDPrep'
+#' functions.
 #'
 #' @param file character string. Path to output of
 #'   \code{\link{assume_var_classes}} which should be manually verified outside
@@ -149,7 +150,8 @@ assume_var_classes <- function(data, out_file = NULL, factor_threshold = 5L) {
 import_var_classes <- function(file = "./datatypes.csv") {
   var_classes <- readr::read_csv(file)
   permitted_datatypes <- c("id", "numeric", "double", "integer", "character", "factor",
-                           "binary", "ordinal", "genotype", "freetext", "logical")
+                           "binary", "ordinal", "ordinal_tstage", "ordinal_nstage",
+                           "genotype", "freetext", "logical")
   # verify data structure
   if(!((all(names(var_classes) == c("var","datatype"))) &
        (length(names(var_classes)) == 2))) {

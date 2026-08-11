@@ -184,23 +184,27 @@ assume_var_classes(data = example_data, out_file = tmp)
 import_var_classes(file = tmp)
 ```
 
-The permitted datatypes are: `"id", "numeric", "double", "integer", "character", "factor", "ordinal", "ordinal_tstage, "ordinal_nstage", "genotype", "freetext", "logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. 'eHDPrep' provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
+The permitted datatypes are: `"id"`, `"numeric"`, `"double"`, `"integer"`, `"character"`, `"factor"`, `"binary"`, `"ordinal"`, `"ordinal_tstage"`, `"ordinal_nstage"`, `"genotype"`, `"freetext"`, and `"logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. 'eHDPrep' provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
 
-The data types for `example_data` are shown below:
+`assume_var_classes()` labels character and factor variables with exactly two unique non-missing values as `"binary"`, and those with more than two but no more than `factor_threshold` (default `5`) unique values as `"factor"`. Factor detection can be disabled with `factor_threshold = 0` or `NULL`. Variables classed as `"numeric"` are converted with `coerce_numeric_vars()`, which reports any values that could not be parsed and were therefore set to `NA`; this is applied automatically by `apply_quality_ctrl()`.
+
+The data types for `example_data`, after the manual amendments described above, are shown below. `assume_var_classes()` can only infer a class from the values it sees, so the domain-specific classes are supplied by the user at this stage: `patient_id` becomes `"id"`, `t_stage` and `n_stage` become the precoded ordinal types, the two SNP variables become `"genotype"`, and `free_text` becomes `"freetext"`. The two-category variables `hypertension` and `rural_urban` are detected as `"binary"` automatically and are kept as such.
+
+`diabetes_type` illustrates why this manual review step matters. It has exactly two non-missing values (`"Type I"` and `"Type II"`), so it is detected as `"binary"`, but clinically it is an ordinal classification. It is therefore amended to `"ordinal"`, and because its levels are not precoded it is left unmodified by `apply_quality_ctrl()`. Automatic detection describes the values; only the user can supply the meaning.
+
+Note also that `diabetes` is detected as `"factor"` rather than `"binary"` because it has three distinct raw values (`"Yes"`, `"No"` and the missingness string `"missing"`). Once missingness is standardised to `NA` (see [Encoding missing values]) only two values remain, and `apply_quality_ctrl()` treats it as binary from that point on.
 
 ```{r, echo = FALSE}
 # create an example class_tbl object
-# note that diabetes_type is classes as ordinal and is not modified as its
-# levels are not pre-coded
 tibble::tribble(~"var", ~"datatype",
 "patient_id", "id",
 "tumoursize", "numeric",
 "t_stage", "ordinal_tstage",
 "n_stage", "ordinal_nstage",
 "diabetes", "factor",
-"diabetes_type", "factor",
-"hypertension", "factor",
-"rural_urban", "factor",
+"diabetes_type", "ordinal",
+"hypertension", "binary",
+"rural_urban", "binary",
 "marital_status", "factor",
 "SNP_a", "genotype",
 "SNP_b", "genotype",
@@ -225,6 +229,7 @@ Data types are modified as follows:
 | `logical`             | Ignored                                                      |
 | `ordinal_tstage`      | Converted to ordered factor with predetermined levels        |
 | `ordinal_nstage`      | Converted to ordered factor with predetermined levels        |
+| `binary`              | Converted to ordered factor with two levels, using the pair given in the `bin_cats` parameter (see `?encode_binary_cats`). Mixed boolean encodings (e.g. `"no"`, `"N"`, `"False"`) are normalised before matching. If no pair in `bin_cats` matches the variable's two values, it is left unmodified |
 | `factor`; `character` | *If \>2 categories:* converted to multiple variables using one-hot encoding (see [Encoding categorical data](#encode-categorical-data)). *If 2 categories, specified in `bin_cats` parameter:* converted to ordered factor with two levels (see `?encode_binary_cats`) |
 | `genotype`            | Converted to ordered factors using SNP allele frequency in the variable (see [Encoding genotype (SNP) data](#encode-genotype-snp-data)) |
 | `freetext`            | Groups of words which appear within two words each other in the variable with a minimum frequency of occurrence set by `min_freq` are converted to logical variables describing each group (see [Extract information from free text variables]) |
@@ -238,7 +243,7 @@ the `example_data` with the following parameters (please see below):
 
 -   `class_tbl`: The object shown above describing variables' data types.
 
--   `bin_cats:` A character vector showing how variables with two options should be encoded with the syntax `negative_finding = positive_finding`. If positivity/negativity is not associated with the binary categories of a variable (e.g. `rural_urban` in `example_data`) then the ordering can be arbitrarily decided.
+-   `bin_cats:` A character vector showing how variables with two options should be encoded with the syntax `negative_finding = positive_finding`. If positivity/negativity is not associated with the binary categories of a variable (e.g. `rural_urban` in `example_data`) then the ordering can be arbitrarily decided. A pair must be supplied for every variable classed as `"binary"`; a binary variable whose two values match no pair in `bin_cats` is left unmodified.
 
 -   `min_freq`: The minimum frequency of occurrence for groups of proximal words in free-text variables. Those which meet this threshold are added as logical variables (see `?extract_freetext` and `?skipgram_append`). This is ignored if there are no free-text variables specified in `class_tbl`.
 
@@ -262,8 +267,8 @@ tibble::tribble(~"var", ~"datatype",
 "t_stage", "ordinal_tstage",
 "n_stage", "ordinal_nstage",
 "diabetes_merged", "factor",
-"hypertension", "factor",
-"rural_urban", "factor",
+"hypertension", "binary",
+"rural_urban", "binary",
 "marital_status", "factor",
 "SNP_a", "genotype",
 "SNP_b", "genotype",

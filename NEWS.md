@@ -68,6 +68,17 @@
 * `encode_ordinals()`, `encode_cats()` and `metavariable_info()` were refactored
   to avoid notes from `R CMD check` about non-standard evaluation, and
   `metavariable_info()` now uses `dplyr::pick()`.
+* `import_var_classes()` now accepts the `"ordinal_tstage"` and
+  `"ordinal_nstage"` datatypes. These are consumed by `apply_quality_ctrl()` and
+  are the classes the documentation instructs users to assign to precoded cancer
+  staging variables, but they were missing from the permitted datatypes and so
+  the documented workflow (amend the output of `assume_var_classes()`, then
+  import it) failed with "not a permitted datatype".
+* Resolved the tidyselect 1.2.0 deprecation warnings emitted by
+  `apply_quality_ctrl()` and `encode_cats()` (use of `.data` in tidyselect
+  expressions, and `all_of()` outside a selecting function).
+* The bundled `example_ontology` was regenerated with a current version of
+  'igraph', so it no longer reports that it was created by an older version.
 
 ## Testing
 
