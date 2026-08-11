@@ -101,10 +101,10 @@ data_QC <- apply_quality_ctrl(example_data, patient_id, data_types,
    bin_cats =c("No" = "Yes", "rural" = "urban"),  min_freq = 0.6)
 }
 \seealso{
-Other high level functionality: 
-\code{\link{assess_quality}()},
-\code{\link{impute_missing_values}()},
-\code{\link{review_quality_ctrl}()},
-\code{\link{semantic_enrichment}()}
+Other high level functionality:
+\code{\link[=assess_quality]{assess_quality()}},
+\code{\link[=impute_missing_values]{impute_missing_values()}},
+\code{\link[=review_quality_ctrl]{review_quality_ctrl()}},
+\code{\link[=semantic_enrichment]{semantic_enrichment()}}
 }
 \concept{high level functionality}

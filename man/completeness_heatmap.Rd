@@ -86,11 +86,11 @@ Kolde R (2019). _pheatmap: Pretty Heatmaps_. R package version 1.0.12,
 \seealso{
 \code{\link[pheatmap]{pheatmap}}
 
-Other measures of completeness: 
-\code{\link{assess_completeness}()},
-\code{\link{compare_completeness}()},
-\code{\link{plot_completeness}()},
-\code{\link{row_completeness}()},
-\code{\link{variable_completeness}()}
+Other measures of completeness:
+\code{\link[=assess_completeness]{assess_completeness()}},
+\code{\link[=compare_completeness]{compare_completeness()}},
+\code{\link[=plot_completeness]{plot_completeness()}},
+\code{\link[=row_completeness]{row_completeness()}},
+\code{\link[=variable_completeness]{variable_completeness()}}
 }
 \concept{measures of completeness}

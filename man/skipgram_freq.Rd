@@ -48,9 +48,9 @@ Guthrie, D., Allison, B., Liu, W., Guthrie, L. & Wilks, Y. A
 \seealso{
 Principle underlying function: \code{\link[quanteda]{tokens_ngrams}}
 
-Other free text functions: 
-\code{\link{extract_freetext}()},
-\code{\link{skipgram_append}()},
-\code{\link{skipgram_identify}()}
+Other free text functions:
+\code{\link[=extract_freetext]{extract_freetext()}},
+\code{\link[=skipgram_append]{skipgram_append()}},
+\code{\link[=skipgram_identify]{skipgram_identify()}}
 }
 \concept{free text functions}

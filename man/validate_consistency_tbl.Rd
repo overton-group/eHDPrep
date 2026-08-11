@@ -64,7 +64,7 @@ bean_rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_b
 validate_consistency_tbl(beans, bean_rules)
 }
 \seealso{
-Other internal consistency functions: 
-\code{\link{identify_inconsistency}()}
+Other internal consistency functions:
+\code{\link[=identify_inconsistency]{identify_inconsistency()}}
 }
 \concept{internal consistency functions}
