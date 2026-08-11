@@ -18,8 +18,8 @@ data frame containing the data type values of variables, as described
 \description{
 Reads in output of \code{\link{assume_var_classes}}, ensures all specified
 datatypes are one of ("id", "numeric", "double", "integer", "character",
-"factor","ordinal", "genotype", "freetext", "logical") as required for high
-level 'eHDPrep' functions.
+"factor", "binary", "ordinal", "genotype", "freetext", "logical") as required
+for high level 'eHDPrep' functions.
 }
 \examples{
 tmp = tempfile(fileext = ".csv")

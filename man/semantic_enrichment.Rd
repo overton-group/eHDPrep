@@ -114,6 +114,7 @@ tibble::glimpse(res)
 Other high level functionality: 
 \code{\link{apply_quality_ctrl}()},
 \code{\link{assess_quality}()},
+\code{\link{impute_missing_values}()},
 \code{\link{review_quality_ctrl}()}
 }
 \concept{high level functionality}

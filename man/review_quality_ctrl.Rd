@@ -79,6 +79,7 @@ QC_review$value_level_changes_plt
 Other high level functionality: 
 \code{\link{apply_quality_ctrl}()},
 \code{\link{assess_quality}()},
+\code{\link{impute_missing_values}()},
 \code{\link{semantic_enrichment}()}
 }
 \concept{high level functionality}

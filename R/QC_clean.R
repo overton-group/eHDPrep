@@ -164,16 +164,79 @@ nums_to_NA <- function (data, ..., nums_to_replace = NULL) {
   }
 }
 
+#' Coerce columns to numeric, replacing non-numeric values with NA
+#'
+#' For each specified column, attempts to coerce the values to numeric.
+#' Values that cannot be coerced (e.g. character strings such as
+#' \code{"hemolysed"} appearing in an otherwise numeric column) are replaced
+#' with \code{NA}. A message lists the dropped values per column so the user
+#' is aware of what was discarded. Use \code{suppressMessages()} to silence.
+#'
+#' Columns that are already numeric are left untouched.
+#'
+#' @param data A data frame, data frame extension (e.g. a tibble), or a lazy
+#'   data frame (e.g. from dbplyr or dtplyr).
+#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Columns to coerce.
+#'   If none are supplied, \code{data} is returned unchanged.
+#' @return \code{data} with the specified columns coerced to numeric.
+#' @importFrom rlang enquos expr
+#' @export
+#'
+#' @examples
+#' df <- data.frame(x = c("1", "2", "hemolysed", "3"),
+#'                  y = c("a", "b", "c", "d"))
+#' coerce_numeric_vars(df, x)
+coerce_numeric_vars <- function(data, ...) {
+  vars <- rlang::enquos(...)
+  if (length(vars) == 0L) return(data)
+
+  selected <- tidyselect::eval_select(rlang::expr(c(!!!vars)), data)
+  for (i in selected) {
+    x <- data[[i]]
+    if (is.numeric(x)) next
+    chr <- as.character(x)
+    new_x <- suppressWarnings(as.numeric(chr))
+    dropped <- chr[is.na(new_x) & !is.na(chr)]
+    if (length(dropped) > 0L) {
+      uniq <- unique(dropped)
+      preview <- paste0("\"", utils::head(uniq, 10L), "\"", collapse = ", ")
+      more <- if (length(uniq) > 10L) paste0(" (+", length(uniq) - 10L, " more)") else ""
+      message("`", names(data)[i], "`: ", length(dropped),
+              " value(s) coerced to NA: ", preview, more)
+    }
+    data[[i]] <- new_x
+  }
+  data
+}
+
 ##' Encode a categorical vector with binary categories
 ##'
 ##' In a character vector, converts binary categories to factor levels.
 ##'
+##' Before pair matching, mixed boolean encodings are normalised automatically.
+##' If all unique non-missing values are boolean synonyms (e.g. a column
+##' containing \code{"false"} and \code{"true"} recorded inconsistently as
+##' \code{"False"} or \code{"No"}), they are collapsed to canonical
+##' \code{"false"}/\code{"true"} so that the \code{"false"="true"} default pair
+##' matches. The synonyms recognised are: \code{"false"}, \code{"FALSE"},
+##' \code{"False"}, \code{"no"}, \code{"No"}, \code{"NO"}, \code{"n"},
+##' \code{"N"} (negative); and \code{"true"}, \code{"TRUE"}, \code{"True"},
+##' \code{"yes"}, \code{"Yes"}, \code{"YES"}, \code{"y"}, \code{"Y"}
+##' (positive). Note: numeric \code{"0"}/\code{"1"} are intentionally excluded
+##' as they are ambiguous (e.g. \code{"0"} may represent a missing value);
+##' handle these with \code{\link{strings_to_NA}} beforehand.
+##'
 ##' Binary categories to convert can be specified with a named character vector,
 ##' specified in \code{values}. The syntax of the named vector is:
 ##' \code{negative_finding = positive_finding}.  If \code{values} is not
-##' provided, the default list will be used: \code{"No"="Yes", "No/unknown" =
-##' "Yes", "no/unknown" = "Yes", "Non-user" = "User", "Never" = "Ever", "WT" =
-##' "MT"}.
+##' provided, the default list will be used: \code{"No"="Yes"},
+##' \code{"No/unknown"="Yes"}, \code{"no/unknown"="Yes"},
+##' \code{"Non-user"="User"}, \code{"Never"="Ever"}, \code{"WT"="MT"},
+##' \code{"Male"="Female"}, \code{"male"="female"}, \code{"M"="F"},
+##' \code{"m"="f"}, \code{"FALSE"="TRUE"}, \code{"false"="true"},
+##' \code{"0"="1"}, \code{"rural"="urban"}, \code{"Absent"="Present"},
+##' \code{"absent"="present"}, \code{"Negative"="Positive"},
+##' \code{"negative"="positive"}.
 ##'
 ##' @param x non-numeric input vector
 ##' @param values Optional named vector of user-defined values for binary values
@@ -186,7 +249,7 @@ nums_to_NA <- function (data, ..., nums_to_replace = NULL) {
 ##'   \code{TRUE}.
 ##' @importFrom forcats fct_relevel
 encode_bin_cat_vec <- function(x, values = NULL, numeric_out = FALSE) {
-  if(is.factor(x)){ x <- as.character(x)} else{x} # convert factor inputs to character
+  if(is.factor(x) || is.logical(x)){ x <- as.character(x)} else{x} # convert factor/logical inputs to character
 
   # if(length(unique(x)) != 2)
   #   stop("Input vector should have 2 unique values", call. = FALSE)
@@ -194,20 +257,54 @@ encode_bin_cat_vec <- function(x, values = NULL, numeric_out = FALSE) {
   # default values to clean
   # first is negative finding, second is positive finding
   default_values <- c("No"="Yes", "No/unknown" = "Yes", "no/unknown" = "Yes",
-                      "Non-user" = "User", "Never" = "Ever", "WT" = "MT")
+                      "Non-user" = "User", "Never" = "Ever", "WT" = "MT",
+                      "Male" = "Female", "male" = "female", "M" = "F", "m" = "f",
+                      "FALSE" = "TRUE", "false" = "true", "0" = "1",
+                      "rural" = "urban",
+                      "Absent" = "Present", "absent" = "present",
+                      "Negative" = "Positive", "negative" = "positive")
 
   # use default values if no others are supplied
   if (is.null(values)) {values <- default_values} else{values}
 
-  for (i in 1:length(values)) {
-      if (all(unique(x) %in% c(names(values)[[i]],values[[i]], NA))) {
-        out <- forcats::fct_relevel(factor(x), c(names(values)[[i]],values[[i]]))
-      if (numeric_out) {out <- sapply(out, function(x) as.double(x)-1)}
+  # attempt to encode `x` against a pair in `values`, returning the encoded
+  # factor (or NULL if no pair matches)
+  match_pair <- function(x) {
+    for (i in seq_along(values)) {
+      if (all(unique(x) %in% c(names(values)[[i]], values[[i]], NA))) {
+        out <- forcats::fct_relevel(factor(x), c(names(values)[[i]], values[[i]]))
+        if (numeric_out) {out <- sapply(out, function(x) as.double(x)-1)}
         return(out)
       }
+    }
+    NULL
   }
 
-   return(x)
+  # First, try to match the values as supplied. This ensures user-provided
+  # labels (e.g. `c("No" = "Yes")`) are respected before any normalisation.
+  out <- match_pair(x)
+  if (!is.null(out)) return(out)
+
+  # Otherwise, normalise mixed boolean encodings and retry. If all unique non-NA
+  # values are boolean synonyms (e.g. "false", "FALSE" mixed with "yes", "Yes"),
+  # collapse to canonical "false"/"true" so that pair matching can succeed. The
+  # canonical `"false" = "true"` pair is appended so normalised columns still
+  # encode even when the user supplies custom `values` that omit it.
+  .bool_false <- c("false", "FALSE", "False", "no", "No", "NO", "n", "N")
+  .bool_true  <- c("true",  "TRUE",  "True",  "yes", "Yes", "YES", "y", "Y")
+  .unique_vals <- unique(x[!is.na(x)])
+  if (length(.unique_vals) >= 2 &&
+      all(.unique_vals %in% c(.bool_false, .bool_true)) &&
+      any(.unique_vals %in% .bool_false) &&
+      any(.unique_vals %in% .bool_true)) {
+    x[x %in% .bool_false] <- "false"
+    x[x %in% .bool_true]  <- "true"
+    values <- c(values, c("false" = "true"))
+    out <- match_pair(x)
+    if (!is.null(out)) return(out)
+  }
+
+  return(x)
 
 }
 
@@ -221,9 +318,14 @@ encode_bin_cat_vec <- function(x, values = NULL, numeric_out = FALSE) {
 #' Binary categories to convert can be specified with a named character vector,
 #' specified in \code{values}. The syntax of the named vector is:
 #' \code{negative_finding = positive_finding}. If \code{values} is not
-#' provided, the default list will be used: \code{"No"="Yes", "No/unknown" =
-#' "Yes", "no/unknown" = "Yes", "Non-user" = "User", "Never" = "Ever", "WT" =
-#' "MT"}.
+#' provided, the default list will be used: \code{"No"="Yes"},
+#' \code{"No/unknown"="Yes"}, \code{"no/unknown"="Yes"},
+#' \code{"Non-user"="User"}, \code{"Never"="Ever"}, \code{"WT"="MT"},
+#' \code{"Male"="Female"}, \code{"male"="female"}, \code{"M"="F"},
+#' \code{"m"="f"}, \code{"FALSE"="TRUE"}, \code{"false"="true"},
+#' \code{"0"="1"}, \code{"rural"="urban"}, \code{"Absent"="Present"},
+#' \code{"absent"="present"}, \code{"Negative"="Positive"},
+#' \code{"negative"="positive"}.
 #'
 #' @inheritParams encode_bin_cat_vec
 #' @inheritParams nums_to_NA

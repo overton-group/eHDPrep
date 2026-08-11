@@ -242,6 +242,8 @@ the `example_data` with the following parameters (please see below):
 
 -   `min_freq`: The minimum frequency of occurrence for groups of proximal words in free-text variables. Those which meet this threshold are added as logical variables (see `?extract_freetext` and `?skipgram_append`). This is ignored if there are no free-text variables specified in `class_tbl`.
 
+-   `impute`: Optionally, missing values can be imputed by setting `impute = TRUE` (default `FALSE`). The strategy is chosen with `impute_method` (default `"auto"`; see [Imputing missing values](#impute-missing-values)). Imputation is applied after missing values are standardised but before any encoding, so that it operates on the raw variable values. All variables except `id_var` and free-text variables are imputed.
+
 ```{r}
 apply_quality_ctrl(data = example_data,
                    id_var = patient_id,
@@ -540,6 +542,43 @@ unique(example_data_NAs2$t_stage)
 nums_to_NA(data = example_data, patient_id, nums_to_replace = c(1,3))
 
 ```
+
+### Imputing missing values {#impute-missing-values}
+
+Once missingness is consistently represented as `NA`, remaining missing values can be *imputed* (filled in with estimated values) using `impute_missing_values()`. Imputation is useful for downstream analyses (e.g. machine learning) which cannot handle missing values, but it should be applied thoughtfully as it introduces estimated, rather than observed, values.
+
+The `method` argument selects the imputation strategy:
+
+| `method`     | Behaviour                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------- |
+| `"auto"`     | *(default)* numeric variables imputed with their median; non-numeric variables imputed with their mode (most frequent value) |
+| `"median"`   | numeric variables imputed with their median (non-numeric fall back to mode)                           |
+| `"mean"`     | numeric variables imputed with their mean (non-numeric fall back to mode)                             |
+| `"mode"`     | all selected variables imputed with their mode                                                        |
+| `"constant"` | missing values replaced with a fixed value supplied via `constant`                                    |
+| `"knn"`      | k-nearest-neighbours imputation (see below)                                                           |
+
+By default all variables are imputed; specific variables can be selected by passing them (unquoted) as additional arguments. The number of values imputed per variable is reported as a message, so imputation can be reviewed alongside other quality control steps with `review_quality_ctrl()`.
+
+```{r}
+# median (numeric) / mode (categorical) imputation of all variables:
+impute_missing_values(example_data)
+
+# impute only diabetes_type, using the mode:
+impute_missing_values(example_data, diabetes_type, method = "mode")
+```
+
+The simple methods above impute each variable independently. `impute_missing_values()` also supports **k-nearest-neighbours (kNN) imputation** (`method = "knn"`), which estimates each missing value from the `k` most similar rows (samples), using the remaining variables as predictors. Similarity is measured with Gower distance, allowing mixed numeric and categorical data to be handled together. Because it draws on the whole row's profile rather than a single column-wide summary, kNN better preserves the relationships between variables.
+
+kNN imputation is provided by the 'VIM' package, which is only required (a suggested, not mandatory, dependency) when this method is used. Variables which should not be used to compute similarity (such as a row identifier) can be excluded with the `ignore` argument:
+
+```{r, eval = requireNamespace("VIM", quietly = TRUE)}
+# k-nearest-neighbours imputation, excluding the identifier from the
+# distance calculation (requires the 'VIM' package):
+impute_missing_values(example_data, method = "knn", ignore = patient_id, k = 5)
+```
+
+Imputation can also be performed as part of the high-level `apply_quality_ctrl()` workflow by setting `impute = TRUE` (and, optionally, `impute_method`). See [Apply quality control].
 
 ### Encoding categorical data {#encode-categorical-data}
 
