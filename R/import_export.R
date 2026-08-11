@@ -79,12 +79,19 @@ import_dataset <- function(file, format = "excel", ...) {
 #' Classes/data types of data variables are assumed with this function and
 #' exported to a .csv file for amendment. Any incorrect classes can then be
 #' corrected and imported using \code{\link{import_var_classes}}.
+#' Character and factor variables with exactly two unique non-missing values are
+#' labelled "binary". Character variables with more than two but no more than
+#' \code{factor_threshold} unique non-missing values are labelled "factor".
 #'
 #' @param data data frame
 #' @param out_file file where variables and their assumed classes are stored for
 #'   user verification.
+#' @param factor_threshold integer. Maximum number of unique non-missing values
+#'   for a character variable to be labelled "factor". Variables with exactly 2
+#'   unique values are labelled "binary" regardless of this threshold. Set to
+#'   \code{0} or \code{NULL} to disable factor detection. Default: \code{5}.
 #'
-#' @return Writes a .csv file containing the variables and their assumed 
+#' @return Writes a .csv file containing the variables and their assumed
 #' data types / classes.
 #' @seealso \code{\link[eHDPrep]{import_var_classes}}
 #' @export
@@ -94,12 +101,26 @@ import_dataset <- function(file, format = "excel", ...) {
 #' tmp = tempfile(fileext = ".csv")
 #' data(example_data)
 #' assume_var_classes(example_data, tmp)
-assume_var_classes <- function(data, out_file = NULL) {
+assume_var_classes <- function(data, out_file = NULL, factor_threshold = 5L) {
   data %>%
     purrr::map_chr(class) %>%
     tibble::enframe(name = "var", value = "datatype") ->
     classes
-  
+
+  n_unique <- purrr::map_int(data[classes$var], ~dplyr::n_distinct(as.character(.x), na.rm = TRUE))
+
+  # Label character/factor columns with exactly 2 unique non-missing values as "binary"
+  is_binary <- classes$datatype %in% c("character", "factor") & n_unique == 2L
+  classes$datatype[is_binary] <- "binary"
+
+  # Label character columns with 3..factor_threshold unique non-missing values as "factor"
+  if (!is.null(factor_threshold) && factor_threshold > 2L) {
+    is_factor <- classes$datatype == "character" &
+      n_unique > 2L &
+      n_unique <= as.integer(factor_threshold)
+    classes$datatype[is_factor] <- "factor"
+  }
+
   readr::write_csv(classes, file = out_file, na = "")
 }
 
@@ -107,8 +128,8 @@ assume_var_classes <- function(data, out_file = NULL) {
 #'
 #' Reads in output of \code{\link{assume_var_classes}}, ensures all specified
 #' datatypes are one of ("id", "numeric", "double", "integer", "character",
-#' "factor","ordinal", "genotype", "freetext", "logical") as required for high
-#' level 'eHDPrep' functions.
+#' "factor", "binary", "ordinal", "genotype", "freetext", "logical") as required
+#' for high level 'eHDPrep' functions.
 #'
 #' @param file character string. Path to output of
 #'   \code{\link{assume_var_classes}} which should be manually verified outside
@@ -128,7 +149,7 @@ assume_var_classes <- function(data, out_file = NULL) {
 import_var_classes <- function(file = "./datatypes.csv") {
   var_classes <- readr::read_csv(file)
   permitted_datatypes <- c("id", "numeric", "double", "integer", "character", "factor",
-                           "ordinal", "genotype", "freetext", "logical")
+                           "binary", "ordinal", "genotype", "freetext", "logical")
   # verify data structure
   if(!((all(names(var_classes) == c("var","datatype"))) &
        (length(names(var_classes)) == 2))) {

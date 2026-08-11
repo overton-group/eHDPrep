@@ -32,9 +32,14 @@ preserving value labels.
 Binary categories to convert can be specified with a named character vector,
 specified in \code{values}. The syntax of the named vector is:
 \code{negative_finding = positive_finding}. If \code{values} is not
-provided, the default list will be used: \code{"No"="Yes", "No/unknown" =
-"Yes", "no/unknown" = "Yes", "Non-user" = "User", "Never" = "Ever", "WT" =
-"MT"}.
+provided, the default list will be used: \code{"No"="Yes"},
+\code{"No/unknown"="Yes"}, \code{"no/unknown"="Yes"},
+\code{"Non-user"="User"}, \code{"Never"="Ever"}, \code{"WT"="MT"},
+\code{"Male"="Female"}, \code{"male"="female"}, \code{"M"="F"},
+\code{"m"="f"}, \code{"FALSE"="TRUE"}, \code{"false"="true"},
+\code{"0"="1"}, \code{"rural"="urban"}, \code{"Absent"="Present"},
+\code{"absent"="present"}, \code{"Negative"="Positive"},
+\code{"negative"="positive"}.
 }
 \examples{
 # use built-in values. Note: rural_urban is not modified

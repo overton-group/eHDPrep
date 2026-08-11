@@ -4,22 +4,30 @@
 \alias{assume_var_classes}
 \title{Assume variable classes in data}
 \usage{
-assume_var_classes(data, out_file = NULL)
+assume_var_classes(data, out_file = NULL, factor_threshold = 5L)
 }
 \arguments{
 \item{data}{data frame}
 
 \item{out_file}{file where variables and their assumed classes are stored for
 user verification.}
+
+\item{factor_threshold}{integer. Maximum number of unique non-missing values
+for a character variable to be labelled "factor". Variables with exactly 2
+unique values are labelled "binary" regardless of this threshold. Set to
+\code{0} or \code{NULL} to disable factor detection. Default: \code{5}.}
 }
 \value{
-Writes a .csv file containing the variables and their assumed 
+Writes a .csv file containing the variables and their assumed
 data types / classes.
 }
 \description{
 Classes/data types of data variables are assumed with this function and
 exported to a .csv file for amendment. Any incorrect classes can then be
 corrected and imported using \code{\link{import_var_classes}}.
+Character and factor variables with exactly two unique non-missing values are
+labelled "binary". Character variables with more than two but no more than
+\code{factor_threshold} unique non-missing values are labelled "factor".
 }
 \examples{
 # example below assumes incorrectly for several variables

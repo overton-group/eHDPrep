@@ -4,3 +4,9 @@
 .Ruserdata
 /doc/
 /Meta/
+
+# generated artefacts
+/Rplots.pdf
+.claude/settings.local.json
+vignettes/Introduction_to_eHDPrep.R
+vignettes/Introduction_to_eHDPrep.log
