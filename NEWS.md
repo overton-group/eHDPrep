@@ -1,5 +1,3 @@
-# eHDPrep (development version)
-
 # eHDPrep 2.0.0
 
 ## Missing value imputation
@@ -77,6 +75,14 @@
   `R CMD check`. The tests are now run when the package is checked.
 * Added test coverage for `impute_missing_values()`, `coerce_numeric_vars()` and
   the imputation behaviour of `apply_quality_ctrl()`.
+
+# eHDPrep 1.4.0
+
+* `encode_ordinals()` now compares variable values to `ord_levels` as characters,
+  so factor variables are checked against the supplied levels correctly rather
+  than against their integer codes. The redundant second summary over the
+  selected variables was also removed.
+* Reduced the size of the vignette PDF.
 
 # eHDPrep 1.3.5
 

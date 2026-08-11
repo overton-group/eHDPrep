@@ -286,8 +286,7 @@ compare_info_content <- function(input1, input2, composite) {
 ##' @seealso \code{\link{compare_info_content}}
 ##' @importFrom magrittr %>%
 ##' @importFrom dplyr mutate
-##' @importFrom ggplot2 ggplot geom_bar ylab xlab theme_light theme aes rel
-##'   element_text
+##' @importFrom ggplot2 ggplot geom_bar ylab xlab theme_light theme aes rel element_text
 ##' @importFrom stats reorder
 ##' @importFrom stringr str_wrap
 ##' @importFrom rlang .data
