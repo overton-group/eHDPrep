@@ -117,8 +117,7 @@ row_completeness <- function(data, id_var) {
 #' @importFrom forcats fct_relevel
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
-#' @importFrom ggplot2 ggplot geom_bar aes theme_light theme xlab ylab labs
-#'   scale_x_continuous scale_fill_manual
+#' @importFrom ggplot2 ggplot geom_bar aes theme_light theme xlab ylab labs scale_x_continuous scale_fill_manual
 #' @export
 #' @family measures of completeness
 #'
@@ -218,8 +217,7 @@ distant_neg_val <- function(data) {
 #' @note See examples of how to plot using plot.new(). This is ensure a new plot
 #'   is created for the heatmap
 #' @importFrom tibble column_to_rownames
-#' @importFrom dplyr mutate matches everything if_else n_distinct select across
-#'   as_label all_of
+#' @importFrom dplyr mutate matches everything if_else n_distinct select across as_label all_of
 #' @importFrom tidyr replace_na
 #' @importFrom pheatmap pheatmap
 #' @importFrom magrittr %>%
@@ -461,8 +459,7 @@ completeness_heatmap <- function(data, id_var, annotation_tbl = NULL, method = 1
 #' @importFrom tibble rownames_to_column
 #' @importFrom rlang as_name .data
 #' @importFrom dplyr quo mutate if_else
-#' @importFrom ggplot2 ggplot geom_density theme theme_light labs
-#'   scale_fill_manual scale_x_continuous xlab ylab
+#' @importFrom ggplot2 ggplot geom_density theme theme_light labs scale_fill_manual scale_x_continuous xlab ylab
 #' @export
 #' @examples
 #' data(example_data)

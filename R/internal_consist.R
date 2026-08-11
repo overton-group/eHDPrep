@@ -207,8 +207,7 @@ import_consistency_file <- function(file = NULL, format = "excel") {
 #'@inheritSection validate_consistency_tbl Consistency Table Requirements
 #'@param id_var An unquoted expression which corresponds to a variable in
 #'  \code{data} which identifies each row.
-#'@importFrom dplyr mutate summarise everything rename_with left_join rename
-#'  row_number mutate if_else all_of
+#'@importFrom dplyr mutate summarise everything rename_with left_join rename row_number mutate if_else all_of
 #'@importFrom purrr pmap map_chr
 #'@importFrom magrittr %>%
 #'@importFrom rlang .data

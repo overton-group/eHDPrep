@@ -93,8 +93,7 @@ cellspec_lgl <- function(.data, rg = FALSE) {
 ##'   in LaTeX format.
 ##'
 ##' @importFrom magrittr %>%
-##' @importFrom dplyr select group_by_all tally arrange ungroup mutate_all
-##'   any_of desc n
+##' @importFrom dplyr select group_by_all tally arrange ungroup mutate_all any_of desc n
 ##' @importFrom knitr kable is_latex_output opts_current
 ##' @importFrom kableExtra cell_spec kable_styling
 ##' @return Returns list of two tibbles or a kable (see \code{kableout}
@@ -269,13 +268,11 @@ count_compare <- function(cols2compare, before_tbl = NULL, after_tbl = NULL, onl
 #'   \code{FALSE}.
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
-#' @importFrom dplyr select group_by_all full_join mutate ungroup mutate_all
-#'   all_of rename filter case_when add_row n between
+#' @importFrom dplyr select group_by_all full_join mutate ungroup mutate_all all_of rename filter case_when add_row n between
 #' @importFrom tibble tibble rownames_to_column
 #' @importFrom scales percent_format
 #' @importFrom stats setNames
-#' @importFrom ggplot2 ggplot aes geom_bar ylab xlab scale_y_continuous
-#'   theme_light theme scale_fill_manual element_blank expansion
+#' @importFrom ggplot2 ggplot aes geom_bar ylab xlab scale_y_continuous theme_light theme scale_fill_manual element_blank expansion
 #' @return Table containing row-level modification records or plot summarising
 #'   modifications.
 #' @export

@@ -624,9 +624,8 @@ encode_cats <- function(data, ...) {
     tidyr::pivot_longer(cols = dplyr::all_of(vars),
                         values_to = ".OHE_value",
                         names_to = ".OHE_name") %>%
-    tidyr::pivot_wider(names_from = c(.data$.OHE_name,
-                                      .data$.OHE_value),
-                       values_from = .data$.OHE_n,
+    tidyr::pivot_wider(names_from = c(".OHE_name", ".OHE_value"),
+                       values_from = ".OHE_n",
                        values_fill = 0,
                        names_sort = TRUE,
                        names_repair = "universal")

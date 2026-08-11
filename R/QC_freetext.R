@@ -32,11 +32,9 @@
 #'   proximal words. Default = 2.
 #' @param words_to_rm Character vector of words which should not be considered.
 #' @param lan Language of \code{var}. Default: \code{english}.
-#' @importFrom quanteda corpus tokens tokens_tolower tokens_remove
-#'   tokens_wordstem tokens_skipgrams
+#' @importFrom quanteda corpus tokens tokens_tolower tokens_remove tokens_wordstem tokens_skipgrams
 #' @importFrom tm stopwords
-#' @importFrom dplyr tibble group_by_all count rename mutate filter arrange desc
-#'   ungroup
+#' @importFrom dplyr tibble group_by_all count rename mutate filter arrange desc ungroup
 #' @return Tibble containing skipgrams as variables and patient values as rows.
 #' @family free text functions
 #' @seealso Principle underlying function: \code{\link[quanteda]{tokens_ngrams}}

@@ -5,8 +5,15 @@
 /doc/
 /Meta/
 
+.claude/
+
 # generated artefacts
 /Rplots.pdf
-.claude/settings.local.json
+Rplots.pdf
+*.Rcheck/
+..Rcheck/
 vignettes/Introduction_to_eHDPrep.R
 vignettes/Introduction_to_eHDPrep.log
+vignettes/Introduction_to_eHDPrep.pdf
+tests/testthat/_problems/
+tests/testthat/testthat-problems.rds

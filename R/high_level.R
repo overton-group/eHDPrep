@@ -321,17 +321,17 @@ apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_fre
                            dplyr::all_of(select_by_datatype(class_tbl, c("id","freetext"), negate = TRUE)),
                            method = impute_method,
                            ignore = dplyr::all_of(select_by_datatype(class_tbl, c("id","freetext"))))} else .} %>%
-    {if (length(dplyr::all_of(select_by_datatype(class_tbl, c("binary","character","factor","logical")))) > 0)
+    {if (length(select_by_datatype(class_tbl, c("binary","character","factor","logical"))) > 0)
     {encode_binary_cats(., dplyr::all_of(select_by_datatype(class_tbl, c("binary","character","factor","logical"))), values = bin_cats)} else .} %>%
-    {if (length(dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage"))) > 0)
+    {if (length(select_by_datatype(class_tbl, "ordinal_tstage")) > 0)
     {encode_ordinals(., ord_levels = c("T1","T2","T3a", "T3b", "T4",NA), strict_levels = T,
                      dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage")))} else .} %>%
-    {if (length(dplyr::all_of(select_by_datatype(class_tbl, "ordinal_nstage"))) > 0)
+    {if (length(select_by_datatype(class_tbl, "ordinal_nstage")) > 0)
     {encode_ordinals(., ord_levels = c("N0","N1","N2",NA), strict_levels = T,
                      dplyr::all_of(select_by_datatype(class_tbl, "ordinal_nstage")))} else .} %>%
-    {if (length(dplyr::all_of(select_by_datatype(class_tbl, "genotype"))) > 0)
+    {if (length(select_by_datatype(class_tbl, "genotype")) > 0)
     {encode_genotypes(.,dplyr::all_of(select_by_datatype(class_tbl, "genotype")))} else .} %>%
-    {if(length(dplyr::all_of(select_by_datatype(class_tbl, "freetext"))) > 0) {
+    {if(length(select_by_datatype(class_tbl, "freetext")) > 0) {
       # extract_freetext discusses input that the user cant modify in this
       # function, so its messages are suppressed. The suppression is scoped to
       # this call only: piping into `suppressMessages()` would force the whole

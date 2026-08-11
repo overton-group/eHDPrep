@@ -125,8 +125,7 @@ validate_mapping_tbl <- function(mapping_tbl, data, ontol_graph) {
 #' @param mode Character constant specifying the directionality of the edges.
 #' @note For use in semantic enrichment, this should be applied before joining
 #'   an ontology with variable nodes.
-#' @importFrom tidygraph with_graph as_tbl_graph graph_is_directed map_local_dbl
-#'   mutate graph_order
+#' @importFrom tidygraph with_graph as_tbl_graph graph_is_directed map_local_dbl mutate graph_order
 #' @importFrom tibble as_tibble
 #' @importFrom magrittr %>%
 #' @return tidygraph with additional node attribute "information_content"
@@ -175,8 +174,7 @@ node_info_content <- function(graph, mode = "in") {
 #' @note For use in semantic enrichment, this should be applied before joining
 #'   an ontology with nodes representing data variables (i.e. before applying
 #'   \code{\link{join_vars_to_ontol}}.
-#' @importFrom tidygraph with_graph as_tbl_graph graph_is_directed map_local_dbl
-#'   mutate graph_order pull
+#' @importFrom tidygraph with_graph as_tbl_graph graph_is_directed map_local_dbl mutate graph_order pull
 #' @importFrom tibble as_tibble
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
@@ -307,10 +305,9 @@ join_vars_to_ontol <- function(ontol_graph, var2entity_tbl, mode = "in", root, k
 #' @param IC_threshold Metavariables with IC less than this value will be
 #'   omitted from output. Default = 0 (no omission).
 #' @family semantic enrichment functions
-#' @importFrom tidygraph mutate map_local_int as_tibble filter graph_order
-#'   select pull map_local_lgl map_local arrange group_by ungroup
+#' @importFrom tidygraph mutate map_local_int as_tibble filter graph_order select pull map_local_lgl map_local arrange group_by ungroup
 #' @importFrom igraph distances
-#' @importFrom dplyr cur_data cur_group_id
+#' @importFrom dplyr cur_group_id
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @return A modified graph object with additional node attributes pertaining to their
