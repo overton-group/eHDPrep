@@ -34,11 +34,11 @@ compare_completeness(example_data, strings_to_NA(example_data), dim = 2,
 
 }
 \seealso{
-Other measures of completeness: 
-\code{\link{assess_completeness}()},
-\code{\link{completeness_heatmap}()},
-\code{\link{plot_completeness}()},
-\code{\link{row_completeness}()},
-\code{\link{variable_completeness}()}
+Other measures of completeness:
+\code{\link[=assess_completeness]{assess_completeness()}},
+\code{\link[=completeness_heatmap]{completeness_heatmap()}},
+\code{\link[=plot_completeness]{plot_completeness()}},
+\code{\link[=row_completeness]{row_completeness()}},
+\code{\link[=variable_completeness]{variable_completeness()}}
 }
 \concept{measures of completeness}

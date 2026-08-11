@@ -26,11 +26,11 @@ data(example_data)
 plot_completeness(example_data, patient_id, "variables")
 }
 \seealso{
-Other measures of completeness: 
-\code{\link{assess_completeness}()},
-\code{\link{compare_completeness}()},
-\code{\link{completeness_heatmap}()},
-\code{\link{row_completeness}()},
-\code{\link{variable_completeness}()}
+Other measures of completeness:
+\code{\link[=assess_completeness]{assess_completeness()}},
+\code{\link[=compare_completeness]{compare_completeness()}},
+\code{\link[=completeness_heatmap]{completeness_heatmap()}},
+\code{\link[=row_completeness]{row_completeness()}},
+\code{\link[=variable_completeness]{variable_completeness()}}
 }
 \concept{measures of completeness}

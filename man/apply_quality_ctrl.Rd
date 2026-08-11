@@ -10,7 +10,9 @@ apply_quality_ctrl(
   class_tbl,
   bin_cats = NULL,
   min_freq = 1,
-  to_numeric_matrix = FALSE
+  to_numeric_matrix = FALSE,
+  impute = FALSE,
+  impute_method = "auto"
 )
 }
 \arguments{
@@ -28,7 +30,9 @@ data frame (e.g. from dbplyr or dtplyr).}
 values using \code{binary_label_1 = binary_label_2} syntax (e.g.
 \code{c("No" = "Yes")} would assign level 1 to "No" and 2 to "Yes"). See
 \code{\link{encode_binary_cats}} for defaults. Applied to variables (columns)
-labelled "character" or "factor" in \code{class_tbl}.}
+labelled "binary", "character", "factor", or "logical" in \code{class_tbl}.
+Note: "character" and "factor" variables with exactly two unique non-missing
+values are automatically treated as binary.}
 
 \item{min_freq}{Minimum frequency of occurrence
 \code{\link{extract_freetext}} will use to extract groups of proximal
@@ -36,6 +40,18 @@ words in free-text from variables (columns) labelled "freetext" in \code{class_t
 
 \item{to_numeric_matrix}{Should QC'ed data be converted to a numeric matrix?
 Default: FALSE.}
+
+\item{impute}{Should missing values be imputed? Default: FALSE. When TRUE,
+\code{\link{impute_missing_values}} is applied after missing values are
+standardised (\code{\link{strings_to_NA}}) but before any encoding, so that
+imputation operates on the raw variable values (e.g. mode imputation fills
+genuine categories). All variables (columns) except \code{id_var} and any
+free text variables are imputed.}
+
+\item{impute_method}{Imputation method passed to
+\code{\link{impute_missing_values}} when \code{impute = TRUE}. One of
+\code{"auto"} (default), \code{"median"}, \code{"mean"}, \code{"mode"},
+\code{"constant"}, or \code{"knn"}.}
 }
 \value{
 \code{data} with several QC measures applied.
@@ -49,6 +65,7 @@ functions).
 The wrapped functions are applied in the following order:
 \enumerate{
 \item Standardise missing values (\code{\link{strings_to_NA}})
+\item Impute missing values (optional, \code{\link{impute_missing_values}})
 \item Encode binary categorical variables (columns) (\code{\link{encode_binary_cats}})
 \item Encode (specific) ordinal variables (columns)(\code{\link{encode_ordinals}})
 \item Encode genotype variables (\code{\link{encode_genotypes}})
@@ -84,9 +101,10 @@ data_QC <- apply_quality_ctrl(example_data, patient_id, data_types,
    bin_cats =c("No" = "Yes", "rural" = "urban"),  min_freq = 0.6)
 }
 \seealso{
-Other high level functionality: 
-\code{\link{assess_quality}()},
-\code{\link{review_quality_ctrl}()},
-\code{\link{semantic_enrichment}()}
+Other high level functionality:
+\code{\link[=assess_quality]{assess_quality()}},
+\code{\link[=impute_missing_values]{impute_missing_values()}},
+\code{\link[=review_quality_ctrl]{review_quality_ctrl()}},
+\code{\link[=semantic_enrichment]{semantic_enrichment()}}
 }
 \concept{high level functionality}

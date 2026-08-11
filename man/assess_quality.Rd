@@ -116,9 +116,10 @@ res$internal_inconsistency
 res$vars_with_zero_entropy
 }
 \seealso{
-Other high level functionality: 
-\code{\link{apply_quality_ctrl}()},
-\code{\link{review_quality_ctrl}()},
-\code{\link{semantic_enrichment}()}
+Other high level functionality:
+\code{\link[=apply_quality_ctrl]{apply_quality_ctrl()}},
+\code{\link[=impute_missing_values]{impute_missing_values()}},
+\code{\link[=review_quality_ctrl]{review_quality_ctrl()}},
+\code{\link[=semantic_enrichment]{semantic_enrichment()}}
 }
 \concept{high level functionality}

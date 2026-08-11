@@ -109,7 +109,6 @@ assess_completeness <- function(data, id_var, plot = TRUE) {
 #' @param consis_tbl Optional consistency table.
 #' @param plot Logical. Should completeness plots be printed?
 #'    Defaults to TRUE. Plots are only displayed when a graphics device is active.
-#' @inheritParams validate_consistency_tbl
 #' @inheritSection validate_consistency_tbl Consistency Table Requirements
 #' @return Nested list of quality measurements
 #' @details Wraps several quality assessment functions from \code{eHDPrep}
@@ -225,6 +224,7 @@ assess_quality <- function(data, id_var, consis_tbl, plot = TRUE) {
 #' The wrapped functions are applied in the following order:
 #' \enumerate{
 #' \item Standardise missing values (\code{\link{strings_to_NA}})
+#' \item Impute missing values (optional, \code{\link{impute_missing_values}})
 #' \item Encode binary categorical variables (columns) (\code{\link{encode_binary_cats}})
 #' \item Encode (specific) ordinal variables (columns)(\code{\link{encode_ordinals}})
 #' \item Encode genotype variables (\code{\link{encode_genotypes}})
@@ -245,12 +245,24 @@ assess_quality <- function(data, id_var, consis_tbl, plot = TRUE) {
 #'   values using \code{binary_label_1 = binary_label_2} syntax (e.g.
 #'   \code{c("No" = "Yes")} would assign level 1 to "No" and 2 to "Yes"). See
 #'   \code{\link{encode_binary_cats}} for defaults. Applied to variables (columns)
-#'   labelled "character" or "factor" in \code{class_tbl}.
+#'   labelled "binary", "character", "factor", or "logical" in \code{class_tbl}.
+#'   Note: "character" and "factor" variables with exactly two unique non-missing
+#'   values are automatically treated as binary.
 #' @param min_freq Minimum frequency of occurrence
 #'   \code{\link{extract_freetext}} will use to extract groups of proximal
 #'   words in free-text from variables (columns) labelled "freetext" in \code{class_tbl}.
 #' @param to_numeric_matrix Should QC'ed data be converted to a numeric matrix?
 #'   Default: FALSE.
+#' @param impute Should missing values be imputed? Default: FALSE. When TRUE,
+#'   \code{\link{impute_missing_values}} is applied after missing values are
+#'   standardised (\code{\link{strings_to_NA}}) but before any encoding, so that
+#'   imputation operates on the raw variable values (e.g. mode imputation fills
+#'   genuine categories). All variables (columns) except \code{id_var} and any
+#'   free text variables are imputed.
+#' @param impute_method Imputation method passed to
+#'   \code{\link{impute_missing_values}} when \code{impute = TRUE}. One of
+#'   \code{"auto"} (default), \code{"median"}, \code{"mean"}, \code{"mode"},
+#'   \code{"constant"}, or \code{"knn"}.
 #' @importFrom rlang .data
 #' @importFrom magrittr %>%
 #' @importFrom dplyr all_of
@@ -281,18 +293,36 @@ assess_quality <- function(data, id_var, consis_tbl, plot = TRUE) {
 #' 
 #' data_QC <- apply_quality_ctrl(example_data, patient_id, data_types, 
 #'    bin_cats =c("No" = "Yes", "rural" = "urban"),  min_freq = 0.6)
-apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_freq = 1, to_numeric_matrix = FALSE) {
+apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_freq = 1, to_numeric_matrix = FALSE, impute = FALSE, impute_method = "auto") {
   if(missing(class_tbl)) {
     stop("The argument `class_tbl` must be supplied. It is generated using the functions assume_var_classes() then import_var_classes()", call. = FALSE)
   } else{}
 
   id_var <- dplyr::enquo(id_var)
 
+  # Auto-promote character/factor columns with exactly 2 unique non-missing values to "binary"
+  char_factor_vars <- select_by_datatype(class_tbl, c("character", "factor"))
+  if (length(char_factor_vars) > 0) {
+    is_binary <- purrr::map_lgl(data[char_factor_vars], ~dplyr::n_distinct(as.character(.x), na.rm = TRUE) == 2L)
+    class_tbl$datatype[class_tbl$var %in% char_factor_vars[is_binary]] <- "binary"
+  }
+
   data %>%
+    {if (length(select_by_datatype(class_tbl, c("numeric", "integer", "double"))) > 0)
+    {coerce_numeric_vars(., dplyr::all_of(
+      select_by_datatype(class_tbl, c("numeric", "integer", "double"))))} else .} %>%
     strings_to_NA(dplyr::all_of(
       select_by_datatype(class_tbl, c("id","numeric", "integer", "double"), negate = TRUE))) %>%
-    {if (length(dplyr::all_of(select_by_datatype(class_tbl, c("character","factor")))) > 0)
-    {encode_binary_cats(., dplyr::all_of(select_by_datatype(class_tbl, c("character","factor"))), values = bin_cats)} else .} %>%
+    # Imputation is performed on the raw (un-encoded) values so that mode
+    # imputation fills genuine categories and kNN can use Gower distance on
+    # mixed data. The id and freetext variables are excluded.
+    {if (impute)
+    {impute_missing_values(.,
+                           dplyr::all_of(select_by_datatype(class_tbl, c("id","freetext"), negate = TRUE)),
+                           method = impute_method,
+                           ignore = dplyr::all_of(select_by_datatype(class_tbl, c("id","freetext"))))} else .} %>%
+    {if (length(dplyr::all_of(select_by_datatype(class_tbl, c("binary","character","factor","logical")))) > 0)
+    {encode_binary_cats(., dplyr::all_of(select_by_datatype(class_tbl, c("binary","character","factor","logical"))), values = bin_cats)} else .} %>%
     {if (length(dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage"))) > 0)
     {encode_ordinals(., ord_levels = c("T1","T2","T3a", "T3b", "T4",NA), strict_levels = T,
                      dplyr::all_of(select_by_datatype(class_tbl, "ordinal_tstage")))} else .} %>%
@@ -302,12 +332,16 @@ apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_fre
     {if (length(dplyr::all_of(select_by_datatype(class_tbl, "genotype"))) > 0)
     {encode_genotypes(.,dplyr::all_of(select_by_datatype(class_tbl, "genotype")))} else .} %>%
     {if(length(dplyr::all_of(select_by_datatype(class_tbl, "freetext"))) > 0) {
-      extract_freetext(., id_var = !! id_var, min_freq = min_freq,
-                       dplyr::all_of(select_by_datatype(class_tbl, "freetext")))
+      # extract_freetext discusses input that the user cant modify in this
+      # function, so its messages are suppressed. The suppression is scoped to
+      # this call only: piping into `suppressMessages()` would force the whole
+      # upstream chain inside the handler and so also discard the reporting from
+      # coerce_numeric_vars() and impute_missing_values().
+      suppressMessages(
+        extract_freetext(., id_var = !! id_var, min_freq = min_freq,
+                         dplyr::all_of(select_by_datatype(class_tbl, "freetext"))))
     } else .} %>%
-    suppressMessages() %>% # extract_freetext discusses input that user cant modify in this function
-    encode_cats(dplyr::all_of(select_by_datatype(class_tbl, c("factor","character")))) %>%
-    suppressWarnings() -> # encode_cats() will warn of (and ignore) binary cats
+    encode_cats(dplyr::all_of(select_by_datatype(class_tbl, c("factor","character")))) ->
     data
 
   if (to_numeric_matrix) {

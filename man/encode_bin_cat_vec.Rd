@@ -25,10 +25,28 @@ Factor with false finding encoded as 1 and true finding encoded as
 In a character vector, converts binary categories to factor levels.
 }
 \details{
+Before pair matching, mixed boolean encodings are normalised automatically.
+If all unique non-missing values are boolean synonyms (e.g. a column
+containing \code{"false"} and \code{"true"} recorded inconsistently as
+\code{"False"} or \code{"No"}), they are collapsed to canonical
+\code{"false"}/\code{"true"} so that the \code{"false"="true"} default pair
+matches. The synonyms recognised are: \code{"false"}, \code{"FALSE"},
+\code{"False"}, \code{"no"}, \code{"No"}, \code{"NO"}, \code{"n"},
+\code{"N"} (negative); and \code{"true"}, \code{"TRUE"}, \code{"True"},
+\code{"yes"}, \code{"Yes"}, \code{"YES"}, \code{"y"}, \code{"Y"}
+(positive). Note: numeric \code{"0"}/\code{"1"} are intentionally excluded
+as they are ambiguous (e.g. \code{"0"} may represent a missing value);
+handle these with \code{\link{strings_to_NA}} beforehand.
+
 Binary categories to convert can be specified with a named character vector,
 specified in \code{values}. The syntax of the named vector is:
 \code{negative_finding = positive_finding}.  If \code{values} is not
-provided, the default list will be used: \code{"No"="Yes", "No/unknown" =
-"Yes", "no/unknown" = "Yes", "Non-user" = "User", "Never" = "Ever", "WT" =
-"MT"}.
+provided, the default list will be used: \code{"No"="Yes"},
+\code{"No/unknown"="Yes"}, \code{"no/unknown"="Yes"},
+\code{"Non-user"="User"}, \code{"Never"="Ever"}, \code{"WT"="MT"},
+\code{"Male"="Female"}, \code{"male"="female"}, \code{"M"="F"},
+\code{"m"="f"}, \code{"FALSE"="TRUE"}, \code{"false"="true"},
+\code{"0"="1"}, \code{"rural"="urban"}, \code{"Absent"="Present"},
+\code{"absent"="present"}, \code{"Negative"="Positive"},
+\code{"negative"="positive"}.
 }

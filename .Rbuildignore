@@ -5,6 +5,10 @@
 ^doc$
 ^LICENSE\.md$
 ^tests/testthat/Rplots\.pdf$
+^Rplots\.pdf$
+^\.claude$
+^vignettes/Introduction_to_eHDPrep\.R$
+^vignettes/Introduction_to_eHDPrep\.log$
 
 ^.*\.Rproj$
 ^\.Rproj\.user$
