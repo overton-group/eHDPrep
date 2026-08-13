@@ -453,6 +453,8 @@ number_of_positive_lymph_nodes. `identify_inconsistency()` can test pairs of var
 
 4.  Mixtures of 2 and 3 (e.g. cat1 in varA only if 20-25 in varC)
 
+5.  Constraining a single variable against fixed values (e.g. `age` must be `>= 70`, or must lie within `0:120`)
+
 The internal consistency tests rely on such rules being specified in a separate data frame (argument: `consis_tbl`). An example of this type of table is shown below. Column headers are not important but column order is important. See `?validate_consistency_tbl` for all requirements.
 
 ```{r}
@@ -488,6 +490,26 @@ The first five columns represent the rules set in `consis_tbl`. The additional c
 6.  The inconsistent row(s)
 7.  The value in the variable reported in column 1
 8.  The value in the variable reported in column 2 (inconsistent with the corresponding value in the variable in column 1, given the rules in `consis_tbl`).
+
+#### Constraining a single variable
+
+Not every rule involves two variables. A variable may also be checked against fixed values, which is useful for range and plausibility checks. Such a rule leaves the second column `NA` and gives the boundary in the fourth column. Two forms are available:
+
+-   **Comparison against a value.** The third column holds the logical test and the fourth the value to compare against. For example `"tumoursize", NA, ">=", "0", NA` requires every tumour size to be non-negative.
+-   **Permitted values.** The third column is `NA` and the fourth holds either a colon-separated numeric range or a single permitted category. For example `"tumoursize", NA, NA, "0:100", NA` requires every tumour size to lie between 0 and 100.
+
+Applying a plausibility check to `tumoursize` reveals that `example_data` contains negative measurements:
+
+```{r}
+plausibility_rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                                      "tumoursize", NA, ">=", "0", NA
+                                      )
+
+identify_inconsistency(data = example_data, consis_tbl = plausibility_rules,
+                       id_var = "patient_id")
+```
+
+Single-variable and two-variable rules can be combined in the same `consis_tbl`. Note that missing (`NA`) values are never reported by a single-variable rule, as they cannot be assessed against a boundary; use `assess_completeness()` to review missingness instead (see [Measure completeness]).
 
 ### Merge variables
 
