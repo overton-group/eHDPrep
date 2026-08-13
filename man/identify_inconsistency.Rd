@@ -21,7 +21,7 @@ tibble detailing any identified internal inconsistencies in
  is returned invisibly.
 }
 \description{
-Tests pairs of variables for consistency between their values according to
+Tests variables for consistency between their values according to
 a table of rules or 'consistency table'.
 }
 \details{
@@ -31,7 +31,9 @@ Multiple types of checks for inconsistency are supported:
 \item Comparing permitted categories (e.g. cat1 in varA only if cat2 in varB)
 \item Comparing permitted numeric ranges (e.g. 20-25 in varC only if 10-20 in
 varD)
-\item Mixtures of 2 and 3 (e.g. cat1 in varA only if 20-25 in varC) 
+\item Mixtures of 2 and 3 (e.g. cat1 in varA only if 20-25 in varC)
+\item Constraining a single variable against fixed values (e.g. varA must be
+>= 70, or must lie in 0-120), by leaving the second column \code{NA}
 }
 
 The consistency tests rely on such rules being specified in a
@@ -48,8 +50,9 @@ to account for one way dependencies (i.e. VarA is fruit, VarB is apple)
   \enumerate{
   \item First column name of data values that will be subject to 
   consistency checking. String. Required.
-  \item Second column name of data values that will be subject to 
-  consistency checking. String. Required.
+  \item Second column name of data values that will be subject to
+  consistency checking. String. Required for a two-variable check;
+  \code{NA} for a single-variable check (see below).
   \item Logical test to compare columns one and two. One of: ">",">=",
   "<","<=","==", "!=". String. Optional if columns 4 and 5 have non-\code{NA} values.
   \item Either a single character string or a colon-separated range of
@@ -62,6 +65,25 @@ to account for one way dependencies (i.e. VarA is fruit, VarB is apple)
   Each row should detail one test to make.
   Therefore, either column 3 or columns 4 and 5 must contain non-\code{NA}
   values.
+
+  \strong{Single-variable checks.} A rule may also constrain one variable
+  against fixed values, rather than comparing two variables. Such a rule has
+  \code{NA} in column 2, the boundary in column 4, and \code{NA} in column 5.
+  Two forms are available:
+  \itemize{
+  \item \emph{Comparison against a value}: column 3 holds the logical test
+  and column 4 the value to compare against. For example
+  \code{"age", NA, ">=", "70", NA} requires every value of \code{age} to be
+  at least 70.
+  \item \emph{Permitted values}: column 3 is \code{NA} and column 4 holds
+  either a colon-separated numeric range or a single category. For example
+  \code{"age", NA, NA, "0:120", NA} requires every value of \code{age} to
+  lie between 0 and 120, and \code{"sex", NA, NA, "Male", NA} requires every
+  value of \code{sex} to be \code{"Male"}.
+  }
+  Unlike two-variable rules, single-variable rules may use columns 3 and 4
+  together. Missing (\code{NA}) values are never reported as inconsistent by
+  a single-variable check, as they cannot be assessed against a boundary.
 }
 
 \examples{
@@ -89,6 +111,14 @@ beans[1, "red_bean_summary"] <- "many_beans"
 beans[1, "red_beans"] <- 10
 
 identify_inconsistency(beans, bean_rules)
+
+# single-variable rules: the second column is NA and the boundary is in the
+# fourth column. Here no more than 10 red beans are permitted, so the rows
+# holding 11 to 15 are reported:
+bean_limits <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+"red_beans", NA, "<=", "10", NA)
+
+identify_inconsistency(beans, bean_limits)
 
 }
 \seealso{

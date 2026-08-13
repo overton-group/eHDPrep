@@ -99,3 +99,90 @@ test_that("identify_inconsistency() range/boundaries tests correctly find no inc
   expect_message(identify_inconsistency(beans, bean_rules_range_c),
                  "No inconsistencies were found.")
 })
+
+# single-variable checks ---------------------------------------------------------------------------
+
+# `data` with values that fall outside plausible boundaries
+patients <- tibble::tibble(id = 1:6,
+                           age = c(65, 72, 80, 45, 90, NA),
+                           sex = c("Male", "Female", "Male", "Male", "Male", "Male"))
+
+test_that("validate_consistency_tbl() accepts single-variable rules", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, ">=", "70", NA,
+                           "age", NA, NA, "0:120", NA,
+                           "sex", NA, NA, "Male", NA)
+  expect_message(validate_consistency_tbl(patients, rules), "Consistency table is valid.")
+})
+
+test_that("single-variable rules require a boundary in column 4", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, ">=", NA, NA)
+  expect_error(validate_consistency_tbl(patients, rules), "must have a value in col 4")
+})
+
+test_that("single-variable rules must not constrain a second variable", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, NA, "0:120", "Male")
+  expect_error(validate_consistency_tbl(patients, rules), "must not have a value in col 5")
+})
+
+test_that("a named variable is still required in column 2 when supplied", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", "70", ">=", NA, NA)
+  expect_error(validate_consistency_tbl(patients, rules),
+               "must be variable names in `data`")
+})
+
+test_that("single-variable comparison against a value finds inconsistencies", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, ">=", "70", NA)
+  expect_warning(identify_inconsistency(patients, rules, id_var = "id"),
+                 "One or more inconsistencies were identified")
+  res <- suppressWarnings(identify_inconsistency(patients, rules, id_var = "id"))
+  # 65 and 45 are below 70; NA cannot be assessed and is not reported
+  expect_equal(res$values_a, c("65", "45"))
+  expect_equal(res$id, c(1L, 4L))
+  expect_true(all(is.na(res$var_b)))
+})
+
+test_that("single-variable numeric range finds inconsistencies", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, NA, "0:70", NA)
+  res <- suppressWarnings(identify_inconsistency(patients, rules, id_var = "id"))
+  expect_equal(res$values_a, c("72", "80", "90"))
+})
+
+test_that("single-variable permitted category finds inconsistencies", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "sex", NA, NA, "Male", NA)
+  res <- suppressWarnings(identify_inconsistency(patients, rules, id_var = "id"))
+  expect_equal(res$values_a, "Female")
+  expect_equal(res$id, 2L)
+})
+
+test_that("single-variable rules report nothing when satisfied", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, NA, "0:120", NA)
+  expect_message(identify_inconsistency(patients, rules, id_var = "id"),
+                 "No inconsistencies were found.")
+})
+
+test_that("missing values are not reported by single-variable rules", {
+  rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "age", NA, ">", "0", NA)
+  # every non-missing age exceeds 0, so only the NA row could be reported
+  expect_message(identify_inconsistency(patients, rules, id_var = "id"),
+                 "No inconsistencies were found.")
+})
+
+test_that("single-variable and two-variable rules can be mixed in one table", {
+  mixed <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+                           "red_beans", "blue_beans", "==", NA, NA,
+                           "red_beans", NA, "<=", "10", NA)
+  res <- suppressWarnings(identify_inconsistency(beans, mixed))
+  # red_beans == blue_beans holds throughout; 11:15 exceed the limit of 10
+  expect_equal(nrow(res), 5)
+  expect_equal(res$values_a, as.character(11:15))
+  expect_true(all(is.na(res$var_b)))
+})

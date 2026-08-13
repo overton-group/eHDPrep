@@ -1,5 +1,23 @@
 # eHDPrep 2.0.0
 
+## Single-variable consistency rules
+
+* `identify_inconsistency()` and `validate_consistency_tbl()` now support rules
+  which constrain one variable against fixed values, in addition to rules which
+  compare two variables. Such a rule leaves the second column of the consistency
+  table `NA` and gives the boundary in the fourth column:
+  * a comparison against a value, where the third column holds the logical test
+    and the fourth the value, e.g. `"age", NA, ">=", "70", NA` requires every
+    value of `age` to be at least 70;
+  * permitted values, where the third column is `NA` and the fourth holds either
+    a colon-separated numeric range or a single category, e.g.
+    `"tumoursize", NA, NA, "0:100", NA`.
+  This makes range and plausibility checks possible, which previously could not
+  be expressed as every rule required two variables. Missing values are not
+  reported by these rules as they cannot be assessed against a boundary.
+  Single-variable and two-variable rules can be mixed in one table, and existing
+  consistency tables are unaffected.
+
 ## Missing value imputation
 
 * New function `impute_missing_values()` fills missing (`NA`) values using either

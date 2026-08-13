@@ -27,8 +27,9 @@ Runs a series of checks on a table of internal consistency rules
   \enumerate{
   \item First column name of data values that will be subject to 
   consistency checking. String. Required.
-  \item Second column name of data values that will be subject to 
-  consistency checking. String. Required.
+  \item Second column name of data values that will be subject to
+  consistency checking. String. Required for a two-variable check;
+  \code{NA} for a single-variable check (see below).
   \item Logical test to compare columns one and two. One of: ">",">=",
   "<","<=","==", "!=". String. Optional if columns 4 and 5 have non-\code{NA} values.
   \item Either a single character string or a colon-separated range of
@@ -41,6 +42,25 @@ Runs a series of checks on a table of internal consistency rules
   Each row should detail one test to make.
   Therefore, either column 3 or columns 4 and 5 must contain non-\code{NA}
   values.
+
+  \strong{Single-variable checks.} A rule may also constrain one variable
+  against fixed values, rather than comparing two variables. Such a rule has
+  \code{NA} in column 2, the boundary in column 4, and \code{NA} in column 5.
+  Two forms are available:
+  \itemize{
+  \item \emph{Comparison against a value}: column 3 holds the logical test
+  and column 4 the value to compare against. For example
+  \code{"age", NA, ">=", "70", NA} requires every value of \code{age} to be
+  at least 70.
+  \item \emph{Permitted values}: column 3 is \code{NA} and column 4 holds
+  either a colon-separated numeric range or a single category. For example
+  \code{"age", NA, NA, "0:120", NA} requires every value of \code{age} to
+  lie between 0 and 120, and \code{"sex", NA, NA, "Male", NA} requires every
+  value of \code{sex} to be \code{"Male"}.
+  }
+  Unlike two-variable rules, single-variable rules may use columns 3 and 4
+  together. Missing (\code{NA}) values are never reported as inconsistent by
+  a single-variable check, as they cannot be assessed against a boundary.
 }
 
 \examples{
@@ -62,6 +82,15 @@ bean_rules <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_b
 "red_beans", "red_bean_summary", NA, "10:15", "many_beans")
 
 validate_consistency_tbl(beans, bean_rules)
+
+# single-variable rules constrain one variable against fixed values.
+# The second column is NA and the boundary is given in the fourth column:
+bean_limits <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+"red_beans", NA, ">=", "1", NA,
+"total_beans", NA, NA, "0:30", NA,
+"red_bean_summary", NA, NA, "few_beans", NA)
+
+validate_consistency_tbl(beans, bean_limits)
 }
 \seealso{
 Other internal consistency functions:

@@ -26,8 +26,9 @@
 #'   \enumerate{
 #'   \item First column name of data values that will be subject to 
 #'   consistency checking. String. Required.
-#'   \item Second column name of data values that will be subject to 
-#'   consistency checking. String. Required.
+#'   \item Second column name of data values that will be subject to
+#'   consistency checking. String. Required for a two-variable check;
+#'   \code{NA} for a single-variable check (see below).
 #'   \item Logical test to compare columns one and two. One of: ">",">=",
 #'   "<","<=","==", "!=". String. Optional if columns 4 and 5 have non-\code{NA} values.
 #'   \item Either a single character string or a colon-separated range of
@@ -40,6 +41,25 @@
 #'   Each row should detail one test to make.
 #'   Therefore, either column 3 or columns 4 and 5 must contain non-\code{NA}
 #'   values.
+#'
+#'   \strong{Single-variable checks.} A rule may also constrain one variable
+#'   against fixed values, rather than comparing two variables. Such a rule has
+#'   \code{NA} in column 2, the boundary in column 4, and \code{NA} in column 5.
+#'   Two forms are available:
+#'   \itemize{
+#'   \item \emph{Comparison against a value}: column 3 holds the logical test
+#'   and column 4 the value to compare against. For example
+#'   \code{"age", NA, ">=", "70", NA} requires every value of \code{age} to be
+#'   at least 70.
+#'   \item \emph{Permitted values}: column 3 is \code{NA} and column 4 holds
+#'   either a colon-separated numeric range or a single category. For example
+#'   \code{"age", NA, NA, "0:120", NA} requires every value of \code{age} to
+#'   lie between 0 and 120, and \code{"sex", NA, NA, "Male", NA} requires every
+#'   value of \code{sex} to be \code{"Male"}.
+#'   }
+#'   Unlike two-variable rules, single-variable rules may use columns 3 and 4
+#'   together. Missing (\code{NA}) values are never reported as inconsistent by
+#'   a single-variable check, as they cannot be assessed against a boundary.
 #'
 #' @param data data frame which will be checked for internal consistency
 #' @param consis_tbl data frame or tibble containing information on internal
@@ -70,6 +90,15 @@
 #' "red_beans", "red_bean_summary", NA, "10:15", "many_beans")
 #'
 #' validate_consistency_tbl(beans, bean_rules)
+#'
+#' # single-variable rules constrain one variable against fixed values.
+#' # The second column is NA and the boundary is given in the fourth column:
+#' bean_limits <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+#' "red_beans", NA, ">=", "1", NA,
+#' "total_beans", NA, NA, "0:30", NA,
+#' "red_bean_summary", NA, NA, "few_beans", NA)
+#'
+#' validate_consistency_tbl(beans, bean_limits)
 validate_consistency_tbl <- function(data, consis_tbl) {
   # Have both data and consis_tbl been supplied
   if(missing(data)) {
@@ -85,37 +114,43 @@ validate_consistency_tbl <- function(data, consis_tbl) {
   } else{}
   
   
+  # rows with no second variable are single-variable checks ---------------------------
+  is_univar <- is.na(consis_tbl[[2]])
+
   # check all listed variables are in dataset (1,2) ----------------------------------
-  consis_tbl %>%
-    mutate(var_a_not_in_data = !.[[1]] %in% names(data)) %>%
-    mutate(var_b_not_in_data = !.[[2]] %in% names(data)) ->
-    missing_vars
-  
-  missing_a_vars <- dplyr::filter(missing_vars, .data$var_a_not_in_data) %>% dplyr::pull(1)
-  missing_b_vars <- dplyr::filter(missing_vars, .data$var_b_not_in_data) %>% dplyr::pull(2)
-  
+  # the second column is only required to name a variable for two-variable checks
+  missing_a_vars <- consis_tbl[[1]][!consis_tbl[[1]] %in% names(data)]
+  missing_b_vars <- consis_tbl[[2]][!is_univar & !consis_tbl[[2]] %in% names(data)]
+
   if(length(missing_a_vars) > 0) {
     stop("All values in the first column of `consis_tbl` must be variable names in `data`.\n
-         \u2716 The following values are not in `data`:\n", 
+         \u2716 The following values are not in `data`:\n",
          paste0(c("- ", missing_a_vars), collapse = "\n- "), call. = FALSE)
   } else if (length(missing_b_vars) > 0) {
-    stop("All values in the second column of `consis_tbl` must be variable names in `data`.\n
-         \u2716 The following values are not in `data`:\n", 
+    stop("All values in the second column of `consis_tbl` must be variable names in `data`",
+         " or `NA` for a single-variable check.\n
+         \u2716 The following values are not in `data`:\n",
          paste0(c("- ", missing_b_vars), collapse = "\n- "), call. = FALSE)
   } else{}
-  
+
   # check either col 3 or col 4 and 5 are non-missing -----------------------------------
   consis_tbl %>%
     dplyr::mutate(
+      univar = is_univar,
       # are all 3 missing?
       missing_all_tests = is.na(.[[3]]) & is.na(.[[4]]) & is.na(.[[5]]),
       # is lgl test present but range tests are also present?
-      lgl_and_range = !is.na(.[[3]]) & (!is.na(.[[4]]) | !is.na(.[[5]])),
+      # (permitted for single-variable checks, which use col 3 with col 4)
+      lgl_and_range = !is_univar & !is.na(.[[3]]) & (!is.na(.[[4]]) | !is.na(.[[5]])),
       # are one of the range tests present but not the other?
-      missing_range = (is.na(.[[4]]) & !is.na(.[[5]])) | (!is.na(.[[4]]) & is.na(.[[5]]))
+      missing_range = !is_univar &
+        ((is.na(.[[4]]) & !is.na(.[[5]])) | (!is.na(.[[4]]) & is.na(.[[5]]))),
+      # single-variable checks need a boundary in col 4 and nothing in col 5
+      univar_no_bound = is_univar & is.na(.[[4]]),
+      univar_var_b_bound = is_univar & !is.na(.[[5]])
       ) ->
     missing_vals
-  
+
   if(any(dplyr::pull(missing_vals, .data$missing_all_tests))) {
     stop("There must (exclusively) be a value in either col 3 or in col 4 and 5.\n\u2716 Rows ",
          paste0(which(dplyr::pull(missing_vals, .data$missing_all_tests)), collapse = ", "),
@@ -128,6 +163,15 @@ validate_consistency_tbl <- function(data, consis_tbl) {
     stop("If there is a value in either col 4 or 5, there must be a value in the other\n\u2716 Rows ",
          paste0(which(dplyr::pull(missing_vals, .data$missing_range)), collapse = ", "),
          " do not adhere to this.")
+  } else if (any(dplyr::pull(missing_vals, .data$univar_no_bound))) {
+    stop("Single-variable checks (where col 2 is `NA`) must have a value in col 4.\n\u2716 Rows ",
+         paste0(which(dplyr::pull(missing_vals, .data$univar_no_bound)), collapse = ", "),
+         " do not adhere to this.", call. = FALSE)
+  } else if (any(dplyr::pull(missing_vals, .data$univar_var_b_bound))) {
+    stop("Single-variable checks (where col 2 is `NA`) must not have a value in col 5",
+         " as there is no second variable to constrain.\n\u2716 Rows ",
+         paste0(which(dplyr::pull(missing_vals, .data$univar_var_b_bound)), collapse = ", "),
+         " do not adhere to this.", call. = FALSE)
   } else{}
 
   # check logical tests column (3) -----------------------------------------------------
@@ -182,9 +226,73 @@ import_consistency_file <- function(file = NULL, format = "excel") {
 }
 
 
+#' Evaluate single-variable consistency rules
+#'
+#' Internal. Applies the rules in \code{rules} (rows of a consistency table
+#' whose second column is \code{NA}) to \code{data}, returning one row per
+#' offending value. Missing values are not reported as inconsistencies as they
+#' cannot be assessed against a boundary.
+#'
+#' @param rules data frame of single-variable rules with the five standard
+#'   consistency table columns, already renamed.
+#' @param data data frame being checked.
+#' @param id_var character. Name of the identifying variable in \code{data}.
+#' @return tibble of inconsistencies, in the same shape as the two-variable
+#'   results.
+#' @noRd
+check_univariate_rules <- function(rules, data, id_var) {
+  out <- vector("list", nrow(rules))
+
+  for (i in seq_len(nrow(rules))) {
+    var   <- rules$var_a[i]
+    op    <- rules$lgl_test[i]
+    bound <- rules$var_a_range[i]
+    vals  <- data[[var]]
+
+    if (!is.na(op)) {
+      # comparison against a single value, e.g. age >= 70
+      rhs <- suppressWarnings(as.numeric(bound))
+      incon <- if (!is.na(rhs) && is.numeric(vals)) {
+        !do.call(op, list(vals, rhs))
+      } else {
+        !do.call(op, list(as.character(vals), bound))
+      }
+    } else {
+      parts <- strsplit(bound, ":", fixed = TRUE)[[1]]
+      lims <- suppressWarnings(as.numeric(parts))
+      incon <- if (length(parts) == 2 && !anyNA(lims) && is.numeric(vals)) {
+        # permitted numeric range, e.g. 0:120
+        !(vals >= lims[1] & vals <= lims[2])
+      } else {
+        # single permitted value, e.g. "Male"
+        !(as.character(vals) == bound)
+      }
+    }
+
+    # missing values cannot be assessed, so are not flagged
+    incon[is.na(incon)] <- FALSE
+
+    if (any(incon)) {
+      out[[i]] <- tibble::tibble(
+        var_a = var,
+        var_b = NA_character_,
+        lgl_test = op,
+        var_a_range = bound,
+        var_b_range = NA_character_,
+        !!id_var := data[[id_var]][incon],
+        values_a = as.character(vals[incon]),
+        values_b = NA_character_
+      )
+    }
+  }
+
+  out <- out[!vapply(out, is.null, logical(1))]
+  if (length(out) == 0) NULL else dplyr::bind_rows(out)
+}
+
 #'Identify inconsistencies in a dataset
 #'
-#'Tests pairs of variables for consistency between their values according to
+#'Tests variables for consistency between their values according to
 #' a table of rules or 'consistency table'.
 #'
 #'Multiple types of checks for inconsistency are supported:
@@ -193,7 +301,9 @@ import_consistency_file <- function(file = NULL, format = "excel") {
 #' \item Comparing permitted categories (e.g. cat1 in varA only if cat2 in varB)
 #' \item Comparing permitted numeric ranges (e.g. 20-25 in varC only if 10-20 in
 #' varD)
-#' \item Mixtures of 2 and 3 (e.g. cat1 in varA only if 20-25 in varC) 
+#' \item Mixtures of 2 and 3 (e.g. cat1 in varA only if 20-25 in varC)
+#' \item Constraining a single variable against fixed values (e.g. varA must be
+#' >= 70, or must lie in 0-120), by leaving the second column \code{NA}
 #'}
 #'
 #'The consistency tests rely on such rules being specified in a
@@ -241,7 +351,15 @@ import_consistency_file <- function(file = NULL, format = "excel") {
 #' beans[1, "red_beans"] <- 10
 #'
 #' identify_inconsistency(beans, bean_rules)
-#' 
+#'
+#' # single-variable rules: the second column is NA and the boundary is in the
+#' # fourth column. Here no more than 10 red beans are permitted, so the rows
+#' # holding 11 to 15 are reported:
+#' bean_limits <- tibble::tribble(~varA, ~varB, ~lgl_test, ~varA_boundaries, ~varB_boundaries,
+#' "red_beans", NA, "<=", "10", NA)
+#'
+#' identify_inconsistency(beans, bean_limits)
+#'
 identify_inconsistency <- function(data = NULL, consis_tbl = NULL, id_var = NULL) {
   
   # prep id_var -----------------------------------------------------------------------------------
@@ -268,7 +386,24 @@ identify_inconsistency <- function(data = NULL, consis_tbl = NULL, id_var = NULL
   # prep consis_tbl ---------------------------------------------------------------------------------
   consis_tbl %>%
     # rename column names in consis_tbl
-    dplyr::rename_with(function(x) c("var_a","var_b","lgl_test", "var_a_range","var_b_range")) %>%
+    dplyr::rename_with(function(x) c("var_a","var_b","lgl_test", "var_a_range","var_b_range")) ->
+    consis_tbl
+
+  # separate single-variable rules (no second variable) from the pairwise rules;
+  # the two are evaluated differently and their results combined at the end
+  univar_res <- NULL
+  if (any(is.na(consis_tbl$var_b))) {
+    univar_res <- check_univariate_rules(
+      dplyr::filter(consis_tbl, is.na(.data$var_b)), data, id_var)
+    consis_tbl <- dplyr::filter(consis_tbl, !is.na(.data$var_b))
+  }
+
+  # with only single-variable rules there are no pairwise tests to run
+  if (nrow(consis_tbl) == 0) {
+    return(finalise_inconsistencies(univar_res, data))
+  }
+
+  consis_tbl %>%
     dplyr::mutate(lgl_incon = NA, range_incon = NA) %>% # placeholder cols for later tests
     dplyr::left_join(vec_lists, by = c("var_a" = "var")) %>% # join lists of vectors from data
     dplyr::rename("values_a" = "vector") %>%
@@ -395,13 +530,53 @@ identify_inconsistency <- function(data = NULL, consis_tbl = NULL, id_var = NULL
                                    "range_incon",
                                    "compare_type"))) ->
     res
-  
+
   # return ---------------------------------------------------------------------------
-  if(nrow(res) > 0) {
+  # combine with any single-variable results. Unused rule columns are all-NA and
+  # so may be logical on one side and character on the other, hence the coercion.
+  finalise_inconsistencies(
+    dplyr::bind_rows(harmonise_rule_cols(res), harmonise_rule_cols(univar_res)),
+    data)
+}
+
+#' Coerce consistency rule columns to character
+#'
+#' Internal. Columns of a results table which describe the rule rather than the
+#' data are all-\code{NA} (and therefore logical) whenever that part of the rule
+#' is unused. This coerces them to character so that single-variable and
+#' pairwise results can be combined.
+#'
+#' @param x tibble of identified inconsistencies, possibly \code{NULL}.
+#' @return \code{x} with rule columns as character.
+#' @noRd
+harmonise_rule_cols <- function(x) {
+  # zero-row tables must still be coerced: their columns retain the logical type
+  # and `bind_rows()` rejects the mismatch even when there are no values
+  if (is.null(x)) {
+    return(x)
+  }
+  rule_cols <- c("var_a", "var_b", "lgl_test", "var_a_range", "var_b_range",
+                 "values_a", "values_b")
+  dplyr::mutate(x, dplyr::across(dplyr::any_of(rule_cols), as.character))
+}
+
+#' Report identified inconsistencies
+#'
+#' Internal. Warns and returns \code{res} if any inconsistencies were found,
+#' otherwise messages and returns \code{data} invisibly. Shared by the
+#' single-variable and pairwise code paths so both report identically.
+#'
+#' @param res tibble of identified inconsistencies, possibly \code{NULL}.
+#' @param data data frame which was checked.
+#' @return \code{res} or, if empty, \code{data} invisibly.
+#' @noRd
+finalise_inconsistencies <- function(res, data) {
+  if(!is.null(res) && nrow(res) > 0) {
     warning("One or more inconsistencies were identified. They are shown in the returned tibble.",
             call. = FALSE)
     return(res)
   } else {
     message("No inconsistencies were found.")
-    invisible(data)}
+    invisible(data)
+  }
 }
