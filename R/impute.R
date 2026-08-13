@@ -220,6 +220,16 @@ impute_vector <- function(x, method = "median", constant = NULL, var = NULL) {
 #' @importFrom magrittr %>%
 #' @family high level functionality
 #' @return \code{data} with missing values in the selected variables imputed.
+#' @references Kowarik, A. & Templ, M. Imputation with the R Package VIM.
+#'   \emph{Journal of Statistical Software} \strong{74}, 1-16 (2016).
+#'   \doi{10.18637/jss.v074.i07}
+#'
+#'   Gower, J. C. A General Coefficient of Similarity and Some of Its
+#'   Properties. \emph{Biometrics} \strong{27}, 857-871 (1971).
+#'   \doi{10.2307/2528823}
+#'
+#'   Little, R. J. A. & Rubin, D. B. \emph{Statistical Analysis with Missing
+#'   Data}. (John Wiley & Sons, 2019).
 #' @export
 #'
 #' @examples

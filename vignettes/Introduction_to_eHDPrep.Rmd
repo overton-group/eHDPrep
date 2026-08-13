@@ -572,7 +572,7 @@ nums_to_NA(data = example_data, patient_id, nums_to_replace = c(1,3))
 
 ### Imputing missing values {#impute-missing-values}
 
-Once missingness is consistently represented as `NA`, remaining missing values can be *imputed* (filled in with estimated values) using `impute_missing_values()`. Imputation is useful for downstream analyses (e.g. machine learning) which cannot handle missing values, but it should be applied thoughtfully as it introduces estimated, rather than observed, values.
+Once missingness is consistently represented as `NA`, remaining missing values can be *imputed* (filled in with estimated values) using `impute_missing_values()`. Imputation is useful for downstream analyses (e.g. machine learning) which cannot handle missing values, but it should be applied thoughtfully as it introduces estimated, rather than observed, values. The single-value methods below assume values are missing completely at random; where this does not hold, imputation can bias subsequent analyses, and the mechanism of missingness should be considered first [@little2019].
 
 The `method` argument selects the imputation strategy:
 
@@ -595,9 +595,9 @@ impute_missing_values(example_data)
 impute_missing_values(example_data, diabetes_type, method = "mode")
 ```
 
-The simple methods above impute each variable independently. `impute_missing_values()` also supports **k-nearest-neighbours (kNN) imputation** (`method = "knn"`), which estimates each missing value from the `k` most similar rows (samples), using the remaining variables as predictors. Similarity is measured with Gower distance, allowing mixed numeric and categorical data to be handled together. Because it draws on the whole row's profile rather than a single column-wide summary, kNN better preserves the relationships between variables.
+The simple methods above impute each variable independently. `impute_missing_values()` also supports **k-nearest-neighbours (kNN) imputation** (`method = "knn"`), which estimates each missing value from the `k` most similar rows (samples), using the remaining variables as predictors. Similarity is measured with Gower distance [@gower1971], allowing mixed numeric and categorical data to be handled together. Because it draws on the whole row's profile rather than a single column-wide summary, kNN better preserves the relationships between variables.
 
-kNN imputation is provided by the 'VIM' package, which is only required (a suggested, not mandatory, dependency) when this method is used. Variables which should not be used to compute similarity (such as a row identifier) can be excluded with the `ignore` argument:
+kNN imputation is provided by the 'VIM' package [@kowarik2016], which is only required (a suggested, not mandatory, dependency) when this method is used. Variables which should not be used to compute similarity (such as a row identifier) can be excluded with the `ignore` argument:
 
 ```{r, eval = requireNamespace("VIM", quietly = TRUE)}
 # k-nearest-neighbours imputation, excluding the identifier from the
