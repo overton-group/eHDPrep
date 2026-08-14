@@ -188,9 +188,7 @@ The permitted datatypes are: `"id"`, `"numeric"`, `"double"`, `"integer"`, `"cha
 
 `assume_var_classes()` labels character and factor variables with exactly two unique non-missing values as `"binary"`, and those with more than two but no more than `factor_threshold` (default `5`) unique values as `"factor"`. Factor detection can be disabled with `factor_threshold = 0` or `NULL`. Variables classed as `"numeric"` are converted with `coerce_numeric_vars()`, which reports any values that could not be parsed and were therefore set to `NA`; this is applied automatically by `apply_quality_ctrl()`.
 
-The data types for `example_data`, after the manual amendments described above, are shown below. `assume_var_classes()` can only infer a class from the values it sees, so the domain-specific classes are supplied by the user at this stage: `patient_id` becomes `"id"`, `t_stage` and `n_stage` become the precoded ordinal types, the two SNP variables become `"genotype"`, and `free_text` becomes `"freetext"`. The two-category variables `hypertension` and `rural_urban` are detected as `"binary"` automatically and are kept as such.
-
-`diabetes_type` illustrates why this manual review step matters. It has exactly two non-missing values (`"Type I"` and `"Type II"`), so it is detected as `"binary"`, but clinically it is an ordinal classification. It is therefore amended to `"ordinal"`, and because its levels are not precoded it is left unmodified by `apply_quality_ctrl()`. Automatic detection describes the values; only the user can supply the meaning.
+The data types for `example_data`, after the manual amendments described above, are shown below. `assume_var_classes()` can only infer a class from the values it sees, so the domain-specific classes are supplied by the user at this stage: `patient_id` becomes `"id"`, `t_stage` and `n_stage` become the precoded ordinal types, the two SNP variables become `"genotype"`, and `free_text` becomes `"freetext"`. The two-category variables `hypertension`, `rural_urban` and `diabetes_type` are detected as `"binary"` automatically and are kept as such. In the case of `diabetes_type`, `"Type I"` and `"Type II"` are distinct classifications rather than ordered levels, so an unordered two-level encoding is appropriate; a variable whose two categories *were* ordered would instead be classed as `"ordinal"` and given explicit levels.
 
 Note also that `diabetes` is detected as `"factor"` rather than `"binary"` because it has three distinct raw values (`"Yes"`, `"No"` and the missingness string `"missing"`). Once missingness is standardised to `NA` (see [Encoding missing values]) only two values remain, and `apply_quality_ctrl()` treats it as binary from that point on.
 
@@ -202,7 +200,7 @@ tibble::tribble(~"var", ~"datatype",
 "t_stage", "ordinal_tstage",
 "n_stage", "ordinal_nstage",
 "diabetes", "factor",
-"diabetes_type", "ordinal",
+"diabetes_type", "binary",
 "hypertension", "binary",
 "rural_urban", "binary",
 "marital_status", "factor",
@@ -243,7 +241,7 @@ the `example_data` with the following parameters (please see below):
 
 -   `class_tbl`: The object shown above describing variables' data types.
 
--   `bin_cats:` A character vector showing how variables with two options should be encoded with the syntax `negative_finding = positive_finding`. If positivity/negativity is not associated with the binary categories of a variable (e.g. `rural_urban` in `example_data`) then the ordering can be arbitrarily decided. A pair must be supplied for every variable classed as `"binary"`; a binary variable whose two values match no pair in `bin_cats` is left unmodified.
+-   `bin_cats:` A character vector showing how variables with two options should be encoded with the syntax `negative_finding = positive_finding`. If positivity/negativity is not associated with the binary categories of a variable (e.g. `rural_urban` in `example_data`) then the ordering can be arbitrarily decided. A pair must be supplied for every variable classed as `"binary"`; a binary variable whose two values match no pair in `bin_cats` is left unmodified. Here `"Type I" = "Type II"` is included so that `diabetes_type` is encoded — the ordering carries no meaning in this case, as the two diabetes types are distinct classifications rather than ranked levels.
 
 -   `min_freq`: The minimum frequency of occurrence for groups of proximal words in free-text variables. Those which meet this threshold are added as logical variables (see `?extract_freetext` and `?skipgram_append`). This is ignored if there are no free-text variables specified in `class_tbl`.
 
@@ -253,7 +251,8 @@ the `example_data` with the following parameters (please see below):
 apply_quality_ctrl(data = example_data,
                    id_var = patient_id,
                    class_tbl = data_types,
-                   bin_cats =c("No" = "Yes", "rural" = "urban"),
+                   bin_cats =c("No" = "Yes", "rural" = "urban",
+                               "Type I" = "Type II"),
                    min_freq = 0.6)
 
 ```
