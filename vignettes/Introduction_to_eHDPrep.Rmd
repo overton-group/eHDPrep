@@ -25,7 +25,7 @@ link-citations: yes
 vignette: >
   %\VignetteIndexEntry{Introduction to eHDPrep}
   %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}bibliography: references.bib
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r, include=FALSE}
@@ -571,7 +571,7 @@ nums_to_NA(data = example_data, patient_id, nums_to_replace = c(1,3))
 
 ### Imputing missing values {#impute-missing-values}
 
-Once missingness is consistently represented as `NA`, remaining missing values can be *imputed* (filled in with estimated values) using `impute_missing_values()`. Imputation is useful for downstream analyses but it should be applied thoughtfully as it introduces estimated, rather than observed, values. The single-value methods below assume values are missing completely at random; where this does not hold, imputation can bias subsequent analyses, and the mechanism of missingness should be considered first [@little2019].
+Once missingness is consistently represented as `NA`, remaining missing values can be *imputed* (filled in with estimated values) using `impute_missing_values()`. Imputation is useful for downstream analyses but it should be applied thoughtfully as it introduces estimated, rather than observed values. The single-value methods below assume values are missing completely at random; where this does not hold, imputation can bias subsequent analyses, and the mechanism of missingness should be considered first [@little2019].
 
 The `method` argument selects the imputation strategy:
 

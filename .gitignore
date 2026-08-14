@@ -6,6 +6,7 @@
 /Meta/
 
 .claude/
+.DS_Store
 
 # generated artefacts
 /Rplots.pdf
