@@ -38,9 +38,11 @@ statistical_mode <- function(x) {
 ##' Fill value for imputing a vector
 ##'
 ##' Internal. Computes the single value with which \code{NA}s in \code{x} will
-##' be replaced. Numeric vectors support "median", "mean", and "mode";
-##' non-numeric vectors are always imputed with the mode (the most frequent
-##' value) as means and medians are undefined for them.
+##' be replaced. Numeric vectors support "median", "mean", and "mode". Dates and
+##' date-times are ordered, so they support the same methods, with the result
+##' returned in the original class. Other non-numeric vectors are always imputed
+##' with the mode (the most frequent value) as means and medians are undefined
+##' for them.
 ##'
 ##' @param x input vector
 ##' @param method one of "median", "mean", "mode", or "constant"
@@ -50,6 +52,23 @@ statistical_mode <- function(x) {
 impute_fill_value <- function(x, method = "median", constant = NULL) {
   if (method == "constant") {
     constant
+  } else if (inherits(x, "Date") || inherits(x, "POSIXt")) {
+    # dates are ordered, so a median/mean is meaningful; compute it on the
+    # underlying numeric and restore the class (and time zone, for date-times)
+    if (method == "mode") return(statistical_mode(x))
+    num <- as.numeric(x)
+    val <- switch(method,
+                  median = stats::median(num, na.rm = TRUE),
+                  mean   = mean(num, na.rm = TRUE),
+                  stop("Unsupported `method`: ", method, call. = FALSE))
+    if (inherits(x, "Date")) {
+      # a median of an even number of dates can fall between two days
+      structure(round(val), class = "Date")
+    } else {
+      tz <- attr(x, "tzone")
+      if (is.null(tz)) tz <- ""
+      as.POSIXct(val, origin = "1970-01-01", tz = tz)
+    }
   } else if (is.numeric(x)) {
     switch(method,
            median = stats::median(x, na.rm = TRUE),
@@ -288,17 +307,21 @@ impute_missing_values <- function(data, ..., method = "auto", constant = NULL,
       next
     }
 
+    # dates and date-times are ordered, so means and medians are meaningful for
+    # them even though `is.numeric()` is FALSE
+    ordered_x <- is.numeric(x) || inherits(x, "Date") || inherits(x, "POSIXt")
+
     # inform user when a mean/median request is downgraded to mode
-    if (method %in% c("mean", "median") && !is.numeric(x)) {
+    if (method %in% c("mean", "median") && !ordered_x) {
       message("`", nm, "` is not numeric: imputing with mode ",
               "instead of ", method, ".")
     }
 
-    # effective per-column method (auto dispatches by type; mean/median on a
-    # non-numeric column falls back to mode within impute_vector())
+    # effective per-column method (auto dispatches by type; mean/median on an
+    # unordered column falls back to mode within impute_vector())
     m <- if (method == "auto") {
-      if (is.numeric(x)) "median" else "mode"
-    } else if (method %in% c("mean", "median") && !is.numeric(x)) {
+      if (ordered_x) "median" else "mode"
+    } else if (method %in% c("mean", "median") && !ordered_x) {
       "mode"
     } else method
 

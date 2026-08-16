@@ -313,6 +313,11 @@ apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_fre
       select_by_datatype(class_tbl, c("numeric", "integer", "double"))))} else .} %>%
     strings_to_NA(dplyr::all_of(
       select_by_datatype(class_tbl, c("id","numeric", "integer", "double"), negate = TRUE))) %>%
+    # Dates are coerced after `strings_to_NA()` so that recognised missingness
+    # strings have already been removed and are not reported as unparseable.
+    {if (length(select_by_datatype(class_tbl, "date")) > 0)
+    {coerce_dates(., dplyr::all_of(
+      select_by_datatype(class_tbl, "date")))} else .} %>%
     # Imputation is performed on the raw (un-encoded) values so that mode
     # imputation fills genuine categories and kNN can use Gower distance on
     # mixed data. The id and freetext variables are excluded.
@@ -341,7 +346,9 @@ apply_quality_ctrl <- function(data, id_var, class_tbl, bin_cats = NULL, min_fre
         extract_freetext(., id_var = !! id_var, min_freq = min_freq,
                          dplyr::all_of(select_by_datatype(class_tbl, "freetext"))))
     } else .} %>%
-    encode_cats(dplyr::all_of(select_by_datatype(class_tbl, c("factor","character")))) ->
+    {if (length(select_by_datatype(class_tbl, c("factor","character"))) > 0)
+    {encode_cats(., dplyr::all_of(
+      select_by_datatype(class_tbl, c("factor","character"))))} else .} ->
     data
 
   if (to_numeric_matrix) {

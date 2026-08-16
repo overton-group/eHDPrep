@@ -184,9 +184,21 @@ assume_var_classes(data = example_data, out_file = tmp)
 import_var_classes(file = tmp)
 ```
 
-The permitted datatypes are: `"id"`, `"numeric"`, `"double"`, `"integer"`, `"character"`, `"factor"`, `"binary"`, `"ordinal"`, `"ordinal_tstage"`, `"ordinal_nstage"`, `"genotype"`, `"freetext"`, and `"logical"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. 'eHDPrep' provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
+The permitted datatypes are: `"id"`, `"numeric"`, `"double"`, `"integer"`, `"character"`, `"factor"`, `"binary"`, `"ordinal"`, `"ordinal_tstage"`, `"ordinal_nstage"`, `"genotype"`, `"freetext"`, `"logical"`, and `"date"`. Note that `ordinal` variables are not modified by `apply_quality_ctrl()` as the ordinal classes would need to be specified for each variable. 'eHDPrep' provides two special ordinal data types `"ordinal_tstage"` and `"ordinal_nstage"` for two common cancer staging measures where the orders are precoded.
 
 `assume_var_classes()` labels character and factor variables with exactly two unique non-missing values as `"binary"`, and those with more than two but no more than `factor_threshold` (default `5`) unique values as `"factor"`. Factor detection can be disabled with `factor_threshold = 0` or `NULL`. Variables classed as `"numeric"` are converted with `coerce_numeric_vars()`, which reports any values that could not be parsed and were therefore set to `NA`; this is applied automatically by `apply_quality_ctrl()`.
+
+Date and date-time variables are labelled `"date"`. Dates frequently arrive as text, so variables classed as `"date"` are converted with `coerce_dates()`, which parses common formats (`2020-01-15`, `15/01/2020`, and similar) and reports any values it could not interpret:
+
+```{r}
+coerce_dates(tibble::tibble(date_of_diagnosis = c("2020-01-15", "2020-03-15",
+                                                  "not recorded")),
+             date_of_diagnosis)
+```
+
+Day-first formats are recognised too, so `"15/01/2020"` is read as 15 January 2020 rather than the year 15. A single format is chosen per variable, however: this keeps the interpretation of ambiguous dates consistent across a variable, but means that a variable mixing formats will have the values in the minority format reported and set to `NA` rather than silently parsed under a different interpretation. Where this occurs, standardise the variable before quality control.
+
+Beyond this coercion, date variables are left unmodified by `apply_quality_ctrl()`, as they are already ordered and machine-interpretable. They participate in the other quality control steps as any other variable: they are included in completeness assessment, can be imputed (with the median date, since dates are ordered), can be compared in [Internal consistency] rules such as requiring a date of birth to precede a date of death, and are converted to days since 1970-01-01 by `encode_as_num_mat()`.
 
 The data types for `example_data`, after the manual amendments described above, are shown below. `assume_var_classes()` can only infer a class from the values it sees, so the domain-specific classes are supplied by the user at this stage: `patient_id` becomes `"id"`, `t_stage` and `n_stage` become the precoded ordinal types, the two SNP variables become `"genotype"`, and `free_text` becomes `"freetext"`. The two-category variables `hypertension`, `rural_urban` and `diabetes_type` are detected as `"binary"` automatically and are kept as such. In the case of `diabetes_type`, `"Type I"` and `"Type II"` are distinct classifications rather than ordered levels, so an unordered two-level encoding is appropriate; a variable whose two categories *were* ordered would instead be classed as `"ordinal"` and given explicit levels.
 
@@ -225,6 +237,7 @@ Data types are modified as follows:
 | `integer`             | Ignored                                                      |
 | `ordinal`             | Ignored                                                      |
 | `logical`             | Ignored                                                      |
+| `date`                | Coerced to `Date` with `coerce_dates()` if not already a date; values which cannot be parsed are set to `NA` and reported. Otherwise left unmodified, as dates are already ordered and machine-interpretable |
 | `ordinal_tstage`      | Converted to ordered factor with predetermined levels        |
 | `ordinal_nstage`      | Converted to ordered factor with predetermined levels        |
 | `binary`              | Converted to ordered factor with two levels, using the pair given in the `bin_cats` parameter (see `?encode_binary_cats`). Mixed boolean encodings (e.g. `"no"`, `"N"`, `"False"`) are normalised before matching. If no pair in `bin_cats` matches the variable's two values, it is left unmodified |

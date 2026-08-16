@@ -164,6 +164,94 @@ nums_to_NA <- function (data, ..., nums_to_replace = NULL) {
   }
 }
 
+#' Coerce columns to dates, replacing unparseable values with NA
+#'
+#' For each specified column, attempts to coerce the values to \code{\link{Date}}.
+#' Values that cannot be parsed (e.g. \code{"not recorded"} appearing in an
+#' otherwise date-valued column) are replaced with \code{NA}. A message lists
+#' the dropped values per column so the user is aware of what was discarded.
+#' Use \code{suppressMessages()} to silence.
+#'
+#' Columns which are already \code{Date} objects are left untouched. Date-time
+#' (\code{POSIXct}) columns are converted to \code{Date}, discarding the time of
+#' day; a message reports this, as it is a loss of information.
+#'
+#' Dates are parsed with the formats given in \code{formats}, tried in order.
+#' The default covers the ISO 8601 form (\code{"2020-01-15"}) and the common
+#' unambiguous variants. Note that formats are not guessed per value: a column
+#' is parsed with the first format which succeeds for all of its non-missing
+#' values, so mixed-format columns will report the values that did not parse.
+#'
+#' @param data A data frame, data frame extension (e.g. a tibble), or a lazy
+#'   data frame (e.g. from dbplyr or dtplyr).
+#' @param ... <\code{\link[dplyr]{dplyr_tidy_select}}> Columns to coerce.
+#'   If none are supplied, \code{data} is returned unchanged.
+#' @param formats character vector of date formats to try, in order, as
+#'   accepted by \code{\link{strptime}}. Default:
+#'   \code{c("\%Y-\%m-\%d", "\%Y/\%m/\%d", "\%d-\%m-\%Y", "\%d/\%m/\%Y")}.
+#' @return \code{data} with the specified columns coerced to \code{Date}.
+#' @seealso \code{\link{coerce_numeric_vars}}
+#' @importFrom rlang enquos expr
+#' @export
+#'
+#' @examples
+#' df <- data.frame(x = c("2020-01-15", "2020-02-30", "not recorded"),
+#'                  y = c("a", "b", "c"))
+#' # "2020-02-30" is not a real date and "not recorded" is not a date at all,
+#' # so both become NA and are reported:
+#' coerce_dates(df, x)
+coerce_dates <- function(data, ...,
+                         formats = c("%Y-%m-%d", "%Y/%m/%d",
+                                     "%d-%m-%Y", "%d/%m/%Y")) {
+  vars <- rlang::enquos(...)
+  if (length(vars) == 0L) return(data)
+
+  selected <- tidyselect::eval_select(rlang::expr(c(!!!vars)), data)
+  for (i in selected) {
+    x <- data[[i]]
+    nm <- names(data)[i]
+
+    if (inherits(x, "Date")) next
+
+    if (inherits(x, "POSIXt")) {
+      # a date-time is already unambiguous; drop the time of day but say so
+      message("`", nm, "`: converted from date-time to date, ",
+              "discarding the time of day.")
+      data[[i]] <- as.Date(x)
+      next
+    }
+
+    chr <- as.character(x)
+    n_present <- sum(!is.na(chr))
+    # Try each format, scoring it by how many values survive a round trip.
+    # Scoring on the parse alone is not enough: `strptime()` ignores trailing
+    # characters, so "15/01/2020" "parses" under "%Y/%m/%d" as the year 15.
+    # Re-formatting the result and comparing with the input rejects that.
+    best <- NULL
+    best_score <- -1L
+    for (fmt in formats) {
+      parsed <- as.Date(chr, format = fmt)
+      score <- sum(!is.na(parsed) & format(parsed, fmt) == chr, na.rm = TRUE)
+      if (score > best_score) {
+        best <- parsed
+        best_score <- score
+      }
+      if (score == n_present) break
+    }
+
+    dropped <- chr[is.na(best) & !is.na(chr)]
+    if (length(dropped) > 0L) {
+      uniq <- unique(dropped)
+      preview <- paste0("\"", utils::head(uniq, 10L), "\"", collapse = ", ")
+      more <- if (length(uniq) > 10L) paste0(" (+", length(uniq) - 10L, " more)") else ""
+      message("`", nm, "`: ", length(dropped),
+              " value(s) coerced to NA: ", preview, more)
+    }
+    data[[i]] <- best
+  }
+  data
+}
+
 #' Coerce columns to numeric, replacing non-numeric values with NA
 #'
 #' For each specified column, attempts to coerce the values to numeric.

@@ -103,9 +103,16 @@ import_dataset <- function(file, format = "excel", ...) {
 #' assume_var_classes(example_data, tmp)
 assume_var_classes <- function(data, out_file = NULL, factor_threshold = 5L) {
   data %>%
-    purrr::map_chr(class) %>%
+    # `class()` returns more than one value for some types (e.g. a date-time is
+    # c("POSIXct", "POSIXt")), so the first is taken to keep this one per column
+    purrr::map_chr(~class(.x)[1]) %>%
     tibble::enframe(name = "var", value = "datatype") ->
     classes
+
+  # dates and date-times are both reported as "date"
+  is_date <- purrr::map_lgl(data[classes$var],
+                            ~inherits(.x, "Date") || inherits(.x, "POSIXt"))
+  classes$datatype[is_date] <- "date"
 
   n_unique <- purrr::map_int(data[classes$var], ~dplyr::n_distinct(as.character(.x), na.rm = TRUE))
 
@@ -129,8 +136,8 @@ assume_var_classes <- function(data, out_file = NULL, factor_threshold = 5L) {
 #' Reads in output of \code{\link{assume_var_classes}}, ensures all specified
 #' datatypes are one of ("id", "numeric", "double", "integer", "character",
 #' "factor", "binary", "ordinal", "ordinal_tstage", "ordinal_nstage",
-#' "genotype", "freetext", "logical") as required for high level 'eHDPrep'
-#' functions.
+#' "genotype", "freetext", "logical", "date") as required for high level
+#' 'eHDPrep' functions.
 #'
 #' @param file character string. Path to output of
 #'   \code{\link{assume_var_classes}} which should be manually verified outside
@@ -151,7 +158,7 @@ import_var_classes <- function(file = "./datatypes.csv") {
   var_classes <- readr::read_csv(file)
   permitted_datatypes <- c("id", "numeric", "double", "integer", "character", "factor",
                            "binary", "ordinal", "ordinal_tstage", "ordinal_nstage",
-                           "genotype", "freetext", "logical")
+                           "genotype", "freetext", "logical", "date")
   # verify data structure
   if(!((all(names(var_classes) == c("var","datatype"))) &
        (length(names(var_classes)) == 2))) {

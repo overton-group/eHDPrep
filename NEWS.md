@@ -1,5 +1,40 @@
 # eHDPrep 2.0.0
 
+## Date variable support
+
+* Date and date-time variables are now supported throughout. A new `"date"`
+  datatype is accepted by `import_var_classes()` and produced by
+  `assume_var_classes()` for `Date` and `POSIXct`/`POSIXt` columns.
+* New function `coerce_dates()` converts variables classed as `"date"` to
+  `Date`, parsing common formats (`"2020-01-15"`, `"15/01/2020"`, and the
+  `/`- and `-`-separated variants of each) and reporting values which could not
+  be interpreted, in the same manner as `coerce_numeric_vars()`. Date-time
+  columns are converted to dates with a message noting the loss of the time of
+  day. It is applied automatically by `apply_quality_ctrl()`, after missingness
+  strings have been standardised so that they are not reported as unparseable.
+* Beyond this coercion, date variables are left unmodified by
+  `apply_quality_ctrl()`, as they are already ordered and machine
+  interpretable. They are included in completeness assessment, may be used in
+  internal consistency rules (e.g. requiring a date of birth to precede a date
+  of death), and are converted to days since 1970-01-01 by
+  `encode_as_num_mat()`.
+* `impute_missing_values()` now imputes dates and date-times with their median
+  (or mean) rather than falling back to the mode. Medians and means are
+  meaningful for dates as they are ordered, even though `is.numeric()` is
+  `FALSE` for them. The original class, and the time zone of a date-time, are
+  preserved.
+
+## Bug fixes for date and categorical handling
+
+* `assume_var_classes()` no longer fails on date-time variables. `class()`
+  returns two values for a `POSIXct` column (`"POSIXct"` and `"POSIXt"`), which
+  caused the error `Result must be length 1, not 2` and prevented the function
+  from being used at all on such datasets.
+* `apply_quality_ctrl()` no longer fails when a dataset contains no character or
+  factor variables. `encode_cats()` was called unconditionally and errored with
+  "`cols` must select at least one column" when it selected none, unlike the
+  other encoding steps which are skipped when they have nothing to do.
+
 ## Single-variable consistency rules
 
 * `identify_inconsistency()` and `validate_consistency_tbl()` now support rules
