@@ -1,3 +1,7 @@
+# eHDPrep 2.0.1
+
+* Added Kluivert Boakye Duah as package author.
+
 # eHDPrep 2.0.0
 
 ## Date variable support
@@ -139,6 +143,8 @@
   `R CMD check`. The tests are now run when the package is checked.
 * Added test coverage for `impute_missing_values()`, `coerce_numeric_vars()` and
   the imputation behaviour of `apply_quality_ctrl()`.
+  
+
 
 # eHDPrep 1.4.0
 

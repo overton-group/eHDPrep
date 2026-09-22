@@ -5,6 +5,9 @@ Version: 2.0.0
 Authors@R: c(person("Tom", "Toner", role = c("aut"),
                     email = "ttoner03@qub.ac.uk",
                     comment = c(ORCID = "0000-0001-8059-5822")),
+             person("Kluivert", "Boakye Duah", role = c("aut"),
+                    email = "kboakyeduah01@qub.ac.uk",
+                    comment = c(ORCID = "0009-0000-4314-9831")),
              person("Ian", "Overton", role = c("aut", "cre"),
                     email = "I.Overton@qub.ac.uk",
                     comment = c(ORCID = "0000-0003-1158-8527"))

@@ -1,6 +1,6 @@
 ---
 title: "'eHDPrep': an 'R' package for Electronic Health Data Quality Control and Semantic Enrichment"
-author: "Tom Toner, Ian Overton"
+author: "Tom Toner, Kluivert Boakye Duah, Ian Overton"
 output:
   pdf_document:
     toc: yes
@@ -76,7 +76,7 @@ Additionally, two "levels" of functions are provided:
 
 -   "Low-level" functions require more user interaction, but can be parameterised more extensively to accommodate specific aspects of a dataset. Some of the "low-level" functions are not provided in the "high-level" functions because they require additional user guidance; for example the merging function: `merge_cols()` (see [Merge variables]).
 
-Finally, this package is built using several packages from the ['tidyverse'](https://www.tidyverse.org/) and follows its structures and grammars [@wickham2019a]. Therefore, the `data` object can typically be [piped](https://magrittr.tidyverse.org/reference/pipe.html) through the functions of 'eHDPrep' which will be modified as described in the function's documentation and returned. We recommend that users have experience with the pipe operator and core 'tidyverse' packages before using 'eHDPrep'.
+Finally, this package is built using several packages from the ['tidyverse'](https://tidyverse.org/) and follows its structures and grammars [@wickham2019a]. Therefore, the `data` object can typically be [piped](https://magrittr.tidyverse.org/reference/pipe.html) through the functions of 'eHDPrep' which will be modified as described in the function's documentation and returned. We recommend that users have experience with the pipe operator and core 'tidyverse' packages before using 'eHDPrep'.
 
 # Data
 
