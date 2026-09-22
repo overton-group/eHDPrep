@@ -1,6 +1,7 @@
 # eHDPrep 2.0.1
 
 * Added Kluivert Boakye Duah as package author.
+* Updated the quality control workflow to include `impute_missing_values()`.
 
 # eHDPrep 2.0.0
 

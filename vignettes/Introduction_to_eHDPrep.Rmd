@@ -92,8 +92,8 @@ tibble::glimpse(example_data)
 The quality control functions aim to assess, improve, and compare the quality of a dataset along multiple quality dimensions: completeness, validity, accuracy, consistency, and uniqueness [@roebuck2011]. A suggested workflow for quality control is shown below. The order of these steps is defined by dependency, where later steps benefit from earlier steps. 
 
 ```{r echo=FALSE, fig.cap="Suggested workflow of low-level quality control functions in eHDPrep. Dashed lines and boxes represent optional steps.", fig.align='center'}
-# ![](./images/Figure_1.png)
-knitr::include_graphics("./images/Figure_1.png")
+# ![](./images/workflow.png)
+knitr::include_graphics("./images/workflow.png")
 ```
 
 
